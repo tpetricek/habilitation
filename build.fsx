@@ -10,11 +10,11 @@ let SUMATRAPDF = @"C:\Programs\Publishing\SumatraPDF\SumatraPDF.exe"
 
 let path = __SOURCE_DIRECTORY__
 
-let logf clr fmt = Printf.kprintf (fun s -> 
-  Console.ForegroundColor <- clr  
+let logf clr fmt = Printf.kprintf (fun s ->
+  Console.ForegroundColor <- clr
   printfn "[%s] %s" (DateTime.Now.ToLongTimeString()) s) fmt
 
-let updateTex() = 
+let updateTex() =
   logf ConsoleColor.DarkGray "running latex"
   let ps =
     ProcessStartInfo
@@ -24,11 +24,11 @@ let updateTex() =
         UseShellExecute = false,
         CreateNoWindow = true )
   let p = Process.Start(ps)
-  p.WaitForExit() 
-  logf (if p.ExitCode <> 0 then ConsoleColor.DarkRed else ConsoleColor.DarkGreen) 
+  p.WaitForExit()
+  logf (if p.ExitCode <> 0 then ConsoleColor.DarkRed else ConsoleColor.DarkGreen)
     "pdflatex completed (%d)" p.ExitCode
 
-let updateBib() = 
+let updateBib() =
   logf ConsoleColor.DarkGray "running bibtex"
   let run () =
     let ps =
@@ -39,8 +39,8 @@ let updateBib() =
           UseShellExecute = false,
           CreateNoWindow = true )
     let p = Process.Start(ps)
-    p.WaitForExit() 
-    logf (if p.ExitCode <> 0 then ConsoleColor.DarkRed else ConsoleColor.DarkGreen) 
+    p.WaitForExit()
+    logf (if p.ExitCode <> 0 then ConsoleColor.DarkRed else ConsoleColor.DarkGreen)
       "bibtex completed (%d)" p.ExitCode
   run ()
   updateTex ()
@@ -49,7 +49,7 @@ let updateBib() =
   run ()
   updateTex ()
 
-let watchTex() = 
+let watchTex() =
   let fsw = new FileSystemWatcher(path,"*.tex",IncludeSubdirectories=true)
   fsw.Changed.Add(fun _ ->
     fsw.EnableRaisingEvents <- false
@@ -57,7 +57,7 @@ let watchTex() =
     fsw.EnableRaisingEvents <- true )
   fsw.EnableRaisingEvents <- true
 
-let watchBib() = 
+let watchBib() =
   let fsw = new FileSystemWatcher(path,"*.bib",IncludeSubdirectories=true)
   fsw.Changed.Add(fun _ ->
     fsw.EnableRaisingEvents <- false
@@ -65,15 +65,16 @@ let watchBib() =
     fsw.EnableRaisingEvents <- true )
   fsw.EnableRaisingEvents <- true
 
-updateBib ()
-watchTex ()
-watchBib ()
-
 let ps =
   ProcessStartInfo
     ( FileName = SUMATRAPDF,
       Arguments = "\"" + __SOURCE_DIRECTORY__ + "\\" + FILE.Replace(".tex", ".pdf") + "\"",
       WorkingDirectory = path )
 
-let _ = Process.Start(ps)
+updateTex ()
+Process.Start(ps) |> ignore
+updateBib ()
+watchTex ()
+watchBib ()
+
 System.Threading.Thread.Sleep(System.Threading.Timeout.Infinite)
