@@ -7,6 +7,7 @@
 \usepackage{amsmath}
 \usepackage{natbib}
 \usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{graphicx}
 \usepackage{endnotes}
@@ -24,9 +25,42 @@
 % \usepackage{caladea}
 \usepackage[colorlinks]{hyperref} % [hidelinks]
 \usepackage{hypcap}
-\usepackage{fancyvrb}
+\usepackage{listings}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
 
-\DefineVerbatimEnvironment{thegamma}{Verbatim}{fontfamily=zi4,numbers=left,xleftmargin=6mm,fontsize=\small,commandchars=\\\{\}}
+\newcommand{\lsep}[0]{\;\; | \;\;}
+\newcommand{\kvd}[1]{\textnormal{\ttfamily\bfseries #1}}
+\newcommand{\ident}[1]{\textnormal{\ttfamily #1}}
+\newcommand{\qident}[1]{\textnormal{\ttfamily '#1'}}
+
+\newcommand{\langl}{\begin{picture}(4.5,7)
+\put(1.1,2.5){\rotatebox{60}{\line(1,0){5.5}}}
+\put(1.1,2.5){\rotatebox{300}{\line(1,0){5.5}}}
+\end{picture}}
+\newcommand{\rangl}{\begin{picture}(4.5,7)
+\put(.9,2.5){\rotatebox{120}{\line(1,0){5.5}}}
+\put(.9,2.5){\rotatebox{240}{\line(1,0){5.5}}}
+\end{picture}}
+\newcommand{\vect}[1]{\langl #1 \rangl}
+
+%\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}
+
+\newcommand{\tytagof}{\ident{tagof}}
+\newcommand{\reduce}{\rightsquigarrow}
+\newcommand{\sem}[1]{\llbracket #1 \rrbracket}
+\newcommand{\semalt}[1]{S(#1)}
+
+\newenvironment{nitemize}
+{ \vspace{-0.4em}
+  \begin{itemize}
+    \setlength{\itemsep}{5pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt} }
+{ \end{itemize}
+  \vspace{-0.4em} }
+
 
 \hypersetup{
 linkcolor=Black,
@@ -42,6 +76,39 @@ runcolor=Black
   \makebox[0pt][r]{\theenmark. \rule{0pt}{\dimexpr\ht\strutbox+}}%
 }
 
+\lstdefinestyle{mystyle}{
+  commentstyle=\color{ForestGreen},
+  keywordstyle=\color{NavyBlue},
+  stringstyle=\color{Maroon},
+  basicstyle=\ttfamily,
+  numbers=left,
+  numberstyle=\footnotesize,
+  xleftmargin=3em
+}
+
+\lstdefinelanguage{thegamma}{
+  keywords={let},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  sensitive=true
+}
+\lstdefinelanguage{sharp}{
+  keywords={var,in,foreach,let,type,null,match,with,for},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  sensitive=true
+}
+\lstdefinelanguage{ppython}{
+  keywords={False},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  sensitive=true
+}
+\lstset{style=mystyle}
+
 \urlstyle{sf}
 
 \widowpenalties 2 10000 0
@@ -50,8 +117,6 @@ runcolor=Black
 %\renewcommand*\thesection{\arabic{section}}
 %\setcounter{secnumdepth}{0} % sections are level 1
 
-\newcommand{\kvd}[1]{\textnormal{\ttfamily\bfseries #1}}
-\newcommand{\ident}[1]{\textnormal{\ttfamily #1}}
 
 \begin{document}
 \title{\Huge\textbf{Simple programming tools \\for data exploration}}
@@ -72,6 +137,10 @@ CUNI
 \tableofcontents
 
 \part{Commentary}
+
+% ==================================================================================================
+% CHAPTER 1: INTRODUCTION
+% ==================================================================================================
 
 \chapter{Introduction}
 
@@ -123,6 +192,8 @@ number of users, reducing the size of the gap on the side of programming.
 \end{figure}
 
 \section{How data journalists explore data}
+\label{sec:intro-ddj}
+
 To explain the motivation of this thesis, I use an example data exploration done in the context of
 data journalism \citep{bounegru-2021-handbook}. Following the phenomenal success of the swimmer
 Michael Phelps at the 2016 Olympic games, many journalists produced charts such as the one
@@ -150,19 +221,19 @@ range of options offered by the tool and can then be modified to change paramete
 visualization.
 
 \begin{figure}[t]
-\begin{thegamma}
-\kvd{let} data = olympics.'group data'.'by Team'.'sum Gold'.then
+\begin{lstlisting}[language=thegamma]
+let data = olympics.'group data'.'by Team'.'sum Gold'.then
     .'sort data'.'by Gold descending'.then
     .paging.skip(42).take(6)
     .'get series'.'with key Team'.'and value Gold'
 
-\kvd{let} phelps = olympics.'filter data'.'Athlete is'.'Michael Phelps'.then
+let phelps = olympics.'filter data'.'Athlete is'.'Michael Phelps'.then
     .'group data'.'by Athlete'.'sum Gold'.then
     .'get series'.'with key Athlete'.'and value Gold'
 
 charts.bar(data.append(phelps).sortValues(true))
     .setColors(["#94c8a4","#94c8a4","#94c8a4","#e30c94"])
-\end{thegamma}
+\end{lstlisting}
 \caption{Source code of the data analysis used to produce the visualization in
 Figure~\ref{fig:phelps}. The case study is based on the work presented in Chapter~\ref{ch:thegamma}.}
 \label{fig:gamma}
@@ -200,7 +271,7 @@ This context leads to a number of requirements for the envisioned data explorati
 
 ~
 
-\begin{itemize}
+\begin{nitemize}
 \item \emph{Gradual progression from simple to complex}. The system must allow non-program\-mers with
 limited resources to easily complete simple tasks in an interface that allows them to later
 learn more and tackle harder problems. In the technical dimensions of programming systems
@@ -220,7 +291,7 @@ many users learn the spreadsheet formula language.
 consumer of the data analyses. They should be able to study the analysis, but
 also make simple modifications such as changing analysis or visualization parameters,
 as is often done in interactive visualizations by journalists \citep{kennedy-2021-engagements}.
-\end{itemize}
+\end{nitemize}
 
 The above criteria point at the gap between spreadsheets and regular programming systems
 illustrated by Figure~\ref{fig:gap} and there are multiple possible solutions and approaches to
@@ -260,7 +331,7 @@ However, the programs that are constructed during data exploration have a number
 characteristics that distinguishes them from programs typically considered in programming
 langauge research:
 
-\begin{itemize}
+\begin{nitemize}
 \item \emph{Data exists alongside code}. Systems such as spreadsheets often mix
   data and code in a single environment. In conventional programming, this is done in
   image-based systems like Smalltalk, but not in the context of programming languages.
@@ -278,7 +349,7 @@ langauge research:
   often done using libraries and tools that are implemented outside of the tool that the analysts
   use. For example, spreadsheet formulas use mostly built-in functions, while data analyses in
   Python often use libraries implemented in C/C++ for performance reasons.
-\end{itemize}
+\end{nitemize}
 
 The above generally hold for simple data explorations that are done by data journalists, public
 servants and analysts that this thesis is primarily concerned with. The characteristics do not
@@ -351,7 +422,7 @@ of \citet{muller-2020-rhetoric} to make explicit how the term should be understo
 context of this thesis. The notion of simplicity is used as a unifying theme in this commentary,
 but it takes one of several more specific and rigorously evaluable forms:
 
-\begin{itemize}
+\begin{nitemize}
 \item In the context of user-centric work, I refer to a system as \emph{simple} if it allows
   non-programmers to complete tasks that are typically limited to programmers. This is the
   case when discussing the iterative prompting interaction principle in Chapters~\ref{ch:thegamma}
@@ -372,7 +443,7 @@ but it takes one of several more specific and rigorously evaluable forms:
   case for the notebook system presented in Chapter~\ref{ch:wrattler}, data access library
   in Chapter~\ref{ch:fsdata} and the language for creating visualizations in Chapter~\ref{ch:galois}.
   Using such high-level abstractions means that programmers have write less code.
-\end{itemize}
+\end{nitemize}
 
 The overarching theme of this thesis is thus the design of programming tools for data exploration
 that are simple in one or more of the meanings of the term indicated above. The focus on simplicity
@@ -499,7 +570,7 @@ and libraries. The concepts discussed in the previous section have been implemen
 several open-source software packages that are available under the permissive Apache 2.0 (F\# Data)
 and MIT (all other projects) licenses.
 
-\begin{itemize}
+\begin{nitemize}
   \item \textbf{F\# Data} (\url{https://github.com/fsprojects/FSharp.Data}) has became a widely-used
     F\# library for data access. It implements utilities, parsers and type providers for working
     with structured data in multiple formats (XML, JSON, HTML and CSV). The initial version based
@@ -529,19 +600,752 @@ and MIT (all other projects) licenses.
     since been developed into a general-purpose langauge for transparent, self-explanatory research
     outputs by the Institute of Computing for Climate Science, University of Cambridge.
     A live example can be found at \url{https://f.luid.org}.
-\end{itemize}
+\end{nitemize}
+
+% ==================================================================================================
+% CHAPTER 2: TYPE PROVIDERS
+% ==================================================================================================
 
 \chapter{Type providers}
 
-Accessing data has traditionally been easier in dynamically typed scripting languages,
-because the language does not need to consider the structure of the input data when
-checking if the program accesses it correctly. The type provider mechanism, originally
-implemented in F\# \citep{syme-2012-providers,syme-2013-inforich} makes it possible to achieve
-similar simplicity with static type checking by providing an extension -- a type provider -- that
-infers types based on external inputs. The provided types are then used to check
+The first step of the data science lifecycle outlined in the previous chapter was data acquisition.
+This typically involves reading data in semi-structured formats such as CSV, XML and JSON or
+retrieving data from a a database. The aim of the work on type providers, outlined in this chapter,
+is to make programmatic data acquisition reliable and simpler.
+
+The lack of reliability arises primarily from the fact that most data access code is written in
+dynamically-typed scripting languages. This is largely because using such langauges is easier.
+A dynamically-typed language does not need to consider the structure of the input data to
+check that the program accesses it correctly. If we retrieve a JSON object that represents a record
+with fields \texttt{title} and \texttt{link} and parse it into an object \texttt{item} in
+JavaScript, we can then access the fields using just \texttt{item.title} and \texttt{item.link}.
+The fields will exist at runtime, but the language does not need to know at compile-time whether
+they will be  available, because member access is not statically checked.
+
+In statically-typed programming languages, the situation is no better. The typical approach, illustrated
+in Figure~\ref{fig:rss}, is equally dynamic, but more verbose. Object fields are accessed using
+a string-based lookup, which can easily contain fields that do not exist at runtime (indeed, there
+is an uncaught typo on line 6!) and, moreover, the lookup has to be done using an additional method
+invocation and may require tedious type coversions. The first challenge we face is how to
+make accessing data in semi-structured formats, such as JSON, XML and CSV, as simple as in
+dynamically-typed languages (a matter of just using a dot), but support checking that will
+statically guarantee that the accessed fields will be present at runtime.
+
+However, the simplicity of data access in dynamic scripting langauge also has its limits. It is easy to
+access individual fields, but the code gets more complicated if we want to perform a simple
+query over the data. Consider, for example, the query in Figure~\ref{fig:pandas}.
+
+\begin{figure}[h!]
+\vspace{-0.33em}
+\begin{lstlisting}[language=sharp]
+var url = "http://dvd.netflix.com/Top100RSS";
+var rss = XDocument.Load(topRssFeed);
+var channel = rss.Element("rss").Element("channel");
+
+foreach(var item in channel.Elements("item")) {
+  Console.WriteLine(item.Element("titel").Value);
+}
+\end{lstlisting}
+\vspace{-0.33em}
+\caption{Printing titles of items from an RSS feed in C\#. The snippet uses dynamic lookup to
+find appropriate elements in the XML and extracts and prints the title of each item.}
+\label{fig:rss}
+\end{figure}
+
+\begin{figure}[t]
+\begin{lstlisting}[language=ppython]
+olympics = pd.read_csv("olympics.csv")
+olympics[olympics["Games"] == "Rio (2016)"]
+  .groupby("Athlete")
+  .agg({"Gold": sum})
+  .sort_values(by="Gold", ascending=False)
+  .head(8)
+\end{lstlisting}
+\caption{Data transformation written using pandas in Python. The code loads a CSV file with
+Olympic medal history, gets data for Rio 2016 games, groups the data by athlete and sums their
+number of gold medals and, finally, takes the top 8 athletes.}
+\label{fig:pandas}
+\end{figure}
+
+Despite being widely accepted as simple, the Python code snippet involves a remarkable number
+of concepts and syntactic elements that the user needs to master:
+
+\begin{nitemize}
+\item \emph{Generalised indexers} (\texttt{.[ condition ]}) are used to filter the data. This is
+  further complicated by the fact that \texttt{==} is overloaded to work on a data series and the
+  indexer accepts a Boolean-valued series as an argument.
+\item \emph{Python dictionaries} (\texttt{\{"key": value\}}) are here used not to specify a lookup
+  table, but to define a list of aggregation operations to apply on individual columns. It also
+  determines the columns of the returned data table.
+\item \emph{Well-known names}. The user also has to remember the (somewhat inconsistently named)
+  names of operations such as \texttt{groupby} and \texttt{sort\_values} and remember the
+  column names from their data source such as \texttt{"Athlete"}.
+\end{nitemize}
+
+To make data acquisition simpler, the user should not need this many concepts and they should not
+need to remember the names of operations or the names of columns in their data source.
+Moreover, their code should be checked to ensure that it accesses the correct supported
+operations and applies them on compatible data that exist in the data source. As I will show later,
+this can be achieved using type providers, a concept that originated in the F\# programming language
+in the early 2010s.
+
+\section{Information-rich programming}
+In the 2010s, applications increasingly relied on external data sources and APIs for their
+function. The typical solution for accessing such data was either to use a scripting language,
+a dynamic access library (both illustrated above) or a code-generation tool that would generate
+code for accessing the data source or an API (although only for data sources with small enough
+schema). This provided the motivation for the type provider mechanism in F\#
+\citep{syme-2012-providers,syme-2013-inforich}, which made it possible to make the type checker
+in a statically-typed programming language aware of the structure of external data sources.
+
+Technically, a type provider in F\# is an extension that is executed by the compiler at
+compile-time. A type provider can run arbitrary code, such as access read a database schema or
+access another external data source. It then generates a representation of a type that is
+passed to the compiler and used to check the user program. For example, the World Bank
+type provider (Figure~\ref{fig:wb}) retrieves the list of known countries and indicators from
+the World Bank database (by querying the REST API provided by the World Bank) and generates
+a collection of types. The \texttt{WorldBank} type has a \texttt{GetDataContext} method, which
+returns an instance of a type with the \texttt{Countries} member and the type returned by this
+member has one member corresponding to each country in the World Bank database.
+The World Bank type provider, created by the auhtor of this thesis and presented in a report
+\citep{syme-2012-providers} not included here, shows two important properties of type providers:
+
+\begin{figure}[t]
+\begin{lstlisting}[language=sharp]
+type WorldBank = WorldBankDataProvider<"World Development Indicators">
+let data = WorldBank.GetDataContext()
+
+data.Countries.``United Kingdom``.Indicators
+  .``Central government debt, total (% of GDP)``
+\end{lstlisting}
+\vspace{-0.5em}
+\caption{The World Bank type provider \citep{syme-2012-providers} provides access to indicators
+collected by the World Bank. The countries and indicators are mapped to properties (members)
+of an F\# class that represents the data.}
+\vspace{-0.5em}
+\label{fig:wb}
+\end{figure}
+
+\begin{nitemize}
+\item \emph{Static type provider parameters.} A type provider in F\# can take literal values
+  (such as \texttt{"World Development Inicators"}) as parameters. They can be used when the provider
+  is executed (at compile-time) to guide how types are generated. Here, the parameter specifies
+  a particular database to use as the source. These can be names of files with schema, connection
+  strings or live URLs.
+
+\item \emph{Lazy type generation.} The types generated by a type provider are generated lazily, i.e.,
+  the members of a type (and the return types of those members) are only generated when the type
+  checker encounters the type in code. This makes it possible to import very large (potentially
+  infinite) external schema into the type system.
+\end{nitemize}
+
+There are other interesting aspects of type providers, but the above two features are crucial
+for the work included in this thesis. In the following two sections, I review the key contributions
+to type providers presented in Part~\ref{part:providers} make data acquisition reliable
+and simpler.
+%
+The work on type providers included in this thesis develops two kinds of type providers.
+The type providers for CSV, JSON and XML packaged in the F\# Data library make it possible
+to access data in a statically-checked way using ordinary member access. The work also makes
+two theoretical contributions, an algorithm for schema inference from sample data and a
+programming langugae theory of type providers.
+
+The pivot type provider, developed for the experimental programming language The Gamma,
+makes it possible to construct queries such as that shown in Figure~\ref{fig:pandas} (and
+was mentioned briefly in Section~\ref{sec:intro-ddj}). It adapts the theory developed for the
+F\# Data type providers to show that only correct queries can be constructed when using it.
+%
+The full account of the work can be found in Chapter~\ref{ch:fsdata} and
+Chapter~\ref{ch:dotdriven}, respectively. The following provides an accessible high-level overview
+of the contributions.
+
+\section{Type providers for semi-structured data}
+The F\# Data library implements type providers for accessing data in XML, JSON and CSV formats.
+It is based on the premise that most real-world data sources using those formats do not have an
+explicit schema. The type providers thus infer the schema from a sample (or a collection of
+samples). The inferred schema is then mapped to F\# types through which the user of the type
+provider can access the data.
+
+\begin{figure}[t]
+\begin{lstlisting}[language=sharp]
+// worldbank.json - a sample response used for schema inference
+[ { "page": 1, "pages": 1, "per_page": "1000", "total": 53 },
+  [ { "indicator": { "id": "GC.DOD.TOTL.GD.ZS" },
+      "country": { "id": "CZ" },
+      "date": "2011", "value": null },
+    { "indicator": { "id": "GC.DOD.TOTL.GD.ZS" },
+      "country": { "id": "CZ" },
+      "date": "2010", "value": 35.1422970266502 } ] ]
+\end{lstlisting}
+\begin{lstlisting}[language=sharp]
+// demo.fsx - a data acquisition script using a type provider
+type WB = JsonProvider<"worldbank.json">
+let wb = WB.Load("http://api.worldbank.org/.../GC.DOD.TOTL.GD.ZS?json")
+
+printf "Total: %d" wb.Record.Total
+for item in wb.Array do
+  match item.Value with
+  | Some v -> printf "%d %f" item.Date v
+  | _ -> ()
+\end{lstlisting}
+\caption{Using the .JSON type provider for accessing data from a REST API. The inference uses
+a local sample file, while at runtime, data is obtained by calling the live service.}
+\label{fig:json}
+\end{figure}
+
+The example shown in Figure~\ref{fig:json} illustrates one typical use. Here, the user is
+accessing information from a service that returns data as JSON (incidentally, the service is also
+the World Bank, but here we treat it as an ordinary REST service). The user stored a local copy
+of a sample response from the service (\texttt{worldbank.json}) and uses it as a static parameter
+for the JSON type provider (line 2). They then load data from the live service (line 3)
+and print the total number of items (line 5) as well as each year for which there is a value
+(line 8). Three aspects of the type provider deserve particular attention:
+
+\begin{nitemize}
+\item \emph{Real-world schema inference is hard.} Here, the response is an array always containing
+  two items, a record with meta-data and an array with individual data points. The data records
+  have consistent structure, although some values may be \kvd{null}.
+\item \emph{Inference needs to be stable.} The type providers allow adding further samples. If the
+  user adds further examples, the structure of the provided types should change in a predictable
+  (and limited) way so that the user code can be easily updated.
+\item \emph{Safety guaranteed by static checks is relative.} Static type checking guarantees that
+  only data available in the sample input can be accessed in user code, but if the data loaded at
+  runtime have different structure, this will not prevent errors. We thus need to specify what
+  exactly can the system guarantee about programs.
+\end{nitemize}
+
+The F\# Data type providers, presented in full in Chapter~\ref{ch:fsdata} offer an answer to
+all of these three challenges. They can infer shape of real-world data, infer types with a stable
+structure and capture the runtime guarantees formally through the relative safety property. The
+publication also presented novel programming language theory that made it possible to analyze type
+providers formally, which I briefly review in the next three sections.
+
+\subsection{Shape inference and provider structure}
+When the type provider for semi-structured data is used, it is given a sample of data that
+can be analysed at compile time (such as the \texttt{"worldbank.json"} file name above). It
+uses this to infer the shape of the data. A shape is a structure similar to a type and is
+composed from primitive shapes, record shapes, collections and a few other special shapes:
+%
+\begin{equation*}
+\begin{array}{rcl}
+ \hat{\sigma} &=& \nu \; \{ \nu_1 \!:\! \sigma_1, \,\ldots\,, \nu_n \!:\! \sigma_n \}\\
+                &|& \ident{float} \lsep \ident{int} \lsep \ident{bool} \lsep \ident{string}\\
+       \sigma &=& \kvd{nullable}\langl \hat{\sigma} \rangl \lsep [\sigma] \lsep \kvd{any} \lsep \kvd{null}  \lsep ~\bot~
+\end{array}
+\end{equation*}
+%
+The inference distinguishes between non-nullable shapes ($\hat{\sigma}$) and nullable shapes
+($\sigma$), which can be inferred even when the collection of inputs contains the \kvd{null}
+value. The former consist of primitive shapes (inferred from a corresponding value) and
+a record shape. The record shape has an (optional) name $\nu$ and consists of a multiple fields
+that have their own respective shapes. A record is the shape inferred for JSON objects, but also
+XML elements containing attributes and child elements. A non-nullable shape can be made nullable
+by explicitly wrapping it as $\kvd{nullable}\langl \hat{\sigma} \rangl$. Other nullable shapes
+include collections (a \kvd{null} value is treated as an empty collection) and shapes that represent
+any data, only null values and the bottom shape $\bot$, representing no information about the shape.
+The anove definition does not include handling of choice shapes (corresponding to sum types), which
+is introduced later.
+
+A key techincal operation of the shape inference is expressed using the \emph{common preferred shape}
+function written as $\sigma_1 \triangledown \sigma_2 = \sigma$. Given two shapes, the function
+returns a shape the most specific shape that can be used to represent values of both of the two
+given shapes. The details are discussed later, but it is worth illustrating how the function works
+using two examples.
+
+\begin{nitemize}
+\item $\ident{int} \,\triangledown\, \ident{float} = \ident{float}\quad$ In this case, the common
+  preferred shape is \ident{float}. This may lead to a loss of precision, but it makes accessing
+  the data easier than if we inferred a shape representing a choice shape. This is one example
+  where the system favors practical usability over formal correctness.
+\item $\{ \textit{x} \!:\! \ident{int} \} \,\triangledown\,
+  \{ \textit{x} \!:\! \ident{int}, \textit{y} \!:\! \ident{int} \} =
+  \{ \textit{x} \!:\! \ident{int}, \textit{y} \!:\! \kvd{nullable}\langl\ident{int}\rangl \}\quad$
+  In this case, the common preferred shape is a record where the field that was missing in one
+  of the shapes is marked as \kvd{nullable}. In general, the system aims to infer records whenever
+  possible, which is the key for the stability of inferred types discussed below.
+\end{nitemize}
+
+When the type provider is used, it receives a sample data value and uses it to infer the expected
+shape of data. A data value is modelled formally as a value that can be either a primitive value
+(integer $i$, floating-point value $f$, string $s$, a Boolean or \kvd{null}), a collection of values
+or a record with fields that have other values:
+%
+\begin{equation*}
+\begin{array}{lcl}
+  \\[-0.5em]
+ d &=& i \lsep f \lsep s \lsep \kvd{true} \lsep \kvd{false} \lsep \kvd{null} \\[0.1em]
+   &|& [d_1; \ldots; d_n] \lsep \nu~\{ \nu_1 \mapsto d_1, \ldots, \nu_n \mapsto d_n \}
+\end{array}
+\end{equation*}
+%
+The shape inference is then defined as a function $\semalt(d_1, \ldots, d_n)=\sigma$ that takes a
+collection of data values and infers a single shape $\sigma$ that represents the shape of all the
+specified values. (Note that this can always be defined. In case where values are of incompatible
+shape, the system infers the shape $\kvd{any}$.)
+
+\begin{equation*}
+\begin{array}{rclcrclcrcl}
+ \semalt{i} &=& \ident{int} && \semalt{\kvd{null}}  &=& \kvd{null} && \semalt{\kvd{true}} &=& \ident{bool}\\[0.3em]
+ \semalt{f} &=& \ident{float} && \semalt{s} &=& \ident{string} && \semalt{\kvd{false}}  &=& \ident{bool}\\
+\end{array}
+\end{equation*}
+\noindent
+\vspace{-0.6em}
+\begin{equation*}
+\begin{array}{l}
+ \semalt{[d_1; \ldots; d_n]} = [\semalt{d_1, \ldots, d_n}] \\[0.5em]
+ \semalt{\nu~\{ \nu_1 \mapsto d_1, \ldots, \nu_n \mapsto d_n \}} = \nu~\{ \nu_1:\semalt{d_1}, \ldots, \nu_n :\semalt{d_n} \} \\[0.5em]
+ \semalt{d_1, \ldots, d_n} = \sigma_n ~\textnormal{where}~ \sigma_0 = \bot,~ \forall i\in \{ 1.. n \}.~ \sigma_{i-1} \triangledown \semalt{d_i} \vdash \sigma_i \\[0.6em]
+\end{array}
+\end{equation*}
+%
+The shape inference is primarily defined on individual data values. For those, the system infers
+the shape corresponding to the value. For lists, we infer the shape based on all the values in
+the list. Finally, the last rule handles multiple sample data values by inferring their individual
+shapes and combining them using the  $\triangledown$ function.
+
+The last aspect of the formal programming language model of type providers is the logic that,
+given an inferred shape, produces the corresponding F\# type. To explain the important
+properties of type providers, we do not need to elaborate what an F\# type is here, but the most
+important case is a class with members (properties or methods). A type provider takes the inferred
+shape and produces an F\# type $\tau$ for the shape, a collection of classes $L$ that may appear
+in $\tau$ (typically as types of members in case $\tau$ is a class). The type provider also needs
+to generate code that turns a raw data value $d$ passed as input at runtime into a value of the
+provided type $\tau$, which is represented as an expression $e$:
+%
+\begin{equation*}
+\sem{\sigma} = (\tau, e, L) \qquad (\textnormal{where}~L,\emptyset \vdash e:\ident{Data}\rightarrow\tau)
+\end{equation*}
+%
+The mapping $\sem{\sigma}$ takes an inferred shape $\sigma$ and returns a tripple consisting of an
+F\# type $\tau$, a function turning a data value into a value of type $\tau$ and a collection of
+classes $L$.
+
+This brief overview of the formal model of type providers for semi-structured data makes it possible
+to formulate the two key results about the F\# Data type providers. The first describes the relative
+type safety of programs written using a type provider and is a novel variation on the classic
+type safety property of programming langauge research. The second describes the
+stability of provided types and concerns usability of the system.
+
+\subsection{Relative safety of checked programs}
+
+The aim of type systems, in general, is to ensure that programs which passed type checking do not
+contain a certain class of errors. This has been characterised by \citet{milner-1978-gowrong}
+using a famous slogan ``Well typed programs do not go wrong'' (with \textit{wrong} being a formal
+entity in Milner's system). A code written using a type provider can go wrong if the
+input obtained at runtime is of a structure that does not match the structure of the input used
+as a sample for shape inference at compile time.
+
+However, thanks to the formal model defined above, the property can be specified precisely and,
+most importantly, we can specify for which inputs the programs written using a type provider will
+never fail because of invalid data access. The definition relies on a preferred shape relation
+$\sqsubseteq$, which captures the fact that one shape is more specific than another (if
+$\sigma_1 \sqsubseteq \sigma_2$ then $\sigma_1 \triangledown \sigma_2 = \sigma_2$).
+%
+The theorem is also defined in terms of the $\reduce$ operation, which captures the operational
+semantics of the programs of the language used in the formal model. The relation $e_1 \reduce e_2$
+specifies that an expression $e_1$ reduces to $e_2$ in a single step (and $\reduce^{*}$ is the
+transitive closure of $\reduce$).
+
+\begin{theorem}[Relative safety]
+\label{thm:safety}
+Assume $d_1, \ldots, d_n$ are samples, $\sigma=\semalt{d_1, \ldots, d_n}$ is an inferred
+shape and $\tau,e,L = \sem{\sigma}$ are a type, expression and class definitions generated by a
+type provider.
+
+For all inputs $d'$ such that $\semalt{d'} \sqsubseteq \sigma$ and all expressions $e'$
+(representing the user code) such that $e'$ does not contain any of the dynamic data operations $op$
+and any \ident{Data} values as sub-expressions and $L; y\!:\!\tau \vdash e'\!:\!\tau'$, it is
+the case that $L, e[y\leftarrow e'~d'] \reduce^{*} v$ for some value $v$ and
+also $\emptyset; \vdash v : \tau'$.
+\end{theorem}
+\vspace{-0.2em}
+
+In other words, the relative safety property specifies that, for any program that the user may
+write using a type provider (without using low-level functions that are only usable accessible
+inside a type provider), if the program is executed with any input whose shape is more specific
+than the shape inferred from statically known samples, the program will not encounter a data-related
+runtime error. It is, of course, still possible for runtime errors to happen, but not with a
+well-chosen sample and, as the wide-ranging adoption of the F\# Data library suggests,\footnote{The
+package is one of the most downloaded F\# libraries at the \url{https://www.nuget.org} package
+repository and the open-source project at \url{https://github.com/fsprojects/FSharp.Data} has
+over 100 contributors.} this is often a sufficient guarantee in practice.
+
+\subsection{Stability of provided types}
+When the user of an F\# Data type provider gets a runtime error, this is because the
+data source they use produced an input of a structure not encountered before. A typical example
+is an input that includes \kvd{null} in a field that previously always had a value.
+Such errors are inevitable (without an explicit schema). The programmer can handle this by
+adding the new input as a new sample to the collection of samples used for the shape inference.
+
+If they do so, the type provider will provide a new different type. In this case, an important
+property of the system is that the newly provided type will have the same general structure as
+the type provided before. This means that the data processing code, written using the provided
+type, will be easy to adapt. The programmer will need to add handling of a missing value, but
+they will not have to restructure their code. (A system based on statistical analysis of similarity
+would not have this property as a small change in the input may affect a decision whether two
+shape are sufficiently similar to be unified into a single type.) Using the formal model, we
+can capture this property (and later prove that it holds for the F\# Data type providers).
+
+\begin{theorem}[Stability of inference]
+Assume we have a set of samples $d_1, \ldots, d_n$, a provided type based on the samples
+$\tau_1, e_1, L_1 = \sem{\semalt{d_1, \ldots, d_n}}$ and some user code $e$ written using
+the provided type, such that $L_1; x:\tau_1\vdash e : \tau$.
+%
+Next, we add a new sample $d_{n+1}$ and consider a new provided type
+$\tau_2, e_2, L_2 = \sem{\semalt{d_1, \ldots, d_n, d_{n+1}}}$.
+
+Now there exists $e'$ such that $L_2; x:\tau_2\vdash e' : \tau$ and if
+for some $d$ it is the case that $e[x\leftarrow e_1~d] \reduce v$ then
+also $e'[x\leftarrow e_2~d] \reduce v$.
+%
+Such $e'$ is obtained by transforming sub-expressions of $e$ using one of the following
+translation rules:
+%
+\vspace{-0.1em}
+\begin{enumerate}[(i)]
+\itemsep -0.1em
+\item $C[e]$ to $C[\kvd{match}~e~\kvd{with}~\ident{Some}(v) \rightarrow v~|~\ident{None} \rightarrow \ident{exn}]$
+\item $C[e]$ to $C[e.\ident{M}]$ where $\ident{M} = \tytagof(\sigma)$ for some $\sigma$
+\item $C[e]$ to $C[\ident{int}(e)]$
+\end{enumerate}
+\end{theorem}
+%
+The translation rules use a context $C[e]$ to specify that a transformation needs to be done
+somewhere in the program. Importantly, all the rules are \emph{local} meaning that a change
+is done in a particular place in the program. The change can be (i) handling of missing value,
+(ii) accessing a newly introduced member when the change introduces a new choice type
+and (iii) adding a conversion of a primitive value.
+
+\section{Type providers for query construction}
+The type providers presented in the previous section are designed to allow easy programmatic
+access to data in semi-structured formats. The focus is on providing typed direct access to the
+data. The pivot type provider, presented in Chapter~\ref{ch:dotdriven}, builds on the same
+concepts, but focuses on letting users construct queries over tabular data. The user should not
+just be able to fetch the data in a typed form, but also use the provided types to filter,
+aggregate and reshape the data.
+
+\begin{figure}[t]
+\vspace{-0.5em}
+\begin{lstlisting}[language=sharp]
+olympics
+  .'filter data'.'Games is'.'Rio (2016)'.then
+  .'group data'.'by Athlete'.'sum Gold'.then
+  .'sort data'.'by Gold descending'.then
+  .'paging'.take(8)
+\end{lstlisting}
+\vspace{-0.25em}
+\caption{Data transformation constructed using the pivot type provider. This implements the
+same logic as pandas code in Figure~\ref{fig:rio}, computing the top 8 athletes from the Rio 2016
+Olympic games based on their number of gold medals.}
+\label{fig:rio}
+\vspace{-0.25em}
+\end{figure}
+
+The use of the pivot type provider is illustrated in Figure~\ref{fig:rio}, which implements
+the data querying logic written using the pandas Python library in Figure~\ref{fig:pandas}.
+The type provider is implemented in the context of The Gamma programming language, which is a
+simple statically typed programming language with class-based object model and type providers
+that runs in the web browser.
+
+As the code sample shows, the querying is implemented as a single chain of member accesses.
+Except for \texttt{take}, which is a method with a numerical parameter, all the members are
+properties that return another object of another class type with furhter members that can be
+used to continue constructing the query (the symbol \texttt{'} is used to wrap names containing
+a space). The system has a number of properties:
+
+\begin{nitemize}
+\item \emph{Discoverability of members.} All querying logic is expressed through member accesses.
+  The members are statically known (generated by a type provider). When using the type provider in
+  an editor, the user gets a choice of available members (auto-completion) when they type ``.''
+  and they can thus construct query simply by repeatedly choosing one of the offered members.
+
+\item \emph{Lazy class generation.} The classes used in the code are generated lazily. This is
+  necessary, because each operation transforms the set of available fields based on which the
+  subsequent types are generated. For example, calling \texttt{'drop Games'} would remove the field
+  \texttt{Games} from the schema.
+
+\item \emph{Safety of generated types.} Any query constructed using the type provider is correct meaning that it
+  will not attempt to access a field that does not exist in the data. This is a variant of the
+  usual type safety property that is formalized below.
+\end{nitemize}
+
+The formalization of the type provider follows the same style as that for F\# Data, but it explicitly
+encodes the laziness of the type provider as illustrated in the next section.
+
+\subsection{Formalizing lazy type provider for data querying}
+The pivot type provider works on tabular data. In order to generate a type, it needs to have the
+schema of the input table (names of fields and their types). In the above example, the type
+provider is imported through a configuration rather than code and \texttt{olympics} refers to a
+value of the provided type, but the type is generated using a known schema of the input data.
+In the formal model, the schema is written as (with $f$ ranging over the field names and
+$\tau$ ranging over a small set of primitive types):
+%
+\begin{equation*}
+F=\{ f_1 \mapsto \tau_1, \ldots, f_n \mapsto \tau_n \}
+\end{equation*}
+%
+When the type provider is invoked, it takes the schema and generates a class for querying data
+of the given schema. The types of the members of the class are further classes that allow further
+querying. As the provided class structure is potentially infinite, it needs to be generated
+lazily. The structure of provided class definition, written as $L$ is thus a function mapping
+a class name $C$ to a pair consisting of the class definition and a function that provides
+definitions of delayed classes (types used by the members of the class $C$):
+%
+\begin{equation*}
+L(C) = \kvd{type}~C(x:\tau) = \overline{m}, L'
+\end{equation*}
+%
+Here, $\kvd{type}~C(x:\tau) = \overline{m}$ is a definition of a class $C$ that consists of a
+sequence of members $\overline{m}$ and has a constructor taking a variable $x$ of type $\tau$ as
+an argument. The structure and evaluation of the resulting object calculus is discussed
+in Chapter~\ref{ch:dotdriven} and is loosely modelled after standard object calculi
+\citep{igarashi-2001-fj,abadi-2012-objects}, with the exception that it includes
+operations for transforming data as primitives.
+
+The classes provided by the pivot type provider can be used to construct a query, which is a
+value of type \ident{Query}. Expressions of this type are those of the relational algebra
+(projection, sorting, selection, as well as additional grouping). The type provider constructs
+classes that take the query constructed so far as the constructor argument. The provided members
+further refine and build the query. A type provider is formally defined as a function
+$\ident{pivot}(F)$, which is similar to the function $\sem{\sigma}$ defined for the F\# Data
+type providers:
+%
+\begin{equation*}
+\begin{array}{l}
+\ident{pivot}(F) = C, \{ C \mapsto (\kvd{type}~C(x:\ident{Query}) = \ldots,L) \}\\
+  \qquad \textnormal{where}~F=\{ f_1 \mapsto \tau_1, \ldots, f_n \mapsto \tau_n \}
+\end{array}
+\end{equation*}
+%
+The full definition given in Chapter~\ref{ch:dotdriven} uses a number of auxiliary functions to
+define the type provider, each of which defines members for specifying a particular query operation.
+To illustrate the approach, the following excerpt shows the $\ident{drop}(F)$ function that is used
+to construct operations that let the user drop any of the columns currently in the schema $F$.
+The generated class has a member \qident{drop $f$} for each of the fields and a memebr
+\ident{then}, which can be used to complete the selection and return to the choice of other query
+operations. Each of the \ident{drop} operations returns a class generated for the newly restricted
+domain and passes it a query that applies the selection $\Pi$ operation of the relational algebra
+on the input data:
+%
+\begin{equation*}
+\begin{array}{ll}
+\ident{drop}(F) = C, \{ C \mapsto (l, L' \cup \bigcup L_f) \}\qquad\\[0.5em]
+l = \kvd{type}~C(x:\ident{Query}) = &\hspace{-1em}\forall f \in \ident{dom}(F)~\textnormal{where}~C_f, L_f = \ident{drop}(F')\\
+~~\qquad \kvd{member}~\qident{drop $f$} : C_f = C_f(\Pi_{\ident{dom}(F')}(x)) & \quad\textnormal{and}~ F' = \{ f'\mapsto\tau'\in F, f' \neq f\}\\
+~~\qquad \kvd{member}~\ident{then} : C' = C'(x)\qquad                 &\textnormal{where}~C', L' = \ident{pivot}(F)\\
+\end{array}
+\end{equation*}
+
+The formalization of the pivot type provider follows a similar style as that of the F\# Data,
+although it differs in that it explicitly represents the laziness of the type generation and
+also in that the provided types construct more complex code, expressed using a a variant of
+relational algebra, that is executed at runtime. The formalization serves to explain the functioning
+of the type provider, but also allows us to prove its safety.
+
+\subsection{Safety of data acquisition programs}
+
+The pivot type provider guarantees that the data transformations, which can be constructed using
+the types it generates and are expressed using the primitives of the relational algebra, will
+always be correct. They will never result in an undefined runtime behaviour that one may otherwise
+encounter when accidentally accessing a non-existent field. This is important result, because the
+sequence of operations transforms the fields in an interesting way. Operations like \texttt{drop}
+remove fields from the schema, while \texttt{group by} not only changes the set of fields, but also
+their types (e.g., when we count distinct values of a string-typed field $f$ in aggregation,
+the resulting dataset will contain a numerical field $f$).
+
+To capture the property formally, we again state that any program written by the programmer using
+the type provider (without directly accessing the low-level operations of the relational algebra)
+will always reduce to a value. The evaluation is defined on datasets $D$ which
+map fields to vectors of values, written as $D =
+\{ f_1\mapsto\vect{v_{1,1},\ldots,v_{1,m}}, \ldots, f_n\mapsto\vect{v_{n,1},\ldots,v_{n,m}} \}$.
+A specific kind of data value is a data series $\ident{series}\langl\tau_k,\tau_v\rangl(D)$ that
+contains a vector of keys $k$ and a vector of values $v$. The evaluation is defined as a reduction
+operation $e \leadsto_{L}^{*} e'$ which also has access to class definitions $L$.
+Similarly, the typing judgment $L_1;\Gamma \vdash e : \tau; L_2$ includes additional handling of
+lazily generated classes. It states that the expression $e$ has a type $\tau$ in a variable context
+$\Gamma$. The typing is provided with (potentially unevaluated) class definitions $L_1$. It
+accesses (and evaluates) some of those definitions and those that are used throughout the typing
+derivation are represented by~$L_2$.
+
+\begin{theorem}[Safety of pivot type provider]
+\label{thm:pivot-safe}
+Given a schema $F=\{f_1\mapsto\tau_1, \ldots, f_n\mapsto\tau_n \}$, let $C,L=\ident{pivot}(F)$ then for any
+expression $e$ that does not contain relational algebra operations or $\ident{Query}$-typed values as sub-expression,
+if $L;x\!:\!C \vdash e : \ident{series}\langl\tau_1,\tau_2\rangl; L'$ then for all $D =
+\{ f_1\mapsto\vect{v_{1,1},\ldots,v_{1,m}}, \ldots, f_n\mapsto\vect{v_{n,1},\ldots,v_{n,m}} \}$
+such that $\vdash v_{i, j} : \tau_i$ it holds that $e[x\leftarrow C(D)]\leadsto_{L'}^{*}
+  \ident{series}\langl\tau_k,\tau_v\rangl(\{ f_k\mapsto{k_1,\ldots,k_r}, f_v\mapsto{v_1,\ldots,v_r} \})$
+  such that for all $j$ $\vdash k_j : \tau_k$ and $\vdash v_j : \tau_v$.
+\end{theorem}
+
+In other words, if a programmer uses the provided types to write a program $e$ that evaluates to
+a data series and we provide the program with input data $D$ that matches the schema used to invoke
+the type provider, the program will always evaluate to a data series containing values of the
+correct type. Although the property is not labelled as \emph{relative type safety} as in the
+case of the F\# Data type providers, it follows the same spirit. A well-typed program will not
+go wrong, as long as the input has the right structure.
+
+\section{Conclusions}
+In this chapter, I offered a brief overivew of the work on type providers that is included in
+Part~\ref{part:providers} of this thesis. The focus of this part is on simplifying programmatic
+data acquisition, that is on making it easier and safer to write code that reads data from external
+data sources. It consists of a type provider for accessing semi-structured data in XML, JSON and
+CSV formats (Chapter~\ref{ch:fsdata}) and the pivot type provider that makes it possible to
+express queries over tabular data (Chapter~\ref{ch:dotdriven}).
+
+Both of the contributions consist of a practical implementation, as a library for the F\# language and
+as a component of the web-based programming environment The Gamma, respectively. They combine this
+with a theoretical analysis using the methodology of theoretical programming language research.
+This makes it possible to precisely capture subtle aspects of how the type providers work
+(including shape inference, laziness and generation of types for query construction), but also
+to capture safety guarantees of the generated types. Given that type providers always access
+external data, the guarantees are not absolute as in conventional programming language theory.
+For this reason, my work introduced a novel notion of \emph{relative type safety}, stating that
+programs will ``not go wrong'' as long as the input has correct structure (in a precisely defined
+sense).
+
+From a broader perspective, the two type providers can be seen as filling a glaring gap in the
+theoretical work of statically-typed programs. A theoretician who defines a type system always uses
+a top-level typing rule \,$\vdash\!e\!:\!\tau$\, stating that a program $e$ (closed expression) that
+does not use any variables has a type $\tau$. While at the top-level, programs may not use any variables,
+this is misleading because most real-world programs access the outside world in some way, but
+this is typically done in an unchecked way. Monads and effect systems \citep{lucassen-1988-effects,spj-1993-imperative}
+can be used to track that some external access is made, but they do not help the static type
+system understand the structure of the outside data.
+%
+With a slight notational creativity, we can say that the static type checking of a program that
+uses type providers starts with a rule $\pi(\oplus) \vdash e\!:\!\tau$ where $\oplus$ (used as the
+astronomical symbol for the Earth) refers to the entire outside world and $\pi$ refers
+to some projection from all the things that exist in the outside world to program variables
+with static types that a programming language understands.
+
+The two kinds of type providers discussed in this chapter also differ in how they approach the
+technology gap suggested in Figure~\ref{fig:gap}. The F\# Data type providers aim to make
+programming with external data in a statically typed programming langauge a bit easier.
+In other words, they extend the area that can be covered by conventional programming,
+including more users and reducing the complexity. The pivot type provider and The Gamma
+programming environment tries to fill a particular space within the gap. It lets relatively
+large number of users (who are not professional programmers) solve problems that are more complex
+than simple data wrangling in a spreadsheet system, but much less complex than using a conventional
+programming tool such as Python and pandas. Its usability is a topic I will revisit in
+Chapter~\ref{ch:iterative} and the paper included as Chapter~\ref{ch:thegamma}.
+
+% ==================================================================================================
+% CHAPTER 3: DATA INFRASTRUCTURE
+% ==================================================================================================
 
 \chapter{Data infrastructure}
+
+Data scientists use a wide range of tools when working with data. A large part of what makes
+data cleaning and data exploration challenging is that data scientists often need to switch
+from one tool to another \citep{rattenbury-2017-wrangling}. They may use an interactive online
+tool like Trifacta to do data cleanup, run an ad-hoc command-line tool to
+transform it and then import it into a Jupyter notebook to create a visualization. Moreover,
+data science is an interactive and iterative process. Data scientist need to be able to quickly
+review the results of the operation they performed in order to see whether the results match
+their expectations and to detect unexpected problems. The interactivity brings a further challenge,
+which is the reproducibility of results. If the data scientist quickly tries multiple different
+approaches, reverts some of their earlier experiments, they should always be able to know what
+exact steps led to the final result they see on their screen.
+
+In this chapter, I provide overview of two contributions to the infrastructure for doing data
+exploration. The work addresses the three requirements that arise from the typical way data
+exploration is done as outlined above:
+
+\begin{nitemize}
+\item \emph{Polyglot tooling support.} Data scientist need an easy way of integrating multiple
+  different tools. For example, they should be able to use a simple data acquisition tools,
+  such as the pivot type provider implemented in The Gamma, but then pass the data to Python
+  for further processing or to visual interactive tool.
+
+\item \emph{Live preview support.} In order to let data scientists quickly review the results
+  of the operations they perform, the infrastructure should provide immediate live previews
+  without unnecessary recomputation.
+
+\item \emph{Reproducibility and correctness.} The results that the data scientist sees on the
+  screen should always match with the code (or reproducible another trace) they have in their
+  data exploration environment. If the operations involved are deterministic, re-running them
+  should produce the same result.
+\end{nitemize}
+
+Although each of those challenges has a range of solutions, there are not many systems that
+address all of them. This chapter provides an overview of work leading towards such system.
+It consists of two parts. The first is a data exploration environment for The Gamma that introduces
+an efficient way of evaluating live previews (presented in full in Chapter~\ref{ch:foundations})
+using a method based on maintaining a dependency graph. The second part is a notebook system for
+data science called Wrattler (presented in full in Chapter~\ref{ch:wrattler}) that
+follows the same basic approach, but allows integration of multiple langauges and tools and also
+uses the dependency graph to ensure reproducibility of the data explorations.
+
+Methodologically, the work outlined in this chapter combines the programming systems research
+methods with programming language theory. Both of the systems are available as open-source
+projects and they have been evaluated through a range of realistic case studies. The publication
+on live previews for data exploration environment presents a formal model to explain how
+live previews are computed using a dependency graph and to show the correctness of this approach,
+but it also includes a performance evaluation. The main contribution of the work on Wrattler
+is the novel architecture of the system.
+
+\section{Notebooks and live programming}
+
+As noted above, all three of the challenges have been addressed in isolation. The integration of
+different tools has been addressed in the context of scientific workflow systems such as
+Taverna \citep{oinn-2004-taverna} and Kepler \cite{altintas-2004-kepler} that orchestrate
+complex scientific pipelines, but such tooling is too heavyweight for basic data exploration
+done for example by data journalists. Scientific workflow systems also tackle the problem
+of reproducibility as the workflows capture the entire data processing pipeline.
+
+In the context of programming tools, work on live environments that provide immediate feedback
+and help the programmer better understand relationships between the program code and its outputs
+have been inspired by the work of \cite{victor-2012-learnable,victor-2012-principle}. A
+comprehensive review by \cite{rein-2019-review} includes programming tools and systems that
+provide immediate feedback ranging from those for UI development and image processing to live
+coding tools for music. A chief difficulty with providing live feedback as code is modified
+lies in identifying what has been changed. This can be done by using a structure editor that
+keeps track of code edits \citep{omar-2019-live}. The approach presented below aims to support
+ordinary text-based editing and is based on the idea of reconstructing a dependency graph from
+the code.
+
+\begin{figure}[t]
+\includegraphics[scale=0.24]{img/live.png}
+\caption{A live preview in The Gamma, generated for a code snippet that uses the pivot type
+  provider for data exploration. The interface also lets the user navigate through the steps
+  of the transformation and modify parameters of the query.}
+\label{fig:live}
+\end{figure}
+
+~
+
+Finally, the issue of reproducibility has received much attention in the context of notebooks
+for data science such as Jupyter \citep{kluyver-2016-jupyter}. Although Jupyter can be used
+to produce reproducible notebooks, there are practical barriers to this. In particular, it
+allows execution of cells out-of-order, meaning that one can run code in a way that modifies
+the global state in an unexpected and non-reproducible way. This has been addressed in multiple
+systems \citep{pimentel-2015-noworkflow,koop-2017-dataflow} and our approach in Wrattler builds
+on this tradition.
+
+\section{Live data exploration environment}
+
+\subsection{Data exploration calculus}
+
+\subsection{Computing previews using a dependency graph}
+
+\section{Live, reproducible, polyglot notebooks}
+
+\subsection{Architecture for a novel notebook system}
+
+\subsection{Dependency graphs for notebooks}
+
+x
+
+\section{Conclusions}
+
+% ==================================================================================================
+% CHAPTER 4: ITERATIVE PROMPTING
+% ==================================================================================================
+
 \chapter{Iterative prompting}
+\label{ch:iterative}
 
 \cite{rattenbury-2017-wrangling}
 50-80
