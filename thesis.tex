@@ -2,9 +2,12 @@
 
 \usepackage[utf8]{inputenc}
 %\usepackage[russian]{babel}
+\usepackage{xypic}
+\usepackage{subcaption}
 \usepackage{textcomp}
 \usepackage{booktabs} % For formal tables
 \usepackage{amsmath}
+\usepackage{semantic}
 \usepackage{natbib}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -33,6 +36,18 @@
 \newcommand{\kvd}[1]{\textnormal{\ttfamily\bfseries #1}}
 \newcommand{\ident}[1]{\textnormal{\ttfamily #1}}
 \newcommand{\qident}[1]{\textnormal{\ttfamily '#1'}}
+
+\definecolor{kvdclr}{rgb}{0.0,0.0,0.6}
+\definecolor{numclr}{rgb}{0.0,0.4,0.0}
+\definecolor{prepclr}{rgb}{0.6,0.0,0.2}
+\newcommand{\Num}[1]{\textcolor{numclr}{#1}}
+\newcommand{\bndclr}[1]{\textcolor{kvdclr}{#1}}
+\newcommand{\bkndclr}[1]{\textcolor{prepclr}{#1}}
+\newcommand{\blblclr}[1]{\textcolor{numclr}{#1}}
+\newcommand{\bnd}[1]{\textnormal{\textcolor{kvdclr}{\sffamily #1}}}
+\newcommand{\bknd}[1]{\textnormal{\textcolor{prepclr}{\sffamily #1}}}
+\newcommand{\blbl}[1]{\textnormal{\textcolor{numclr}{\sffamily #1}}}
+\newcommand{\narrow}[1]{\hspace{-0.6em}#1\hspace{-0.6em}}
 
 \newcommand{\langl}{\begin{picture}(4.5,7)
 \put(1.1,2.5){\rotatebox{60}{\line(1,0){5.5}}}
@@ -1326,9 +1341,150 @@ on this tradition.
 
 \section{Live data exploration environment}
 
+The Gamma is an attempt to explore a particular point in the design space of data exploration
+tools. It is built around code written in a simple programming language. This focus on code makes
+it easier to guarantee reproducibility and transparency of data analyses.  but it raises the
+question of how easy can data exploration be when done through a text-based programmatic
+environment. I revisit this problem from the human-computer interaction perspective in the next
+chapter, after discussing the infrastructure that makes using The Gamma easier.
+
+One of the lessons learned from spreadsheets is the value of immediate or live feedback.
+To make data exploration in The Gamma easier, the work outlined in this section develops an
+efficient mechanism for displaying live previews for The Gamma as illustratd in
+Figure~\ref{fig:live}. However, providing live previews in a text-based programming environment
+is a challenge \citep{mcdirmid-2007-live}. There are two difficulties:
+
+\begin{nitemize}
+\item \emph{Live previews and abstractions.} It is difficult to provide live previews for code
+  inside functions or classes, because variables in such context cannot be easily linked to
+  concrete values. Even if such abstractions are not used as frequently in data exploration code,
+  abstractions are often the key concern in conventional theoretical thinking about programming
+  langauge design.
+
+\item \emph{Responding to code changes.} Code in a text editor can change in arbitrary ways and
+  so it is unclear how to update existing live preview when an edit is made. This is easier in
+  structure editors where edits are limited and understood by the system, but live previews for
+  a text-based system need to adapt to large and potentially breaking changes in code.
+\end{nitemize}
+
+In the work included as Chapter~\ref{ch:foundations}, I tackle the first challenge by arguing that
+we need a better theoretical model of programming languages for data exploration. When data
+scientist explore data in a notebook environment, they typically do not introduce new abstractions
+and most code is first-order. They often use external libraries, some of which provide higher-order
+fucntions (projection, filtering, etc.) and so code may use functions and lambda expressions,
+but those are typically passed directly as arguments to those functions. My work thus introduces
+the \emph{data exploration calculus}, which is a small formal model of a programming language
+that corresponds closely to code written to explore data and can be used to formally study
+problems in programmatic data exploration tools.
+
+The problem of responding to code changes is tackled by constructing a dependency graph and
+caching its nodes. When the code is edited, the new version is parsed, resulting in a new
+abstract syntax tree. The nodes of the tree are then analysed and linked to nodes in a
+dependency graph. When the node of the tree corresponds to dependency graph node that has been
+created previously (with the same dependencies), the graph node is reused. Live previews are
+then computed (and associated with) dependency graph nodes. As a result, when dependencies of
+a particular expression do not change, it is linked to the same graph node as before and the
+associated live preview is reused.
+
+In the following two sections, I provide a brief review of the data exploration calculus and of
+the dependency graph construction mechanism. In Chapter~\ref{ch:foundations}, the data exploration
+calculus is then used to formalize the graph construction and show that live previews computed
+based on the graph are the same as previews that would be computed by directly evaluating the
+data exploration calculus expression. The publication also evaluates the efficiency using live
+previews, quantifying the reduction in overhead in contrast to two other evaluation strategies.
+
 \subsection{Data exploration calculus}
 
+\begin{figure}
+\raggedright
+\hspace{0.5em}{\sffamily Programs, commands, terms, expressions and values}
+%
+\begin{equation*}
+\begin{array}{lcl}
+p &\narrow{::=}& c_1; \ldots; c_n\\
+c &\narrow{::=}& \kvd{let}~x = t \lsep t\\
+\end{array}
+\qquad
+\begin{array}{lcl}
+t &\narrow{::=}& o \lsep x \\
+  &\narrow{|}& t.m(e, \ldots, e)
+\end{array}
+\qquad
+\begin{array}{lcl}
+e &\narrow{::=}& t \lsep \lambda x\rightarrow e\\
+v &\narrow{::=}& o \lsep \lambda x\rightarrow e\\
+\end{array}
+\end{equation*}
+
+%
+\hspace{0.5em}{\sffamily Evaluation contexts of expressions}
+%
+\begin{equation*}
+\begin{array}{lcl}
+C_e[-] &=& C_e[-].m(e_1, \ldots, e_n) ~\lsep~ o.m(v_1, \ldots, v_{m}, C_e[-], e_1,\ldots , e_n) ~\lsep~ -\\
+C_c[-] &=& \kvd{let}~x = C_e[-] ~\lsep~ C_e[-]\\
+C_p[-] &=& o_1;\; \ldots;\; o_{k};\; C_c[-];\; c_{1};\; \ldots;\; c_n\\
+\end{array}
+\end{equation*}
+
+%
+\hspace{0.5em}{\sffamily Let elimination and member reduction}
+%
+\begin{equation*}
+\begin{array}{l}
+\hspace{-0.5em}\begin{array}{l}
+o_1;\; \ldots;\; o_{k};\; \kvd{let}~x=o;\; c_{1};\; \ldots; c_n \rightsquigarrow\\
+\qquad  o_1;\; \ldots;\; o_{k};\; o; c_{1}[x\leftarrow o];\; \ldots; c_n[x\leftarrow o]\end{array}
+~~\text{\small (let)}\\[1.2em]
+\inference
+  {o.m(v_1, \ldots, v_n) \rightsquigarrow_\epsilon o'}
+  {C_p[o.m(v_1, \ldots, v_n)] \rightsquigarrow C_p[o']}
+~~\text{\small (external)}
+\end{array}
+\end{equation*}
+
+\caption{Syntax, contexts and reduction rules of the data exploration calculus}
+\label{fig:dec-calculus}
+\end{figure}
+
 \subsection{Computing previews using a dependency graph}
+
+\begin{figure}
+\centering
+\subcaptionbox{
+  \raggedright
+  Graph constructed from initial expression:
+  $\kvd{let}~x = \Num{15}~\kvd{in}~\ident{data.skip}(\Num{10}).\ident{take}(x)$
+  \label{fig:dep-graph-a}
+}{
+  $\xymatrix{
+  \bnd{val}(\Num{10}) & \bnd{val}(\Num{15})\\
+  \bnd{mem}(\ident{skip},s_0)\ar[d]_{\blbl{arg}(0)} \ar[u]^{\blbl{arg}(1)} &
+  \bnd{mem}(\ident{take},s_1)\ar[l]_{\blbl{arg}(0)} \ar[u]_{\blbl{arg}(1)}\\
+  \bnd{var}(\ident{data})
+  }\qquad$
+  \vspace{0.5em}
+}
+\hspace{1em}
+\subcaptionbox{
+  \raggedright
+  Updated graph after changing $x$ to $10$:
+  $\kvd{let}~x = \Num{10}~\kvd{in}~\ident{data.skip}(\Num{10}).\ident{take}(x)$
+  \label{fig:dep-graph-b}
+}{
+  $\xymatrix{
+  \bnd{val}(\Num{10})&\\
+  \bnd{mem}(\ident{skip}, s_0)\ar[d]_{\blbl{arg}(0)} \ar[u]^{\blbl{arg}(1)} &
+  \bnd{mem}(\ident{take}, s_2)\ar[l]_{\blbl{arg}(0)} \ar@/_/[lu]_{\blbl{arg}(1)}\\
+  \bnd{var}(\ident{data})
+}\qquad$
+\vspace{0.5em}
+}
+\vspace{0.5em}
+\caption{Dependency graphs formed by two steps of the live programming process. }
+\label{fig:dep-graph}
+\vspace{0.5em}
+\end{figure}
 
 \section{Live, reproducible, polyglot notebooks}
 
