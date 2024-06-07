@@ -61,6 +61,8 @@
 
 %\theoremstyle{definition}
 \newtheorem{theorem}{Theorem}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
 
 \newcommand{\tytagof}{\ident{tagof}}
 \newcommand{\reduce}{\rightsquigarrow}
@@ -184,10 +186,10 @@ skills for completing even the simplest tasks.
 \centering
 \includegraphics[scale=0.25]{img/gap.png}
 \vspace{-0.5em}
-\caption{Illustration showing a gap between easy to use but limited spreadsheets
-and unlimited but hard to use programming tools. Adapted from \citet{edwards-2015-transcript}.}
+\caption{The gap between programming and spreadsheets -- spreadsheets can be used by many people,
+but solve problems of a limited complexity. Programming scales arbitrarily, but has a high minimal
+complexity limiting the number of users. Adapted from \citet{edwards-2015-transcript}.}
 \label{fig:gap}
-\vspace{1em}
 \end{figure}
 
 The above illustration should not be taken at face value. Although there is no single accepted
@@ -431,11 +433,14 @@ comprehensive case study instead of a user study to evaluate the design.
 \section{What makes a programming tool simple}
 
 The very title of this thesis refers to the aim of creating programming tools for data exploration
-that are \emph{simple}. However, simplicity is difficult to quantify exactly and is understood
+that are \emph{simple}. However, simplicity is difficult to quantify precisely. It is understood
 differently by different communitites and in different contexts. I thus follow the recommendation
 of \citet{muller-2020-rhetoric} to make explicit how the term should be understood in the
-context of this thesis. The notion of simplicity is used as a unifying theme in this commentary,
-but it takes one of several more specific and rigorously evaluable forms:
+context of this thesis. The notion of simplicity is used as a unifying theme in this commentary.
+In the papers presented as part of this thesis, the notion takes one of several more specific and
+rigorously evaluated forms:
+
+~
 
 \begin{nitemize}
 \item In the context of user-centric work, I refer to a system as \emph{simple} if it allows
@@ -474,6 +479,7 @@ as defined by IBM (with slight modifications). As the diagram shows, the focus o
 initial data exploration phase.
 
 \begin{figure}[h]
+  \vspace{1em}
   \includegraphics[scale=0.2]{img/lifecycle.png}
   \vspace{-1em}
   \caption{Illustration showing the data science lifecycle, as understood by \cite{ibm-2020-lifecycle},
@@ -524,7 +530,7 @@ Programmatic data exploration is typically done in notebook systems such as Jupy
 \citep{kluyver-2016-jupyter} that make it possible to combine documentation, formulas, code and
 output such as visualizations. Notebook systems are a convenient tool, but they suffer from
 a number of limitations and issues. The two novel systems presented in Part~\ref{part:infra} adress
-some of those.
+several of those.
 
 Chapter~\ref{ch:foundations} presents a programming environment for The Gamma that makes data
 exploration easier by providing instant feedback. The research contributions of the work are
@@ -586,31 +592,31 @@ several open-source software packages that are available under the permissive Ap
 and MIT (all other projects) licenses.
 
 \begin{nitemize}
-  \item \textbf{F\# Data} (\url{https://github.com/fsprojects/FSharp.Data}) has became a widely-used
+  \item \emph{F\# Data} (\url{https://github.com/fsprojects/FSharp.Data}) has became a widely-used
     F\# library for data access. It implements utilities, parsers and type providers for working
     with structured data in multiple formats (XML, JSON, HTML and CSV). The initial version based
     on the work presented in Chapter~\ref{ch:fsdata} has since been extended by multiple
     contributors from the F\# community.
 
-  \item \textbf{The Gamma} (\url{https://github.com/the-gamma}) is a simple data exploration
+  \item \emph{The Gamma} (\url{https://github.com/the-gamma}) is a simple data exploration
     environment for non-programmers such as data journalists. It implements the iterative
     prompting mechanism for data access (Chapters~\ref{ch:thegamma} and \ref{ch:dotdriven})
     and live preview mechanism (Chapter~\ref{ch:foundations}). Live demos using the environment
     in a web browser can  be found at \url{https://thegamma.net} and \url{https://turing.thegamma.net}.
 
-  \item \textbf{Wrattler} (\url{https://github.com/wrattler}) is an experimental notebook system
+  \item \emph{Wrattler} (\url{https://github.com/wrattler}) is an experimental notebook system
     described in Chapter~\ref{ch:wrattler} that tracks dependencies between cells, makes it
     possible to combine multiple langauges in a single notebook and hosts AI assistants for
     data wrangling described in Chapter~\ref{ch:aia}. More information can be found at
     \url{http://www.wrattler.org}.
 
-  \item \textbf{Compost.js} (\url{https://github.com/compostjs}) is a composable library for creating
+  \item \emph{Compost.js} (\url{https://github.com/compostjs}) is a composable library for creating
     data visualizations described in Chapter~\ref{ch:compost}. Although the library is implemented
     in the F\# language, it is compiled to JavaScript and provides a convenient interface for
     Java\-Script users. A range of demos illustrating the use of the library can be found online at
     \url{https://compostjs.github.io}.
 
-  \item \textbf{Fluid} (\url{https://github.com/explorable-viz/fluid}) is a programming langauge
+  \item \emph{Fluid} (\url{https://github.com/explorable-viz/fluid}) is a programming langauge
     for building linked data visualizations described in Chapter~\ref{ch:galois}. The project has
     since been developed into a general-purpose langauge for transparent, self-explanatory research
     outputs by the Institute of Computing for Climate Science, University of Cambridge.
@@ -1033,6 +1039,8 @@ is done in a particular place in the program. The change can be (i) handling of 
 and (iii) adding a conversion of a primitive value.
 
 \section{Type providers for query construction}
+\label{sec:tp-query}
+
 The type providers presented in the previous section are designed to allow easy programmatic
 access to data in semi-structured formats. The focus is on providing typed direct access to the
 data. The pivot type provider, presented in Chapter~\ref{ch:dotdriven}, builds on the same
@@ -1272,7 +1280,7 @@ exploration is done as outlined above:
 \item \emph{Polyglot tooling support.} Data scientist need an easy way of integrating multiple
   different tools. For example, they should be able to use a simple data acquisition tools,
   such as the pivot type provider implemented in The Gamma, but then pass the data to Python
-  for further processing or to visual interactive tool.
+  for further processing or to a visual interactive tool.
 
 \item \emph{Live preview support.} In order to let data scientists quickly review the results
   of the operations they perform, the infrastructure should provide immediate live previews
@@ -1305,7 +1313,7 @@ is the novel architecture of the system.
 
 As noted above, all three of the challenges have been addressed in isolation. The integration of
 different tools has been addressed in the context of scientific workflow systems such as
-Taverna \citep{oinn-2004-taverna} and Kepler \cite{altintas-2004-kepler} that orchestrate
+Taverna \citep{oinn-2004-taverna} and Kepler \citep{altintas-2004-kepler} that orchestrate
 complex scientific pipelines, but such tooling is too heavyweight for basic data exploration
 done for example by data journalists. Scientific workflow systems also tackle the problem
 of reproducibility as the workflows capture the entire data processing pipeline.
@@ -1340,17 +1348,19 @@ systems \citep{pimentel-2015-noworkflow,koop-2017-dataflow} and our approach in 
 on this tradition.
 
 \section{Live data exploration environment}
+\label{sec:infra-livedata}
 
-The Gamma is an attempt to explore a particular point in the design space of data exploration
-tools. It is built around code written in a simple programming language. This focus on code makes
-it easier to guarantee reproducibility and transparency of data analyses.  but it raises the
+The Gamma explores a particular point in the design space of data exploration
+tools. It is built around code written in a simple programming language, leveraging the type
+provider introduced in Section~\ref{sec:tp-query}. This focus on code makes it easier to guarantee
+reproducibility and transparency of data analyses.  At the same time, the design raises the
 question of how easy can data exploration be when done through a text-based programmatic
 environment. I revisit this problem from the human-computer interaction perspective in the next
 chapter, after discussing the infrastructure that makes using The Gamma easier.
 
 One of the lessons learned from spreadsheets is the value of immediate or live feedback.
 To make data exploration in The Gamma easier, the work outlined in this section develops an
-efficient mechanism for displaying live previews for The Gamma as illustratd in
+efficient method for displaying live previews for The Gamma as illustratd in
 Figure~\ref{fig:live}. However, providing live previews in a text-based programming environment
 is a challenge \citep{mcdirmid-2007-live}. There are two difficulties:
 
@@ -1364,7 +1374,7 @@ is a challenge \citep{mcdirmid-2007-live}. There are two difficulties:
 \item \emph{Responding to code changes.} Code in a text editor can change in arbitrary ways and
   so it is unclear how to update existing live preview when an edit is made. This is easier in
   structure editors where edits are limited and understood by the system, but live previews for
-  a text-based system need to adapt to large and potentially breaking changes in code.
+  a text-based system need to accommodate large and potentially breaking changes in code.
 \end{nitemize}
 
 In the work included as Chapter~\ref{ch:foundations}, I tackle the first challenge by arguing that
@@ -1393,8 +1403,6 @@ based on the graph are the same as previews that would be computed by directly e
 data exploration calculus expression. The publication also evaluates the efficiency using live
 previews, quantifying the reduction in overhead in contrast to two other evaluation strategies.
 
-\subsection{Data exploration calculus}
-
 \begin{figure}
 \raggedright
 \hspace{0.5em}{\sffamily Programs, commands, terms, expressions and values}
@@ -1402,17 +1410,19 @@ previews, quantifying the reduction in overhead in contrast to two other evaluat
 \begin{equation*}
 \begin{array}{lcl}
 p &\narrow{::=}& c_1; \ldots; c_n\\
-c &\narrow{::=}& \kvd{let}~x = t \lsep t\\
+c &\narrow{::=}& t\\
+  &\narrow{|}& \kvd{let}~x = t~t\\
 \end{array}
 \qquad
 \begin{array}{lcl}
-t &\narrow{::=}& o \lsep x \\
+t &\narrow{::=}& o \\
+  &\narrow{|}& x\\
   &\narrow{|}& t.m(e, \ldots, e)
 \end{array}
 \qquad
-\begin{array}{lcl}
-e &\narrow{::=}& t \lsep \lambda x\rightarrow e\\
-v &\narrow{::=}& o \lsep \lambda x\rightarrow e\\
+\begin{array}{lclcl}
+e &\narrow{::=}& t &\narrow{|}& \lambda x\rightarrow e\\
+v &\narrow{::=}& o &\narrow{|}& \lambda x\rightarrow e\\
 \end{array}
 \end{equation*}
 
@@ -1447,9 +1457,101 @@ o_1;\; \ldots;\; o_{k};\; \kvd{let}~x=o;\; c_{1};\; \ldots; c_n \rightsquigarrow
 \label{fig:dec-calculus}
 \end{figure}
 
-\subsection{Computing previews using a dependency graph}
+\subsection{Data exploration calculus}
+
+The data exploration calculus is a small formal language for data exploration. The calculus is
+intended as a small realistic model of how are programming languages used in data exploration scripts
+and computational notebooks. The calculus itself is not Turing-complete and models first-order
+code only, but it supports the notion of external libraries that provide specific data exploration
+functionality. This may include standard functions for working with collections or data frames that
+are common in Python, but also libraries based on type providers as in the case of The Gamma.
+
+Figure~\ref{fig:dec-calculus} shows the syntax of the calculus.
+A program $p$ consists of a sequence of commands $c$.
+A command can be either a let binding or a term. Let bindings define variables $x$
+that can be used in subsequent commands. As noted earlier, lambda functions can only appear as
+arguments in method calls. To model this, the calculus distinguishes between terms that can appear
+at the top-level and expressions that can appear as argument in an invocation.
+A term $t$ can be a value, variable or a member access, while an expression $e$
+can be a lambda function or a term. Values defined by external libraries are written
+as $o$.
+
+The evaluation is defined by a small-step reduction $\rightsquigarrow$.
+Fully evaluating a program results in an irreducible sequence of
+objects $o_1;\; \ldots;\; o_n$ (one object for each command, including let bindings) which can be
+displayed as intermediate results of the data analysis. The operational semantics is parameterized
+by a relation $\rightsquigarrow_\epsilon$ that models the functionality of external libraries.
+Figure~\ref{fig:dec-calculus} defines the reduction rules in terms of $\rightsquigarrow_\epsilon$
+and evaluation contexts; $C_e$ specifies left-to-right evaluation of arguments of a method call,
+$C_c$ specifies evaluation of a command and $C_p$ defines left-to-right evaluation of a program.
+The rule (external) calls a method provided by an external library in a
+call-by-value fashion, while (let) substitutes a value of an evaluated variable in
+all subsequent commands and leaves the result in the list of commands.
+
+Note that our semantics does not define how $\lambda$ applications are reduced. This is done by
+external libraries, which will typically supply functions with arguments using standard $\beta$-reduction.
+The result of evaluating an external call is also required to be an object value $o$.
+To illustrate how a definition of an external library looks, consider the following script:
+%
+\begin{equation*}
+\begin{array}{l}
+\kvd{let}~l = \ident{list}.\ident{range}(\Num{0}, \Num{10})\\
+l.\ident{map}(\lambda x \rightarrow \ident{math}.\ident{mul}(x, \Num{10}))
+\end{array}
+\end{equation*}
+%
+An external library provides the \ident{list} and \ident{math} objects, as well as
+numbers $n$, lists of objects $[o_1, \ldots, o_k]$ and failed computations $\bot$.
+Next, the external library needs to define the semantics of the \ident{range}, \ident{mul} and
+\ident{map} members through the $\rightsquigarrow_\epsilon$ relation. The following shows
+the rules for the \ident{map} operation on lists:
+%
+\begin{equation*}
+\begin{array}{l}
+\\[-0.75em]
+\inference
+  {e[x \leftarrow n_i] \rightsquigarrow o_i \quad (\textit{for all $i\in 1\ldots k$})}
+  {[ n_1, \ldots, n_k ].\ident{map}(\lambda x\rightarrow e) \rightsquigarrow_\epsilon [ o_1, \ldots, o_k ]}
+\qquad
+\inference
+  {(\textit{otherwise})}
+  {[ n_1, \ldots, n_k ].m(v_1, \ldots, v_n) \rightsquigarrow_\epsilon \bot}
+\\[-0.75em]
+~
+\end{array}
+\end{equation*}
+%
+When evaluating \ident{map}, we apply the provided function to all elements of the list using
+standard $\beta$-reduction and return a list of resulting objects. The $\rightsquigarrow_\epsilon$
+relation is defined on all member accesses, but non-existent members reduce to the failed
+computation $\bot$.
+
+We require that external libraries satisfy two conditions. First, when a method is called with
+observationally equivalent values as arguments, it should return the same value (compositionality).
+Second, the evaluation of $o.m(v_1,\ldots,v_n)$ should be defined for all $o, n$ and $v_i$ (totality).
+The above definition satisfies those requirements by using the standard $\beta$-reduction
+for reducing lambda functions and by reducing all invalid calls to the $\bot$ object.
+Compositionality implies deterministic behaviour of external libraries and is essential for
+implementing an efficient live preview mechanism. The totality of the definition, in turn,
+makes it possible to prove the following \emph{normalization} property:
+%
+\begin{theorem}[Normalization]
+\label{thm:normalization}
+For all $p$, there exists $n, o_1, \ldots, o_n$ such that $p\rightsquigarrow^{*} o_1;\ldots;o_n$
+where $\rightsquigarrow^{*}$ is the reflexive, transitive closure of $\rightsquigarrow$.
+\end{theorem}
+%
+The value of the data exploration calculus is that it can be used to model the functionality
+of different tools that support data exploration. The work outlined here (and presented in
+full in Chapter~\ref{ch:foundations}) uses the calculus to formalise an efficient mechanism
+for showing live previews during the editing of data exploxation script. As mentioned earlier,
+the mechanism works by constructing a dependency graph, binding expressions to the graph and
+associating live previews with the (cached) nodes of the graph. The formal properties of the data
+exploration calculus make it possible to prove that live previews computed in this way are the
+same as previews that would be obtained by fully re-evaluating the data exploration script.
 
 \begin{figure}
+\vspace{-0.5em}
 \centering
 \subcaptionbox{
   \raggedright
@@ -1465,7 +1567,6 @@ o_1;\; \ldots;\; o_{k};\; \kvd{let}~x=o;\; c_{1};\; \ldots; c_n \rightsquigarrow
   }\qquad$
   \vspace{0.5em}
 }
-\hspace{1em}
 \subcaptionbox{
   \raggedright
   Updated graph after changing $x$ to $10$:
@@ -1483,18 +1584,280 @@ o_1;\; \ldots;\; o_{k};\; \kvd{let}~x=o;\; c_{1};\; \ldots; c_n \rightsquigarrow
 \vspace{0.5em}
 \caption{Dependency graphs formed by two steps of the live programming process. }
 \label{fig:dep-graph}
-\vspace{0.5em}
+\end{figure}
+
+\subsection{Computing previews using a dependency graph}
+
+Given a program in the data exploration calculus, I now describe the core of a mechanism that
+can be used for providing the user with live previews as illustrated in Figure~\ref{fig:live}.
+The key idea behind our method is to maintain a dependency graph with
+nodes representing individual operations of the computation that can be evaluated
+to obtain a preview. Each time the program text is modified, we parse it afresh (using an
+error-recovering parser) and bind the abstract syntax tree to the dependency graph.
+When binding a new expression to the graph, we reuse previously created nodes as long as
+they have the same structure and the same dependencies. For expressions that have a new
+structure, we create new nodes.
+
+The nodes of the graph serve as unique keys into a lookup table containing previously
+evaluated parts of the program. When a preview is requested for an expression, we use the graph
+node bound to the expression to find a preview. If a preview has not been evaluated, we force
+the evaluation of all dependencies in the graph and then evaluate the operation represented by
+the current node.
+
+
+The nodes of the graph represent individual operations of the computation. A node indicates what
+kind of operation the computation performs and is linked to its dependencies through edges.
+This makes it possible to define computation not just over expressions of the data exploration
+calculus, but also over the dependency graph. In order to cache computed previews with the node
+as the key, some of the nodes need to be annotated with a unique symbol. That way, we can
+create two unique nodes representing, for example, access to a member named \ident{take} which
+differ in their dependencies. The graph edges are labelled with labels indicating the kind of
+dependency. For a method call, the labels are ``first argument'', ``second argument'' and so on.
+Writing $s$ for symbols and $i$ for integers, nodes (vertices) $\bndclr{v}$ and edge labels
+$\blblclr{l}$ are defined as:
+%
+\begin{equation*}
+\begin{array}{rcll}
+\bndclr{v}&=&\bnd{val}(o) \lsep \bnd{var}(x)\lsep \bnd{mem}(m, s)\lsep \bnd{fun}(x, s)&\qquad(\textit{Vertices})\\
+\blblclr{l}&=&\blbl{body} \lsep \blbl{arg}(i)&\qquad(\textit{Edge labels})\\
+\end{array}
+\end{equation*}
+%
+The \bnd{val} node represents a primitive value and contains the object itself. Multiple occurrences
+of the same value, such as $\Num{10}$, will be represented by the same node. Member access \bnd{mem}
+contains the member name, together with a unique symbol $s$ -- two member access nodes with
+different dependencies will contain a different symbol. Dependencies of a member access are labelled
+with \blbl{arg} indicating the index of the argument ($0$~for the instance and $1,2,3,\ldots$ for the
+arguments). Finally, nodes \bnd{fun} and \bnd{var} represent function values and variables
+bound by $\lambda$ abstraction.
+
+Figure~\ref{fig:dep-graph} illustrates how to build the
+dependency graph. Node representing $\ident{take}(x)$ depends on the argument -- the
+number $\Num{15}$ -- and the instance, which is a node representing $\ident{skip}(\Num{10})$.
+This, in turn, depends on the instance \ident{data} and the number $\Num{10}$. Note that variables
+bound via \kvd{let} binding such as $x$ do not appear as $\bnd{var}$ nodes. The node using it
+depends directly on the node representing the expression assigned to $x$.
+
+After changing the value of $x$, we create a new graph. The dependencies of the node
+$\bnd{mem}(\ident{skip}, s_0)$ are unchanged. The symbol $s_0$ attached to the node remains
+the same and so the previously computed previews can be reused. This part of the program is not recomputed.
+The $\blbl{arg}(1)$ dependency of the \ident{take} call
+changed and so we create a new node $\bnd{mem}(\ident{skip}, s_2)$ with a fresh symbol $s_2$.
+The preview for this node is then computed as needed using the already known values of its
+dependencies.
+
+The full description of how the dependency graph is constructed can be found in
+Chapter~\ref{ch:foundations}. The construction proceeds recursively over the syntactic structure
+of the program in the data exploration calculus. For each expression in the program, it recursively
+obtains graph nodes representing its sub-expressions. It then checks the cache to see if a node
+representing the current expression with the same dependencies exists already. If so, the node is
+reused. If no, a new node (possibly with a new symbol) is created.
+
+The construction of the graph makes it possible to compute preview over the nodes of the
+dependency graph and cache the previously computed previews by using the graph node as the cache
+key. I illustrate how the evaluation works using two of the reduction rules. For simplicity,
+I do not discuss the caching here. I will also write $p$ for evaluated previews which can be either
+primitive objects $o$ or functions $\lambda x.e$ (for which we cannot show a preview directly).
+Given a dependency graph $(V, E)$ where $V$ is a set of vertices $\bndclr{v_1}, \bndclr{v_2}, \ldots, \bndclr{v_n}$
+and $E$ is a set of directed labelled edges of the form $(\bndclr{v_1}, \bndclr{v_2}, \blblclr{l})$,
+the evaluation is then defined as a relation $\bndclr{v} \Downarrow p$. The following two rules
+illustrate evaluation for primitive values and for member access:
+%
+\begin{equation*}
+\begin{array}{l}
+\inference
+  {~}
+  {\bnd{val}(o) \Downarrow o }~~\text{\small (val)}
+\\~\\
+\inference
+  { \forall i\in\{0\ldots k\}.(\bnd{mem}(m, s), \bndclr{v_i}, \blbl{arg}(i)) \in E \\
+    \bndclr{v_i} \Downarrow p_i & p_0.m(p_1, \ldots, p_k) \rightsquigarrow_\epsilon p }
+  { \bnd{mem}(m, s) \Downarrow p }~~\text{\small (mem-val)}
+\end{array}
+\end{equation*}
+%
+The (val) rule is simple. If a graph node represents a primitive value, it directly reduces to
+the value. The (mem-val) rule illustrates a more interesting case. To evaluate a member access,
+we need to find the graph nodes that represent its arguments (by looking for links with an
+appropriate label), reduce those recursively and then use the external library reduction
+$\rightsquigarrow_\epsilon$ to reduce the memeber access.
+
+The sketch presented here omits one interesting aspect of the mechanism. In general, previews
+can be provided for all sub-expressions that include variables defined by an earlier let binding.
+However, if a sub-expression contains a variable bound by a lambda expression, we have no
+way of obtaining suitable value for the variable. In this case, our mechanism evaluates
+a delayed preview $\llbracket e \rrbracket_\Gamma$, which represents a partially-evaluated
+expression that depends on variables specified by $\Gamma$. Delayed previews could still be
+useful if the user interface allowed the user to specify sample value for the free variables
+and they also have interesting theoretical connection to work on Contextual Modal Type Theory
+\citep{nanevski-2008-cmtt} and comonads~\citep{gabbay-2013-cmtt}.
+
+The full paper, included as Chapter~\ref{ch:foundations}, uses two research methodologies
+to evaluate the work. First, it formalizes how the live preview mechanism works using the
+model based on the data exploration calculus as sketched above. The formalisation is
+used to show that the previews computed over the dependency graph are \emph{correct}. That is,
+they are the same as the values we would obtain by evaluating the data exploration calculus
+expressions directly. The formalization is also used to list a number of common edits to
+a program that do not invalidate previously computed live previews. Examples of such edits
+include extracting sub-expression into a let-bound variable, deleting or adding unused code
+or changing unrelated parts of the program. The evaluation also employs programming systems
+research methods to empirically evaluate the efficiency of the live preview evaluation method.
+The paper contrasts the method with standard call-by-value and lazy evaluation strategies
+(without caching) and shows the reduction of delays in providing live previews for a sample
+coding scenario.
+
+\begin{figure}[t]
+\includegraphics[scale=0.25]{img/wrattler.png}
+\caption{Wrattler running inside the JupyterLab system. The opened notebook passes data between
+cells written in three different programming languages (Python, R and JavaScript).}
+\label{fig:wrattler}
 \end{figure}
 
 \section{Live, reproducible, polyglot notebooks}
 
-\subsection{Architecture for a novel notebook system}
+The live data exploration environment discussed in the previous section tackles the problem of
+providing rapid feedback to data scientists during data exploration. The other two challenges that
+I listed in the opening of this chapter were the need for polyglot tooling support and the need
+to make data analyses more reproducible.
+
+The two challenges are tackled by the open-source Wrattler notebook system presented in full in
+Chapter~\ref{ch:wrattler}. Wrattler is an extension for the industry standard JupyterLab platform.
+As illustrated in Figure~\ref{fig:wrattler}, Wrattler adds a new type of document format that
+allows programmers to mix cells written in multiple different programming languages in a single
+notebook. The extensibility model of Wrattler makes it possible to support not only new programming
+languages, but also interactive tools that run directly in the notebook (hosted in a web browser).
+As a result, it is possible to integrate tools that provide live preview mechanism such as
+The Gamma and also interactive AI assistants that I discuss in Part~\ref{part:iterative}.
+The architecture of the Wrattler system is based on two key principles:
+
+\begin{itemize}
+\item \emph{Polyglot architecture.} The system is designed to allow integration of components in
+  different programming languages. This is done by splitting the monolithic architecture of
+  Jupyter into individual components including the central data store and multiple language runtimes.
+
+\item \emph{Design for reproducibility.} To guarantee reproducibility and track data provenance,
+  the system represents computation as a dependency graph. The graph is similar to the one discussed
+  in the previous section, but uses a coarser granularity with one node for each notebook cell.
+\end{itemize}
+
+The Wrattler system is presented in detail in Chapter~\ref{ch:wrattler}. The paper follows the
+programming systems methodology. It focuses on the novel system architecture and documents the
+capabilities that are enabled by the architecture.
+
+\subsection{Architecture of a novel notebook system}
+
+\begin{figure}[t]
+\begin{tabular}{p{0.45\textwidth} p{0.55\textwidth}}
+\vspace{2em}\includegraphics[scale=0.6,trim=1.5cm 6cm 1cm 0.4cm,clip]{img/arch.pdf} &
+\vspace{0em}\includegraphics[scale=0.6,trim=1cm 0.5cm 1cm 4cm,clip]{img/arch.pdf}
+\end{tabular}
+\caption{In notebook systems such as Jupyter, state and execution is managed by a kernel. In
+  Wrattler, those functions are split between data store and language runtimes. Language runtimes
+  can run on the server-side (e.g.~Python) or client-side (e.g.~The Gamma).}
+\label{fig:arch}
+\end{figure}
+
+Standard notebook architecture consists of a \emph{notebook} and a \emph{kernel}. The kernel
+runs on a server, evaluates code snippets and maintains the state they use.
+Notebook runs in a browser and sends commands to the kernel in order to evaluate
+cells selected by the user. As illustrated in Figure~\ref{fig:arch}, Wrattler splits the
+server functionality into two components:
+
+\begin{itemize}
+\item \emph{Data store.} Imported external data and results of running scripts
+are stored in the data store. The data store keeps version history and annotates data with
+metadata such as types, inferred semantics and provenance information.
+
+\item \emph{Language runtimes.} Code in notebook cells is evaluated by language runtimes.
+The runtimes read input data from and write results back to the data store. Wrattler supports
+language runtimes that run code on the server (similar to Jupyter), but also browser-based
+langauge runtimes.
+
+\item \emph{Notebook.} The notebook is displayed in a web browser and orchestrates
+all other components. The browser builds a dependency graph between cells or individual
+calls. It invokes language runtimes to evaluate code that has changed,
+and reads data from the data store to display results.
+\end{itemize}
+
+The central component of the system is the data store, which enables communication between
+individual Wrattler components and provides a persistent data storage.
+Data frames stored in the data store are associated with a hash of a node in a dependency
+graph constructed from the code in the notebook (using a mechanism discussed below)
+and are immutable. When the notebook changes, new nodes with new hashes are created and
+appended to the data store. This means that language runtimes can cache data and avoid
+fetching them from the data store each time they need to evaluate a code snippet.
+
+External inputs imported into Wrattler notebooks (such as downloaded web pages) are stored as
+binary blobs. Data frames are stored in either JSON or binary format.
+The data store also supports a mechanism for annotating data frames with
+semantic information. Columns can be annotated with primitive data types (date, floating-point
+number) and semantic annotation indicating their meaning (address or longitude and latitude).
+Columns, rows and individual cells of the data frame can also be annotated with custom metadata
+such as their data source or accuracy.
+
+\begin{figure}[t]
+\begin{minipage}{.5\textwidth}
+\hspace{-1em}
+\includegraphics[scale=0.2]{img/graph.png}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+\caption{Dependency graph of a notebook from Figure~\ref{fig:wrattler}. For each cell,
+the graph contains a code node and one (or possibly more) export nodes that represent exported
+data frames. The R and Python cells are independent and map to independent graph node. The node
+corresponding to the final JavaScript cell depends on nodes representing the two variables used
+in the code.}
+\label{fig:deps}
+\end{minipage}
+\end{figure}
 
 \subsection{Dependency graphs for notebooks}
 
-x
+At runtime, Wrattler maintains a dependency graph that is remarkably similar to the one
+used in the live data exploration environment for The Gamma discussed in
+Section~\ref{sec:infra-livedata}. As before, the dependency graph is used to cache results
+of previous computations. The nodes in the graph have a unique identifier (hash) that is used
+as the key for caching data in the data store. When code in the notebook is modified, the
+graph is re-created, reusing previously created nodes where possible.
+
+An example of a dependency graph is shown in Figure~\ref{fig:deps}. For every type of
+cell, Wrattler needs to be able to identify the names of imported and exported variables.
+In case of Python, R and JavaScript, this is done using a lightweight code analysis.
+In case of The Gamma, which can also be used in Wrattler, the full
+parse tree and its associated dependency graph is available. A prototype extension of Wrattler
+embeds The Gamma graph as a sub-graph of the dependency graph maintained by Wrattler.
+
+An important design choice in the Wrattler design is that cells can only share data in the form
+of a data frame. The trade-offs of this choice remain to be evaluated. On the one hand,
+it means that Wrattler fits only certain data analytical scenarios. On the other hand, it
+makes it possible to easily share data between cells in different languages. In the
+example dependency graph, each of the ``export'' nodes thus corresponds to a data frame that
+is stored in the data store (using the unique hash of the graph node as the key).
+
+The dependency graph is updated after every code change. This is done using the same
+mechanism as in the live data exploration environment discussed in Section~\ref{sec:infra-livedata}.
+Wrattler invokes individual langauge runtimes to parse each cell. It then walks over the
+resulting structure and constructs nodes for each cell or exported variable with edges
+indicating dependencies. The hash for each node is computed from the data in the node (typically
+source code or variable name) and hashes of nodes it depends on. An important property of this
+process is that, if there is no change in dependencies of a node, the hash of the node
+will be the same as before. As a result, previously evaluated values attached to nodes
+in the graph are reused.
+
+When the evaluation of an unevaluated cell is requested, Wrattler recursively evaluates all
+the nodes that the cell depends on and then evaluates the values exported by the cell.
+The evaluation is delegated to a language runtime associated with the language of the node.
+For languages that run on the server-side (Python, R), the language runtime sends the source
+code, together with its dependencies, to a server that evaluates the code. Note that the
+request needs to include only hashes of imported variables as the server can obtain those
+directly from the data store. For nodes that run on the client-side (JavaScript, The Gamma),
+the evaluation is done directly in the web browser.
 
 \section{Conclusions}
+
+xx
+
+xx
+
 
 % ==================================================================================================
 % CHAPTER 4: ITERATIVE PROMPTING
