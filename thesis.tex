@@ -628,6 +628,7 @@ and MIT (all other projects) licenses.
 % ==================================================================================================
 
 \chapter{Type providers}
+\label{ch:tp}
 
 The first step of the data science lifecycle outlined in the previous chapter was data acquisition.
 This typically involves reading data in semi-structured formats such as CSV, XML and JSON or
@@ -1854,10 +1855,43 @@ the evaluation is done directly in the web browser.
 
 \section{Conclusions}
 
-xx
+In this chapter, I outlined two contributions to the data analytics infrastructure that
+are included in Part~\ref{part:infra} of this thesis. The two contributions describe systems
+that aim to make data exploration more live and reproducible, while supporting the polyglot
+reality of data processing tools used today.
 
-xx
+The work included in Chapter~\ref{ch:foundations} focuses on providing live previews during
+data exploration. Can we simplify data exploration by efficiently previewing the result of
+a data transformation while the data anlyst is constructing it and tweaking its parameters?
+The mechanism presented in this thesis provides a possible answer. The work follows primarily
+the programming language research methodology and so it attempts to capture the core idea
+behind the appriach, using the simple (but adequate) formal model of the data exploration calculus.
+The implementation of the idea provides live previews for code written in The Gamma, a simple
+programming language with support for type providers that we encountered already in
+Section~\ref{sec:tp-query} and that I will return to once more in the next chapter, but using
+the perspective of human-computer interaction research.
 
+The work included in Chapter~\ref{ch:wrattler} presents a polyglot notebook system Wrattler.
+The system makes it possible to mix multiple tools in a single notebook. This includes
+existing programmatic tools, such as those based on Python and R, as well as novel tools like
+The Gamma. The sharing is enabled by the design choice of allowing only data frames as the
+exchange format between cells. The promise of the Wrattler architecture is to enable more research
+and innovation in the data exploration tooling space. It enables data analysts to use tools they
+are already familiar with, but use novel tools where appropriate - for example, include a cell in
+The Gamma that will let consumers of their notebooks explore aggregate data without advanced
+programming expertise. We will leverage this architecture again in the work on AI assistants
+(Chapter~\ref{ch:aia}), outlined in the next chapter.
+
+~
+
+One interesting point that is revealed by putting the two contributions side-by-side is that they
+both rely on the same implementation technique. They both maintain a dependency graph of
+code (expressions or cells) and update it as the code is edited. The graph is constructed so that
+code that remains the same is bound to the same node, making it possible to reuse previously
+computed results. The technical similarity is rooted in a broader principle. In both cases,
+the reproducible code is the final trace that produces all relevant outputs. The principle is
+in contrast with an alternative where code is executed interactively to modify some state
+as in systems based on Read-Eval-Print Loop (REPLs).
 
 % ==================================================================================================
 % CHAPTER 4: ITERATIVE PROMPTING
@@ -1866,10 +1900,102 @@ xx
 \chapter{Iterative prompting}
 \label{ch:iterative}
 
-\cite{rattenbury-2017-wrangling}
-50-80
-with messy data. Surveys \cite{kaggle-2017-state} indicate
-that up to 80\% of data engineering is spent on \emph{data wrangling}, a tedious process of
+Data wrangling is the tedious process of getting data into the right format for data exploration.
+It involves parsing, joining multiple datasets, correcting errors and recovering semantic
+information. According to domain experts \citep{rattenbury-2017-wrangling}, data wrangling
+takes 50-80\% of data scientist's time. Unfortunately, there is no easy cure to the problem
+of data wrangling. The reason for the difficulty is what \cite{gerrit-2019-csv} refer to
+as the \emph{double Anna Karenina principle}: ``every messy dataset is messy in its own way, and
+every clean dataset is also clean in its own way.'' In other words, there is no single
+characterisation of clean dataset that tools could optimise for. Human insight into the data
+is always needed.
+
+This is perhaps why no easy solution has been successful in solving the problem of data wrangling.
+Graphical end-user programming tools typically make it easy to complete the
+most common tasks for most common kinds of datasets, but are incapable of covering the
+inevitable special cases that are present due to the double Anna Karenina principle.
+Automatic AI-based tools for data wrangling suffer from the same issue. They work well in a
+remarkable number of cases, but they can easily confuse interesting outliers for uninteresting
+noise in cases where a human would immediately spot the difference. This is perhaps why most
+data wrangling is often done manually and often involves a mix of programmatic and end-user
+tools. We can make those tools easier to integrate and make tweaking of parameters easier through
+live previews (as discussed in the previous chapter), but what if we could offer a different way
+of working with them?
+
+The contributions outlined in this chapter are centred around the question of how to
+easily enable human data analysts, even if they are not expert programmers, to supply the
+necessary human insight to primarily programmatci tools when cleaning and analysing data.
+The answer offered and analysed in the first contribution (Chapter~\ref{ch:thegamma}) is
+an interaction principle that I refer to as \emph{iterative prompting}. In a tool that
+implements the principle, the user is repeatedly asked to choose from a list of offered options.
+The principle turns the familiar code completion mechanism from a programmer assistance tool
+into a non-expert programming mechanism. The two contributions presented in Part~\ref{part:iterative}
+use iterative prompting in two ways:
+
+\begin{itemize}
+\item In Chapter~\ref{ch:thegamma}, the mechanism is used to allow non-programmers to construct
+  data exploration scripts that query data from a range of different data sources. A key
+  characteristic of the method is that the mechanism allows users to construct only correct
+  scripts and all scripts expressible in the language can be constructed, i.e., the principle
+  is \emph{correct} and \emph{complete}.
+
+\item In Chapter~\ref{ch:aia}, the mechanism is used to guide four different semi-automatic AI data
+  wrangling tools. Here, the tools run automatically, but the user can use iterative prompting
+  to specify constraints in order to correct errors and oversights in the automatically
+  generated solutions. In other words, iterative prompting provides a unified interface through
+  which the analyst can supply human insights to the AI tool.
+\end{itemize}
+
+The primary contributions of the work presented in this chapter is that it develops and validates
+novel approaches to the problem of data wrangling. To do this, it uses two primary research
+methods. The work introducing iterative prompting (Chapter~\ref{ch:thegamma}) uses human-computer
+interaction research methods. It motivates the interaction principle, describes a prototype
+implementation and shows its effectiveness through a qualitative case study and an empirical user
+study. The work on AI assistants (Chapter~\ref{ch:aia}) uses primarily programming systems methods.
+It describes the architecture of the system and validates it by making four existing automatic
+AI tools interactive and semi-automatic. The novel tools are evaluated empirically. In cases where
+the fully automatic tool fails, our semi-automatic tool allows the user to correct the solution
+with a small number (typically 1-2) simple interactions.
+
+The contributions presented in this chapter are perhaps best seen as design space exploration.
+I believe that programming languages and systems are the right starting point for tackling the
+problem of data wrangling and data exploration. But in order to fulfil this role, they need to
+be significantly easier to use. Non-programmers need to be able to create simple data exploration
+sciprts and data analysts need an easy to use interface for solving typical problems.
+Iterative prompting takes the basic auto completion mechanism leveraged by type providers
+(Chapter~\ref{ch:tp}) to a new level, turning it into a simple but powerful unifying
+interaction principle.
+
+\section{Data wrangling and data anlytics}
+related work...
+
+\section{Iterative prompting}
+
+\subsection{Iterative prompting for data exploration}
+tutorial
+mapping of spaces
+
+\subsection{Usability of iterative prompting}
+case studies
+study
+
+\section{AI assistants}
+
+\subsection{Datadiff}
+intro
+
+\subsection{Formal model}
+summary with graph
+
+\subsection{AI assistants}
+review of tools
+
+\section{Conclusions}
+xx
+
+% ==================================================================================================
+% CHAPTER 5: DATA VISUALIZATION
+% ==================================================================================================
 
 \chapter{Data visualization}
 
