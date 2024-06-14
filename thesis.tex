@@ -32,6 +32,11 @@
 \usepackage{stmaryrd}
 \usepackage{enumerate}
 
+\newcommand{\Din}{X}
+\newcommand{\Dout}{Y}
+\DeclareMathOperator{\choices}{\mathit{choices}}
+\DeclareMathOperator{\best}{\mathit{best}}
+
 \newcommand{\lsep}[0]{\;\; | \;\;}
 \newcommand{\kvd}[1]{\textnormal{\ttfamily\bfseries #1}}
 \newcommand{\ident}[1]{\textnormal{\ttfamily #1}}
@@ -76,6 +81,15 @@
     \setlength{\parskip}{0pt}
     \setlength{\parsep}{0pt} }
 { \end{itemize}
+  \vspace{-0.4em} }
+
+\newenvironment{nenumerate}
+{ \vspace{-0.4em}
+  \begin{enumerate}
+    \setlength{\itemsep}{5pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt} }
+{ \end{enumerate}
   \vspace{-0.4em} }
 
 
@@ -1260,6 +1274,7 @@ Chapter~\ref{ch:iterative} and the paper included as Chapter~\ref{ch:thegamma}.
 % ==================================================================================================
 
 \chapter{Data infrastructure}
+\label{ch:infra}
 
 Data scientists use a wide range of tools when working with data. A large part of what makes
 data cleaning and data exploration challenging is that data scientists often need to switch
@@ -1708,10 +1723,12 @@ The paper contrasts the method with standard call-by-value and lazy evaluation s
 coding scenario.
 
 \begin{figure}[t]
+\vspace{0.5em}
 \includegraphics[scale=0.25]{img/wrattler.png}
 \caption{Wrattler running inside the JupyterLab system. The opened notebook passes data between
 cells written in three different programming languages (Python, R and JavaScript).}
 \label{fig:wrattler}
+\vspace{0.5em}
 \end{figure}
 
 \section{Live, reproducible, polyglot notebooks}
@@ -1731,7 +1748,7 @@ As a result, it is possible to integrate tools that provide live preview mechani
 The Gamma and also interactive AI assistants that I discuss in Part~\ref{part:iterative}.
 The architecture of the Wrattler system is based on two key principles:
 
-\begin{itemize}
+\begin{nitemize}
 \item \emph{Polyglot architecture.} The system is designed to allow integration of components in
   different programming languages. This is done by splitting the monolithic architecture of
   Jupyter into individual components including the central data store and multiple language runtimes.
@@ -1739,7 +1756,7 @@ The architecture of the Wrattler system is based on two key principles:
 \item \emph{Design for reproducibility.} To guarantee reproducibility and track data provenance,
   the system represents computation as a dependency graph. The graph is similar to the one discussed
   in the previous section, but uses a coarser granularity with one node for each notebook cell.
-\end{itemize}
+\end{nitemize}
 
 The Wrattler system is presented in detail in Chapter~\ref{ch:wrattler}. The paper follows the
 programming systems methodology. It focuses on the novel system architecture and documents the
@@ -1748,6 +1765,7 @@ capabilities that are enabled by the architecture.
 \subsection{Architecture of a novel notebook system}
 
 \begin{figure}[t]
+\vspace{0.5em}
 \begin{tabular}{p{0.45\textwidth} p{0.55\textwidth}}
 \vspace{2em}\includegraphics[scale=0.6,trim=1.5cm 6cm 1cm 0.4cm,clip]{img/arch.pdf} &
 \vspace{0em}\includegraphics[scale=0.6,trim=1cm 0.5cm 1cm 4cm,clip]{img/arch.pdf}
@@ -1756,6 +1774,7 @@ capabilities that are enabled by the architecture.
   Wrattler, those functions are split between data store and language runtimes. Language runtimes
   can run on the server-side (e.g.~Python) or client-side (e.g.~The Gamma).}
 \label{fig:arch}
+\vspace{0.5em}
 \end{figure}
 
 Standard notebook architecture consists of a \emph{notebook} and a \emph{kernel}. The kernel
@@ -1764,7 +1783,7 @@ Notebook runs in a browser and sends commands to the kernel in order to evaluate
 cells selected by the user. As illustrated in Figure~\ref{fig:arch}, Wrattler splits the
 server functionality into two components:
 
-\begin{itemize}
+\begin{nitemize}
 \item \emph{Data store.} Imported external data and results of running scripts
 are stored in the data store. The data store keeps version history and annotates data with
 metadata such as types, inferred semantics and provenance information.
@@ -1778,7 +1797,7 @@ langauge runtimes.
 all other components. The browser builds a dependency graph between cells or individual
 calls. It invokes language runtimes to evaluate code that has changed,
 and reads data from the data store to display results.
-\end{itemize}
+\end{nitemize}
 
 The central component of the system is the data store, which enables communication between
 individual Wrattler components and provides a persistent data storage.
@@ -1901,21 +1920,21 @@ as in systems based on Read-Eval-Print Loop (REPLs).
 \label{ch:iterative}
 
 Data wrangling is the tedious process of getting data into the right format for data exploration.
-It involves parsing, joining multiple datasets, correcting errors and recovering semantic
+It involves parsing data, joining multiple datasets, correcting errors and recovering semantic
 information. According to domain experts \citep{rattenbury-2017-wrangling}, data wrangling
-takes 50-80\% of data scientist's time. Unfortunately, there is no easy cure to the problem
+takes up to 50-80\% of data scientist's time. Unfortunately, there is no easy cure to the problem
 of data wrangling. The reason for the difficulty is what \cite{gerrit-2019-csv} refer to
 as the \emph{double Anna Karenina principle}: ``every messy dataset is messy in its own way, and
 every clean dataset is also clean in its own way.'' In other words, there is no single
-characterisation of clean dataset that tools could optimise for. Human insight into the data
+characterisation of a clean dataset that tools could optimise for. Human insight into the data
 is always needed.
 
-This is perhaps why no easy solution has been successful in solving the problem of data wrangling.
+Different research directions approached the problem of data wrangling from different perspectives.
 Graphical end-user programming tools typically make it easy to complete the
-most common tasks for most common kinds of datasets, but are incapable of covering the
+most common tasks for the most common kinds of datasets, but are incapable of covering the
 inevitable special cases that are present due to the double Anna Karenina principle.
 Automatic AI-based tools for data wrangling suffer from the same issue. They work well in a
-remarkable number of cases, but they can easily confuse interesting outliers for uninteresting
+large number of cases, but they can easily confuse interesting outliers for uninteresting
 noise in cases where a human would immediately spot the difference. This is perhaps why most
 data wrangling is often done manually and often involves a mix of programmatic and end-user
 tools. We can make those tools easier to integrate and make tweaking of parameters easier through
@@ -1924,68 +1943,424 @@ of working with them?
 
 The contributions outlined in this chapter are centred around the question of how to
 easily enable human data analysts, even if they are not expert programmers, to supply the
-necessary human insight to primarily programmatci tools when cleaning and analysing data.
-The answer offered and analysed in the first contribution (Chapter~\ref{ch:thegamma}) is
+necessary human insight to programmatic tools when cleaning and analysing data.
+The answer presented in the first contribution (Chapter~\ref{ch:thegamma}) is
 an interaction principle that I refer to as \emph{iterative prompting}. In a tool that
-implements the principle, the user is repeatedly asked to choose from a list of offered options.
+follows the principle, the user is repeatedly asked to choose from a list of offered options.
 The principle turns the familiar code completion mechanism from a programmer assistance tool
-into a non-expert programming mechanism. The two contributions presented in Part~\ref{part:iterative}
+into a non-expert programming mechanism. The two contributions included as Part~\ref{part:iterative}
 use iterative prompting in two ways:
 
-\begin{itemize}
+\begin{nitemize}
 \item In Chapter~\ref{ch:thegamma}, the mechanism is used to allow non-programmers to construct
   data exploration scripts that query data from a range of different data sources. A key
   characteristic of the method is that the mechanism allows users to construct only correct
-  scripts and all scripts expressible in the language can be constructed, i.e., the principle
+  scripts and all scripts expressible in the language can be constructed, i.e.,~the principle
   is \emph{correct} and \emph{complete}.
+
+~
 
 \item In Chapter~\ref{ch:aia}, the mechanism is used to guide four different semi-automatic AI data
   wrangling tools. Here, the tools run automatically, but the user can use iterative prompting
   to specify constraints in order to correct errors and oversights in the automatically
   generated solutions. In other words, iterative prompting provides a unified interface through
   which the analyst can supply human insights to the AI tool.
-\end{itemize}
+\end{nitemize}
 
 The primary contributions of the work presented in this chapter is that it develops and validates
 novel approaches to the problem of data wrangling. To do this, it uses two primary research
-methods. The work introducing iterative prompting (Chapter~\ref{ch:thegamma}) uses human-computer
-interaction research methods. It motivates the interaction principle, describes a prototype
+methods. The work introducing iterative prompting (Chapter~\ref{ch:thegamma}) is rooted in
+human-computer interaction research. It motivates the interaction principle, describes a prototype
 implementation and shows its effectiveness through a qualitative case study and an empirical user
-study. The work on AI assistants (Chapter~\ref{ch:aia}) uses primarily programming systems methods.
-It describes the architecture of the system and validates it by making four existing automatic
+study. The work on AI assistants (Chapter~\ref{ch:aia}) combines programming langauge theory and
+programming systems research methods. It describes the architecture of the system using a formal
+model and validates it by making four existing automatic
 AI tools interactive and semi-automatic. The novel tools are evaluated empirically. In cases where
 the fully automatic tool fails, our semi-automatic tool allows the user to correct the solution
 with a small number (typically 1-2) simple interactions.
 
-The contributions presented in this chapter are perhaps best seen as design space exploration.
-I believe that programming languages and systems are the right starting point for tackling the
+The work in this chapter is best seen as design space exploration.
+I believe that programming languages and systems provide the right starting point for tackling the
 problem of data wrangling and data exploration. But in order to fulfil this role, they need to
 be significantly easier to use. Non-programmers need to be able to create simple data exploration
 sciprts and data analysts need an easy to use interface for solving typical problems.
 Iterative prompting takes the basic auto completion mechanism leveraged by type providers
-(Chapter~\ref{ch:tp}) to a new level, turning it into a simple but powerful unifying
-interaction principle.
+to a new level, turning it into a simple but powerful unifying sinteraction principle.
 
 \section{Data wrangling and data anlytics}
-related work...
+
+Data wrangling is most often done manually using a combination of programmatic and graphical tools.
+Jupyter and RStudio are popular environments used for programmatic data cleaning.
+They are used alongside libraries that implement specific functionality such as parsing CSV files
+or merging datasets \cite{gerrit-2019-csv,sutton-2018-datadiff} and general data transformation
+functions provided, e.g.,~by Pandas and Tidyverse.\footnote{\url{https://pandas.pydata.org} and
+\url{https://www.tidyverse.org} (Accessed 12 June 2024)}
+
+Graphical data wrangling systems such as Trifacta\footnote{\url{https://www.trifacta.com} (Accessed
+12 June 2024)} consist of myriad tools for importing and transforming data, which are accessible
+through different user interfaces or through a scriptable programmatic interface.
+Finally, spreadsheet applications such as Excel and business intelligence tools like Tableau are
+often used for manual data editing, reshaping, and especially
+visualization \citep{kandel-2011-research}. The above general-purpose systems are frequently
+complemented by ad-hoc, for example for parsing PDF documents.
+
+Some of the most practical tools along the entire data wrangling pipeline partially automate
+a specific tedious data wrangling task. To merge datasets, Trifacta and datadiff
+\citep{sutton-2018-datadiff} find corresponding columns using machine learning. To transform textual
+data and tables, Excel employs programming-by-example to parse semistructured
+data and many tools exist to semi-automatically detect duplicate records in databases.
+
+~
+
+Interactive and semi-automatic data wrangling tools, allow the analyst to review
+the current state of the analysis and make changes to it. The interaction
+between a human and a computer in such data wrangling systems follows a number of common patterns:
+
+\begin{nitemize}
+\item \emph{Onetime interaction.} A tool makes a best guess, but allows the analyst to manually edit
+the proposed data transformation. Examples include dataset merging
+in Trifacta and datadiff \citep{sutton-2018-datadiff}.
+
+\item \emph{Live previews.} Environments like Jupyter, Trifacta, and The Gamma
+(Chapter~\ref{ch:foundations}) provide live previews, allowing the analyst to check the results and tweak
+parameters of the operation they are performing before moving~on.
+
+\item \emph{Iterative.} A tool re-runs inference after each interaction with a human
+to refine the result. For example, in Predictive Interaction \citep{heer-2015-predictive}
+the analyst repeatedly selects examples to construct a data~transformation.
+
+\item \emph{Question-based.} A system repeatedly asks the human questions about data and uses the
+answers to infer and refine a general data model. Examples include data repair tools such as UGuide
+\citep{thirumuruganathan-2017-uguide}.
+\end{nitemize}
+
+For interactive data wrangling tools, the \emph{live previews} pattern is the most common one
+with a varying degree of liveness. Most semi-automatic data wrangling tools accept only
+limited forms of human input. The \emph{onetime interaction} pattern is the most common
+and only a few systems follow the more flexible \emph{iterative} pattern. The iterative
+prompting principle that I introduce in this chapter implements the \emph{iterative} pattern
+in a uniform way that is inspired by work on information-rich programming programming
+\citep{syme-2013-inforich} and type providers (Chapter~\ref{ch:tp}). It is centred around
+code, but reduces the conceptual complexity of coding to a single basic kind of interaction.
 
 \section{Iterative prompting}
+Technically speaking, I have already discussed all the components that together make up
+the first implementation discussed in this chapter. In The Gamma, the iterative prompting
+principle is implemented through the standard code completion mechanism that is
+used to select members generated by the type provider outlined in Chapter~\ref{ch:tp}.
+The main contribution of the paper included as Chapter~\ref{ch:thegamma} is that it
+looks at the design from the perspective of human-computer interaction research.
 
-\subsection{Iterative prompting for data exploration}
-tutorial
-mapping of spaces
+The key idea behind the principle is that a non-programmer should be able to construct
+an entire data exploration script only by selecting appropriate members from a list of
+offered choices. Technically speaking, the script thus becomes a single chain of member
+accesses. As I discuss below, this also requires a specific type provider design.
+
+The process of data exploration through iterative prompting is illustrated in Figure
+Figure~\ref{fig:iterative}, which uses the type provider outlined in Chapter~\ref{ch:tp} to
+find the UK House of Lords member from the county of Kent with the most number of days away.
+The example shows three steps of the process:
+
+\begin{nenumerate}
+\item The user starts by selecting an input data source (not using iterative prompting)
+  and types `.' (dot) to see available querying operations. The system offers a list of
+  (all available) operations including filtering, grouping and sorting.
+
+\item The user chooses \texttt{filter data}. They are then offered a list of conditions
+  based on the columns in the dataset. The user selects \texttt{County is} and is then
+  offered a list of all possible values of the column in the dataset. Thanks to the fact
+  that iterative prompting in The Gamma is embedded in an ordinary text editor, they
+  can start typing to filter the (long) list of possible values.
+
+\item The user chooses \texttt{Kent} as the required value. They are then offered a list
+  including further conditons and the \texttt{then} member that makes it possible to choose
+  another transformation. They choose \texttt{then} and continue to add sorting.
+\end{nenumerate}
+
+\begin{figure}[t]
+\hspace{-2em}
+\includegraphics[scale=0.45]{img/iterative.png}
+\caption{Using the iterative prompting interaction principle in The Gamma to explore
+dataset containing information on UK House of Lords members.}
+\label{fig:iterative}
+\end{figure}
+
+In The Gamma, the iterative prompting principle is used in the context of text-based
+programming language with type providers. This is a deliberate design choice. The aim of the
+work is to see whether iterative prompting can make text-based programming accessible to
+non-programmers. As a programming language, The Gamma is a simple object-oriented language
+with nominal type system and support for type providers. It allows a couple of constructs
+in addition to the method chaining shown in Figrue~\ref{fig:iterative} including let binding
+and method calls such as \texttt{expenses.paging.take(10)}. I briefly review the design trade-offs
+below.
+
+\subsection{Iterative prompting for data querying}
+
+The paper included as Chapter~\ref{ch:thegamma} shows that iterative prompting can
+provide a unified interface for exploring data from a range of different data sources.
+One of the hypotheses evaluated in the paper is that this aids usability by supporting transfer
+of knowledge between different kinds of data sources. To evaluate this, we implemented
+type providers for exploring data cubes \citep{syme-2013-inforich}, created by the author of
+this thesis, tabular data, as outined in Chapter~\ref{ch:tp} and discussed in
+full in Chapter~\ref{ch:dotdriven}, and graph databases.
+
+\begin{figure}[t]
+\subcaptionbox{
+  \raggedright
+  Exploring World Bank data using the data \hspace{20em}
+  cube type provider, users choose values from  \hspace{20em}
+  two dimensions to obtain a data series.
+  \label{fig:cubetp}
+}{
+  \includegraphics[scale=0.24]{img/cubetp.png}
+  \vspace{1em}
+}
+\quad
+\subcaptionbox{
+  \raggedright
+  To query graph data, the user specifies a path through the data, possibly with
+    placeholders to select multiple nodes.  \label{fig:graphtp}
+}{
+  \includegraphics[scale=0.24]{img/graphtp.png}
+  \vspace{1em}
+}
+\vspace{0.5em}
+\caption{Design of type providers for exploring cube and graph data}
+\label{fig:tpdiags}
+\end{figure}
+
+Data cubes are multi-dimensional arrays of values. For example, the World Bank collects
+indicators about many countries each year. The type provider makes it possible to select a data
+series, such as CO$_2$ emissions of the US over time:
+
+\begin{lstlisting}[language=thegamma]
+worldbank.byCountry.'United States'.
+  'Climate Change'.'CO2 emissions (kt)'
+\end{lstlisting}
+
+\noindent
+The dimensions of the \texttt{worldbank} cube are countries, years and indicators.
+Figure~\ref{fig:cubetp} illustrates how the provider allows users to slice the data cube --
+\texttt{byCountry.\textquotesingle United States\textquotesingle},
+restricts the cube to a plane and \texttt{\textquotesingle CO2 emissions (kt)\textquotesingle}
+gives a series with years as keys and emissions as values. Similarly, we could first filter the
+data by a year or an indicator.
+
+Graph databases store nodes representing entities and relationships between them.
+The following example explores a database of Doctor Who characters and episodes. It retrieves
+all enemies of the Doctor that appear in the Day of the Moon episode:
+
+\begin{lstlisting}[language=thegamma]
+drwho.Character.Doctor.'ENEMY OF'.'[any]'
+  .'APPEARED IN'.'Day of the Moon'
+\end{lstlisting}
+
+\noindent
+The query is illustrated in in Figure~\ref{fig:graphtp}. We start from the \texttt{Doctor} node
+and then follow two relationships. We use \texttt{\textquotesingle ENEMY
+OF\textquotesingle.\textquotesingle [any]\textquotesingle}
+to follow links to all enemies of the Doctor and then specify
+\texttt{\textquotesingle APPEARED IN\textquotesingle}
+to select only enemies that appear in a specific episode. The members are generated from the data;
+\texttt{\textquotesingle ENEMY OF\textquotesingle} and \texttt{\textquotesingle APPEARED IN\textquotesingle} are labels
+of relations and \texttt{Doctor} and \texttt{\textquotesingle Day of the Moon\textquotesingle} are labels of nodes. The
+\texttt{[any]} member defines a placeholder that can be filled with any node with the specified
+relationships. The results returned by the provider is a table of properties of all nodes
+along the specified path, which can be further queried and visualized.
+
+Unlike the graph and data cube providers, the type provider for tabular data does not just
+allow selecting a subset of the data, but it can be used to construct SQL-like query.
+For example, the code constructed in Figure~\ref{fig:iterative} filters and sorts the data.
+
+When using the provider, the user specifies a sequence of operations. Members such as
+\texttt{\textquotesingle filter data\textquotesingle} or \texttt{\textquotesingle sort data\textquotesingle}
+determine the operation type. Those are followed by members that specify operation parameters.
+For example, when filtering data, we first select the column and then choose a desired value.
+Unlike SQL, the provider only allows users to choose from pre-defined filtering conditions,
+but this is sufficient for constructing a range of practical queries.
 
 \subsection{Usability of iterative prompting}
-case studies
-study
+
+To evaluate the usability of iterative prompting, we conducted a user study for which we
+recruited 13 participants (5 male, 8 female) from a business team of a research institute
+working in non-technical roles (project management, communications).
+Our primary hypothesis was that non-programmers will be able to use iterative prompting
+to explore data, but some aspects of the study were also designed to how users learn to use
+the mechanism and whether knowledge can be trasferred between different data sources.
+The study methodology and detailed discussion of results can be found in Chapter~\ref{ch:thegamma}.
+The key observations from the study are:
+
+\begin{nitemize}
+\item \emph{Can non-programmers explore data with The Gamma?}
+All participants were able to complete, at least partially, a non-trivial data exploration task and
+only half of them required further guidance. A number of participants shared positive comments in
+the group interviews. One participant noted that ``this is actually pretty simple to use,''
+while another felt the system makes coding more accessible:
+``for somebody who does not do coding or programming, this does not feel that daunting.''
+
+\item \emph{How users learn The Gamma?}
+There is some evidence that knowledge can be transferred between different data sources. In two
+of the tasks, participants were able to complete the work after seeing a demo
+of using another data source. One participant ``found it quite easy to translate what you showed
+us in the demo to the new dataset.'' Once users understood iterative prompting, they were also
+able to learn from just code samples and do not need to see a live demo of using the tool.
+One participant noted that ``a video would just be this [i.e.~a code sample] anyway.''
+
+\item \emph{How users understand complex query languages?}
+The tabular type provider uses a member \texttt{then} to complete the specification of a
+current operation, for example when specifying a list of aggregation operations. Two participants
+initially thought that \texttt{then} is used to split a command over multiple lines,
+but rejected the idea after experimenting. One participant then correctly concluded that it
+``allows us to chain together the operations'' of the query. While iterative prompting
+allows users to start exploring new data sources, the structures exposed by more complex data
+sources have their own further design principles that the users need to understand.
+
+\item \emph{What would make The Gamma easier to use?}
+Three participants struggled to complete a task using the tabular data source,
+because they attempted to use an operation that takes a numerical parameter and thus
+violates the iterative prompting principle. Most participants had no difficulty navigating
+around in text editor and some participants used the text editor effectively, e.g.~leveraging
+copy-and-paste. However, two participants struggled with indentation and a syntax error in an
+unrelated command. This could likely be alleviated through better error reporting.
+\end{nitemize}
+
+\begin{figure}[t]
+\centering
+\includegraphics[scale=0.24]{img/datadiff.png}
+\caption{Using the datadiff AI assistant inside Wrattler to semi-automatically merge
+UK Broadband quality data from two files, parsed by an earlier R script. The user is in the process
+of adding a constraint to correct an error in the automatically inferred column matching.}
+\label{fig:ddiff}
+\end{figure}
 
 \section{AI assistants}
+Iterative prompting can be used as a mechanism for program construction, as illustrated in the
+previous section, but it can also be used to guide semi-automatic data wrangling tools.
+As discussed above, many systems that aim to simplify data wrangling using AI methods support
+only the \emph{onetime interaction} pattern where the user invokes the tool and gets back a
+result that they can manually refine if needed. In the paper included as Chapter~\ref{ch:aia},
+we use iterative prompting as the basis for the AI assistants framework, which is a common
+structure for building semi-automatic data wrangling tools that incorporate human feedback.
+When using an AI assistant, the user invokes the assistant on some input data, but they can then
+repeatedly use iterative prompting to further constrain the solution.
 
-\subsection{Datadiff}
-intro
+As illustrated in Figure~\ref{fig:ddiff}, AI assistants are available in the
+Wrattler notebook system discussed in Chapter~\ref{ch:infra}. In addition to code cells that
+obtain, process and visualize data, users can create AI assistant cells that invoke a semi-automatic
+data cleaning tool on some of the available datasets. After invoking the assistant, users are
+shown a preview of the generated clean dataset. If they see an error in the automatically inferred
+solution, they can choose one from the offered options to guide the AI tool and correct the error.
+Iterative prompting for AI assistants uses a graphical user interface, but the
+interaction mechanism of repeatedly choosing one from the offered options remains the~same.
 
-\subsection{Formal model}
-summary with graph
+\subsection{Merging data with Datadiff}
+
+To give an overview of how AI assistants work, consider the task of merging
+multiple incompatible datasets, using the UK broadband quality data, published
+by the UK communications regulator Ofcom.\footnote{Available at: \url{https://www.ofcom.org.uk/research-and-data/data/opendata}}
+The regulator collects data annually, but the formats of the files are inconsistent over the
+years. The order of columns changes, some columns are renamed, and new columns are added. We
+take the 2014 dataset and select six interesting columns (latency, download and
+upload speed, time needed to load a sample page, country, and whether the observation is from
+an urban or a rural area). We then want to find corresponding columns in the 2015 dataset.
+
+The 2015 dataset has 66 different columns so finding corresponding columns manually would be
+tedious. An alternative is to use the automatic datadiff tool~\citep{sutton-2018-datadiff}, which
+matches columns by analyzing the distributions of the data in each column. Datadiff generates a list of
+\emph{patches} that reconcile the structure of the two datasets. A patch describes a single data
+transformation to, for example, reorder columns or recode a categorical column according to an
+inferred mapping. Datadiff is available as an R function that takes two datasets and several
+hyperparameters that affect the likelihood of the different types of patches.
+
+When mergning Broadband datasets, datadiff correctly matches five out of six columns, but it
+incorrectly attempts to match a column representing Local-loop unbundling (LLU) to a column
+representing UK countries. This happens because datadiff allows the recoding of categorical columns,
+and seeks to match them based on the relative frequencies in the two columns. Consequently,
+the inferred transformation includes a patch to recode the \texttt{Cable}, \texttt{LLU}, and
+\texttt{Non-LLU} values to \texttt{Scotland}, \texttt{Wales}, and \texttt{England}. To correct this,
+we could manually edit the resulting list of patches, or tweak the likelihood of the
+\emph{recode} patch. Such parameter tuning is typical for real-world data wrangling, but finding
+the values that give the desired result can be hard.
+
+The semi-automatic datadiff AI assistant presented in this chapter enables the analyst to guide
+the inference process by specifying human insights in the form of constraints.
+The AI assistant first suggests an initial set of patches with one incorrect mapping. After the
+analyst chooses one of the offered constraints, shown in Figure~\ref{fig:ddiff}, datadiff
+runs again and presents a new solution that respects the specified constraints
+until, after two more simple interactions, it reaches the correct solution.
+
+\subsection{Formal model of AI assistants}
+
+The central contribution presented in Chapter~\ref{ch:aia} is a formal model of AI assistants
+that captures their structure. The chapter uses the standard methodology of theoretical
+programming language research, but applied to a problem from the data engineering research field.
+The definition of an AI assistant captures a common structure that semi-automatic data wrangling
+tools can follow in order to use iterative prompting as a mechanism for incorporating human
+insights into the data wrangling process.
+
+The formal model defines AI assistants as a mathematical entity that consists of several
+operations, modelled as mathematical functions between different sets.
+Every AI assistant is defined by three operations that work with expressions~$e$, past human
+interactions $H$, input data $\Din$, and output data $\Dout$. Expressions $e$ can also be
+thought of as data cleaning scripts. Input and output data are typically one or more data
+tables, often annotated with meta-data such as column types.
+While AI assistants share a common structure, the language of expressions $e$ that an assistant
+produces, the notion of human interactions $H$, and the notion of $\Din$ and $\Dout$ can differ
+between assistants.
+
+\begin{definition}[AI assistant]
+\label{def:aia}
+Given expressions $e$, input data $\Din$, output data $\Dout$, and human interactions $H$, an
+\emph{AI assistant} $(H_0, f, \best, \choices)$ is a tuple where
+$H_0$ is a set denoting an empty human interaction and
+$f, \best$ and $\choices$ are operations such that:
+%
+\begin{nitemize}
+\item $f(e,\Din) = \Dout$
+\item $\best_{\Din}(H) = e$
+\item $\choices_{\Din}(H) = (H_1,H_2,H_3,\ldots,H_n)$.
+\end{nitemize}
+\end{definition}
+
+The operation $f$ transforms an input dataset $\Din$ into an output dataset $\Dout$ according to the
+expression (data cleaning script) $e$. The operation $\best_{\Din}$ recommends the best expression
+for a given input dataset $\Din$, respecting past human interactions $H$. Finally, the operation
+$\choices_{\Din}$ generates a sequence of options $H_1, H_2, H_3, \ldots, H_n$ that the
+analyst can choose from (e.g.~through the user interface illustrated in Figure~\ref{fig:ddiff}).
+When interacting with an assistant, the selected human interaction $H$ is passed back to
+$\best_\Din$ in order to refine the recommended expression. Note that the sequence of human
+interactions given by $\choices_{\Din}$ may be sorted, starting with the one deemed the most
+likely. To initialize this process, the AI assistant defines an empty human interaction $H_0$.
+
+The interesting AI logic can be implemented in either the $\best_\Din$
+operation, the $\choices_\Din$ operation, or both. The $f$ operation is typically
+straightforward. It merely executes the inferred cleaning script. Both $\best_{\Din}$ and
+$\choices_{\Din}$ are parameterized by input data $\Din$, which could be the actual input or a
+smaller representative subset to make working with the assistant more efficient.
+
+The logic of working with AI assistants is illustrated in Figure~\ref{fig:interaction}. When using
+the assistant, we start with the empty interaction $H_0$. We then iterate until the human analyst
+accepts a proposed data transformation. In each iteration, we first invoke $\best_\Din(H)$ to get
+the best expression $e^{*}$ respecting the current human insights captured by $H$. We then invoke
+$f(e^{*}, \Din)$ to transform the input data $\Din$ according to $e^{*}$ and obtain a transformed
+output dataset $\Dout$. After seeing a preview of $\Dout$, the analyst can either accept or reject
+the recommended expression $e^{*}$. In the latter case, we generate a list of possible human
+interactions $H_1, H_2, H_3, \ldots, H_n$ using $\choices_\Din(H)$ and ask the analyst to pick an
+option $H_i$ (where $i\in \{1,\ldots,n\}$). We use this choice as a new human interaction $H$ and call
+the AI assistant again.
+
+The Definition~\ref{def:aia} serves both as a model that can be studied formally,
+but also as the basis for an implementation interface of AI assistants. The shared structure
+makes it possible to separate the development of individual AI assistants from the development
+of tools that use them, such as the AI assistant cell type implemented in Wrattler.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.95\textwidth]{img/aias.pdf}
+\caption{Flowchart illustrating the interaction between an analyst and an AI assistant.
+Steps drawn as rounded rectangles correspond to user interactions with the system.}
+\label{fig:interaction}
+\end{figure}
 
 \subsection{AI assistants}
 review of tools
