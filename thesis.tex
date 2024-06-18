@@ -36,6 +36,7 @@
 \newcommand{\Dout}{Y}
 \DeclareMathOperator{\choices}{\mathit{choices}}
 \DeclareMathOperator{\best}{\mathit{best}}
+\DeclareMathOperator{\argmax}{\mathrm{arg\,max}}
 
 \newcommand{\lsep}[0]{\;\; | \;\;}
 \newcommand{\kvd}[1]{\textnormal{\ttfamily\bfseries #1}}
@@ -2338,15 +2339,15 @@ straightforward. It merely executes the inferred cleaning script. Both $\best_{\
 $\choices_{\Din}$ are parameterized by input data $\Din$, which could be the actual input or a
 smaller representative subset to make working with the assistant more efficient.
 
-The logic of working with AI assistants is illustrated in Figure~\ref{fig:interaction}. When using
+The working of AI assistants is illustrated in Figure~\ref{fig:interaction}. When using
 the assistant, we start with the empty interaction $H_0$. We then iterate until the human analyst
-accepts a proposed data transformation. In each iteration, we first invoke $\best_\Din(H)$ to get
+accepts the proposed data transformation. In each iteration, we first invoke $\best_\Din(H)$ to get
 the best expression $e^{*}$ respecting the current human insights captured by $H$. We then invoke
 $f(e^{*}, \Din)$ to transform the input data $\Din$ according to $e^{*}$ and obtain a transformed
 output dataset $\Dout$. After seeing a preview of $\Dout$, the analyst can either accept or reject
 the recommended expression $e^{*}$. In the latter case, we generate a list of possible human
 interactions $H_1, H_2, H_3, \ldots, H_n$ using $\choices_\Din(H)$ and ask the analyst to pick an
-option $H_i$ (where $i\in \{1,\ldots,n\}$). We use this choice as a new human interaction $H$ and call
+option $H_i$. We use this choice as a new human interaction $H$ and call
 the AI assistant again.
 
 The Definition~\ref{def:aia} serves both as a model that can be studied formally,
@@ -2356,17 +2357,143 @@ of tools that use them, such as the AI assistant cell type implemented in Wrattl
 
 \begin{figure}
 \centering
+\vspace{-1em}
 \includegraphics[width=0.95\textwidth]{img/aias.pdf}
 \caption{Flowchart illustrating the interaction between an analyst and an AI assistant.
 Steps drawn as rounded rectangles correspond to user interactions with the system.}
 \label{fig:interaction}
+\vspace{-0.5em}
 \end{figure}
 
-\subsection{AI assistants}
-review of tools
+\subsection{Practical AI assistants}
+To show that AI assistants provide a common structure for a wide range of semi-automatic
+data wrangling tools, the work included as Chapter~\ref{ch:aia} takes four existing
+AI-based data wrangling tools that follow the \emph{onetime interaction} pattern and turns them
+into interactive tools that follow the \emph{iterative} pattern. The original tools
+cover the entire spectrum of data wrangling ranging from parsing of CSV files~\citep{gerrit-2019-csv}
+and merging data files~\citep{sutton-2018-datadiff} to type and semantic information inference
+(see Chapter~\ref{ch:aia}).
+
+The approach we use for turning a non-interactive AI tool into an interactive AI assistant
+is similar in all four cases. The non-interactive tools generally define an objective function
+$Q(e,\Din)$ that scores data cleaning scripts (expressions $e$) based on how well they clean the
+specified input data $\Din$. The automatic AI tool performs an optimization, looking for the
+best data cleaning from the set of all possible expressions $E$ for the given data. Formally,
+the optimization task solved by the existing tools can be written as:
+%
+\vspace{-0.25em}
+\begin{equation*}
+\argmax_{e \in E} Q(\Din, e)
+\end{equation*}
+\vspace{-1.25em}
+
+\noindent
+The AI assistants that we implement and formally describe in Chapter~\ref{ch:aia} adapt this
+optimization to take account of the human interactions $H$ that have been collected through
+the iterative prompting process illustrated in Figure~\ref{fig:interaction}. For a given
+human interaction $H$ (starting with $H_0$), we define a set of expressions $E_H$ that is
+filtered to only include expressions satisfying the condition specified by the user through
+$H$. We also define a parameterized objective function $Q_H$ that is based on the original
+$Q$ but increases or decreases the score for certain expressions based on $H$. Given these
+two definitions, it is possible to define the $\best_\Din(H)$ operation as solving an
+optimization problem:
+%
+\vspace{-0.25em}
+\begin{equation*}
+\best_\Din(H) = \argmax_{e \in E_H} Q_H(\Din, e)
+\end{equation*}
+\vspace{-1.25em}
+
+\noindent
+The four concrete AI assistants that we developed use this definition, but they do not
+always use human interactions to tweak both $E_H$ and $Q_H$. It is often sufficient to
+restrict the set of expressions used by the search and reuse the original unmodified optimization
+algorithm. The implementation of the AI assistants (available in Wrattler) generally required
+a modification of the underlying non-interactive tool. The modification is tool-specific as
+each of the AI assistants is based on a different kind of search algorithm.
+%
+The four practical AI assistants presented in Chapter~\ref{ch:aia} work as follows:
+
+\begin{nitemize}
+\item The \emph{datadiff AI assistant} infers a list of patches that transform the input dataset
+  into a format matching that of the given reference dataset. The assistant optimizes score based
+  on the similarity of the data distributions of the matched columns. The semi-interactive AI
+  assistant allows the user to specify that certain patches (e.g., matching two particular columns)
+  should or should not be included in the resulting set.
+
+\item The \emph{CleverCSV AI assistant} infers formatting parameters of a CSV file to optimize a
+  metric based on how regular the resulting parsed result is. The semi-interactive AI assistant
+  allows the user to specify that a given character should be or should not be used as a delimiter,
+  a quote or an escape character.
+
+\item The \emph{ptype AI assistant} infers types of columns in a dataset, detecting outliers and
+  values representing missing data. The optimization function looks for a type with maximal
+  likelihood based on a probabilistic model. The semi-interactive AI assistant allows the user
+  to reject any aspect of the inferred type (type itself, outlier, missing value), effectively
+  forcing the search to look for the next most likely type.
+
+\item The \emph{ColNet AI assistant} annotates data with semantic information from a knowledge
+  graph such as DBpedia \citep{lehmann-2015-dbpedia}. It uses a Convolutional Neural Network model
+  to calculate the score that sampled data is of a given semantic type and then finds the type
+  with the greatest score. The semi-interactive AI assistant adapts the scoring, allowing the
+  user to specify that a given sample is (or is not) of a specified semantic type.
+\end{nitemize}
+
+In Chapter~\ref{ch:aia}, we evaluate the effectiveness of the four AI assistants both qualitatively
+and quantiatively. Our qualitative evaluation uses three scenarios in which the different
+earlier data wrangling tools are unable to solve a real-world data wrangling challenge using
+the \emph{onetime} interaction. We document how the user can use iterative prompting to obtain
+the desired result, by repeatedly choosing one option from the offered list. To evaluate
+AI assistants quantitatively, we developed a benchmark that counts how many human interactions
+are needed to complete a given data wrangling task for multiple datasets (either reusing an
+existing benchmark or synthetically generated). The evaluation shows that 1-2 human interactions
+are usually sufficient to complete the task.
 
 \section{Conclusions}
-xx
+
+This chapter brings together two contributions that aim to reduce the gab between programming
+and spreadsheets by making two tasks that typically require some kind of programming easier.
+In the first contribution, I focused on data exploration, whereas the second contribution tackles
+the task of data wrangling. My work shows that, in both cases, it is possible to solve
+a large class of problems using the \emph{iterative prompting} interaction principle where the
+user repeatedly chooses one from the offered options. The interaction principle is simple in
+that it reduces the cognitive load by using the \emph{recognition over recall} design heuristic.
+When using iterative prompting, the users do not need to recall the kind of operation they
+could use to solve the problem. Instead they can review the list of offered options and recognize
+the most suitable one.
+
+The work included in Chapter~\ref{ch:thegamma} introduces the \emph{iterative prompting}
+interaction principle and uses it to view the type provider for data querying outlined in
+Chapter~\ref{ch:tp} from a novel perspective using the human-computer interaction research
+methodology. Rather than treating auto-completion as a programmer assistance tool, it is
+now used as a mechanism that allows non-programmers to construct entire programs. The key
+characteristics of the type provider that make this possible is that it is complete and correct,
+i.e.~ it makes it possible to construct all programs and any program constructed by
+repeatedly choosing one of the offered options is correct (even though some may result in
+empty data). The user study that I briefly discussed in this chapter shows that iterative
+prompting can be used by non-programmers to complete a range of data exploration tasks
+in a code-oriented environment. This suggests that it is possible to combine the reproducibility
+and transparency of using code with ease of use approaching that of spreadsheets.
+
+The work included in Chapter~\ref{ch:aia} uses the iterative prompting interaction principle
+(albeit without using the term) to provide human insights to semi-automatic data wrangling
+tools that I refer to as AI assistants. The challenge addressed by AI assistants is how to
+guide data wrangling tools based on AI techniques. Although such tools can solve many problems
+automatically, the complexity of real-world data sets often means that some human guidance
+is needed. Iterative prompting provides an easy method through which humans can provide such
+guidance. The chapter introduces a formal model of AI assistants and uses it as the basis for
+the implementation of four practical tools.
+
+The contributions presented in this chapter link together many of the themes and contributions
+discussed in earlier chapters. In particular, the notion of type providers was introduced
+as a programming tool from the programming language theory perspective in Chapter~\ref{ch:tp}.
+This chapter provides an alternative human-centric perspective. The techniques discussed
+in Chapter~\ref{ch:infra} make type providers even more usable by providing live previews during
+their usage. Finally, the Wrattler notebook system serves as a platform for integrating
+many of the experiments discussed in this thesis. For example, it makes it possible to combine
+interactive AI assistants with conventional programmatic data exploration using the widely
+used Python and R languages.
+
 
 % ==================================================================================================
 % CHAPTER 5: DATA VISUALIZATION
