@@ -125,6 +125,11 @@ runcolor=Black
   morestring=[b]",
   sensitive=true
 }
+\lstdefinelanguage{fluid}{
+  keywords={let},
+  morestring=[b]",
+  sensitive=true
+}
 \lstdefinelanguage{sharp}{
   keywords={var,in,foreach,let,type,null,match,with,for},
   morecomment=[l]{//},
@@ -2501,9 +2506,123 @@ used Python and R languages.
 
 \chapter{Data visualization}
 
-what?
-what?
+Data visualization plays a dual role in the data science lifecycle. Quick data
+visualizations are needed during data exploration to help data analysts make sense of the
+data, find errors and understand how their processing scripts work. However, data visualizations
+are also often one of the outcomes of data science projects. In particular, data journalists
+often analyse data in order to find interesting insights and share those with their readers.
+An illuminating data visualization can be a powerful tool for such storytelling.
 
+Producing a quick data visualization during data exploration is usually easy. In programmatic
+environments, it is usually a matter of calling a function with a few parameters to specify
+the type of chart one wants to see. However, developing a data visualization that helps
+the reader gain insight into a complex problem and critically think about it is typically
+a challenging programming task.
+
+As an example, consider the interactive data visualization shown in Figure~\ref{fig:youguess},
+which is inspired by the New York Times ``You draw it'' article series \citep{aisch-2015-youdraw}.
+The visualization encourages critical thinking by first asking the reader to make a guess
+about the data. Only after the reader drags the bars according to their presumptions, the
+chart reveals the actual values.
+
+\begin{figure}[h!]
+\vspace{1em}
+\hspace{-2.5em}
+\subcaptionbox{
+  \raggedright
+  The user first has to guess what the values are
+  (here, guess how much the UK government spends per category).
+  \label{fig:youguess1}
+}{
+  \includegraphics[scale=0.18]{img/youguess1.png}
+  \vspace{1em}
+}
+\quad
+\subcaptionbox{
+  \raggedright
+  After clicking a button, actual data is shown \hspace{10em} (together with a marker showing the guess).
+  \label{fig:youguess2}
+}{
+  \includegraphics[scale=0.18]{img/youguess2.png}
+  \vspace{1em}
+}
+\vspace{0.5em}
+\caption{An interactive data visualization to encourage critical thinking about data created using
+the composable Compost data visualization library.}
+\label{fig:youguess}
+\end{figure}
+
+The chart is based on a standard bar chart, but there are multiple additional aspects that
+make creating such chart a challenging programming problem:
+
+\begin{nitemize}
+\item The chart combines multiple different visual elements. In additional to the bars themselves,
+  it also needs to include the markers (dashed lines) that show the guess.
+\item The chart uses a custom color scheme, background to indicate possible area of the bar and it
+  grays out the bars for which the user has not yet made a guess.
+\item The chart is interactive, allowing the user to drag the end of the bar to any location in
+  the specified range (until the button is clicked).
+\item Once the button is clicked, a brief animation runs and the bars move from the guessed
+  value to the actual value (the marker stays at the original position).
+\end{nitemize}
+
+Although numerous charting libraries support some of the above features, creating a custom
+data visualization such as the above typically requires using a low-level visualization library
+such as D3 \citep{bostock-2011-d3}, which requires advanced programming skills. Even more
+advanced programming skills are typically needed if one wants to implement data visualization
+that support features such as brushing and linking \citep{buja-1991-linking}. The former allows
+the user to focus on a particular region of the chart, while the latter connects two charts and
+adapts the visualization in the second chart based on the data selection in the first chart.
+Implementing linking is particularly challenging, because it requires understanding what
+inputs contributed to the selected data points and then recomputing the data displayed in the
+other visualization.
+
+
+also linking
+
+two contributions
+
+methodology
+
+\section{data viz}
+D3 is hard
+
+\section{Compost}
+
+\newpage
+
+\section{Fluid}
+
+\begin{figure}[t]
+\hspace{-3em}\includegraphics[scale=0.7]{img/fluid.png}
+\caption{fluid}
+\label{fig:gap}
+\end{figure}
+
+\begin{lstlisting}[language=fluid,mathescape=true]
+let totalFor c rows =
+   sum [ row.output | row $\leftarrow$ rows, row.country == c ]
+let data2015 = [ row | row $\leftarrow$ data, row.year == 2015 ]
+let countryData = [ { x: c, y: totalFor c data2015 }
+                  | c $\leftarrow$ ["China", "USA", "Germany"] ]
+BarChart { caption: "Total by country", data: countryData }
+\end{lstlisting}
+
+\begin{lstlisting}[language=fluid,mathescape=true]
+let series type country = [
+   { x: year, y: row.output }
+   | year $\leftarrow$ [2013..2018], row $\leftarrow$ data,
+     row.year == year, row.energyType == type, row.country == country ]
+LineChart {
+   caption: "Output of USA relative to China",
+   plots: [
+      LinePlot { name: type, data: plot }
+      | type $\leftarrow$ ["Bio", "Hydro", "Solar", "Wind"],
+        let plot = zipWith (fun p1 p2 $\rightarrow$ { x: p1.x, y: p1.y / p2.y })
+                           (series type "USA") (series type "China")
+   ]
+}
+\end{lstlisting}
 
 \part{Publications: Type providers}
 \label{part:providers}
