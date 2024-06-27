@@ -111,6 +111,7 @@ runcolor=Black
 \lstdefinestyle{mystyle}{
   commentstyle=\color{ForestGreen},
   keywordstyle=\color{NavyBlue},
+  ndkeywordstyle=\color{Fuchsia},
   stringstyle=\color{Maroon},
   basicstyle=\ttfamily,
   numbers=left,
@@ -131,7 +132,8 @@ runcolor=Black
   sensitive=true
 }
 \lstdefinelanguage{sharp}{
-  keywords={var,in,foreach,let,type,null,match,with,for},
+  keywords={var,in,foreach,let,type,null,match,with,for,do},
+  ndkeywords={fill,cat,cont,padding,axis,overlay,rect},
   morecomment=[l]{//},
   morecomment=[s]{/*}{*/},
   morestring=[b]",
@@ -2507,11 +2509,11 @@ used Python and R languages.
 \chapter{Data visualization}
 
 Data visualization plays a dual role in the data science lifecycle. Quick data
-visualizations are needed during data exploration to help data analysts make sense of the
+visualizations are needed during data exploration to help data analysts make sense of
 data, find errors and understand how their processing scripts work. However, data visualizations
-are also often one of the outcomes of data science projects. In particular, data journalists
+can also be one of the outcomes of data science projects. In particular, data journalists
 often analyse data in order to find interesting insights and share those with their readers.
-An illuminating data visualization can be a powerful tool for such storytelling.
+A sophisticated and illuminating data visualization can be a powerful tool for such storytelling.
 
 Producing a quick data visualization during data exploration is usually easy. In programmatic
 environments, it is usually a matter of calling a function with a few parameters to specify
@@ -2520,9 +2522,10 @@ the reader gain insight into a complex problem and critically think about it is 
 a challenging programming task.
 
 As an example, consider the interactive data visualization shown in Figure~\ref{fig:youguess},
-which is inspired by the New York Times ``You draw it'' article series \citep{aisch-2015-youdraw}.
-The visualization encourages critical thinking by first asking the reader to make a guess
-about the data. Only after the reader drags the bars according to their presumptions, the
+created using the Compost library discussed below. The visualization is inspired by the New York
+Times ``You draw it'' article series \citep{aisch-2015-youdraw}.
+It encourages critical thinking by first asking the reader to make a guess
+about the actual data. Only after the reader drags the bars according to their presuppositions, the
 chart reveals the actual values.
 
 \begin{figure}[h!]
@@ -2568,8 +2571,9 @@ make creating such chart a challenging programming problem:
 
 Although numerous charting libraries support some of the above features, creating a custom
 data visualization such as the above typically requires using a low-level visualization library
-such as D3 \citep{bostock-2011-d3}, which requires advanced programming skills. Even more
-advanced programming skills are typically needed if one wants to implement data visualization
+such as D3 \citep{bostock-2011-d3}, which requires advanced programming skills.
+
+More advanced programming skills are needed if one wants to implement data visualizations
 that support features such as brushing and linking \citep{buja-1991-linking}. The former allows
 the user to focus on a particular region of the chart, while the latter connects two charts and
 adapts the visualization in the second chart based on the data selection in the first chart.
@@ -2577,21 +2581,235 @@ Implementing linking is particularly challenging, because it requires understand
 inputs contributed to the selected data points and then recomputing the data displayed in the
 other visualization.
 
+In the following two sections, I provide an overview of two systems that are presented in
+Part~\ref{part:visualization}. The sytems make it easier to create rich interactive
+visualizations. First, the paper included as Chapter~\ref{ch:compost} presents Compost, a novel
+functional data visualization library that makes it possible to compose rich charts
+from a small number of primitive building blocks and combinators.
+Second, the paper included as Chapter~\ref{ch:galois}
+presents a program analysis technique that can be used to automatically create linked data
+visualizations based on the code of scritps that construct charts from shared data.
+The two systems are aimed at programmers, but they are simple in that they make it possible
+to create sophisticated interactive visualizations using small amount of straightforward code.
 
-also linking
+Both of the papers introduced in this chapter use programming language research methods.
+Chapter~\ref{ch:galois} presents the analysis technique formally, using a small model
+programming language and discusses its properties. Chapter~\ref{ch:compost} gradually introduces
+the concepts of the Compost library in the form of a tutorial. Published as a
+functional pearl \citep{gibbons-2010-pearl}, it relies on the tacit assessment of the functional
+programming community.
 
-two contributions
+\section{Visualizations to encourage critical thinking}
 
-methodology
+Data visualizations that aim to present data-driven insights to a broader audience often
+require significant programming effort. The ``You draw it'' series by New York Times
+\citep{aisch-2015-youdraw} lets the user draw on the chart, while the award-winning visualization
+of population density in Asian cities by \cite{bremer-2015-asia} tells a story through multiple
+animated and interlinked charts. Visualizations like these are often built using D3
+\citep{bostock-2011-d3}, by constructing the chart piece by piece. D3~is easier than drawing
+pixels or primitive shapes, but it still requires tediously transforming values to coordinates,
+specifying positions in pixels and modifying shape properties in response to events.
 
-\section{data viz}
-D3 is hard
+Higher-level compositional approaches to chart construction are typically based on grammar of
+graphics \citep{wilkinson-1999-grammar}. In grammar of graphics, a chart is a mapping from
+data to chart elements and their visual attributes. Libraries based on this idea include
+ggplot2 \citep{satyanaran-2016-vega,wickham-2016-ggplot2} and Vega \citep{wickham-2010-layered}.
+The mapping is limited to a number of built-in operations, which works well for common types of
+scientific charts, but has a limited generality. For example, in Altair~\citep{vanderplas-2018-altair},
+it is possible to link multiple charts by specifying a data transformation that relates them,
+but this has to be specified using a limited set of combinators provided (and understood) by the
+library.
 
-\section{Compost}
+In contrast to systems based on the grammar of graphics, the two systems presented in this chapter
+rely on the host programming language to specify the mapping from data to chart elements. A chart
+is merely a resulting data type describing the visual elements using domain-specific primitives.
+In the two chapters, summarized in the next two sections, we first define a small, orthogonal set
+of expressive primitives and then introduce a program analysis technique that can automatically
+infer the mapping between source data and elements of the chart.
+
+\begin{figure}[t]
+\begin{minipage}[t]{0.6\textwidth}\vspace{-4em}
+\includegraphics[scale=0.7]{img/compost.png}
+\end{minipage}%
+\begin{minipage}{0.35\textwidth}\vspace{0pt}
+\caption{\raggedright A bar chart that compares the UK general election results
+for years 2017 (left) and 2019 (right), created using the Compost library.}
+\label{fig:compost}
+\end{minipage}
+\end{figure}
+
+\section{Composable data visualizations}
+The Compost library, presented in Chapter~\ref{ch:compost} can be seen as a functional
+domain-specific language for describing charts. As is often the case with domain-specific
+languages, finding the right primitives is more of an art than science. The Compost library
+is designed in a way that gives it a number of desirable properties:
+
+\begin{nitemize}
+\item Concepts such as bar charts, line charts or charts with aligned
+  axes are all expressed in terms of more primitive building blocks using a small number of combinators.
+\item The primitives are specified in domain terms. When drawing a line, the value of an $y$ coordinate
+  is an exchange rate of 1.36 USD/GBP, not 67 pixels from the bottom.
+\item Common chart types such as bar charts or line charts can be easily captured as high level
+  abstractions, but many interesting custom charts can be created as well.
+\item The approach can easily be integrated with the Elm architecture \citep{czaplicki-2016-mvu}
+	to create web-based charts that involve animations or interaction with the user.
+\end{nitemize}
+
+\subsection{Declarative chart descriptions}
+
+To illustrate the first two points, consider the chart in Figure~\ref{fig:compost}, which
+compares UK election results for years 2017 and 2019. In the chart, the $x$ axis shows categorical
+values representing the political parties such as ``Conservative'' or ``Labour''. The
+$y$ axis shows numerical values representing the number of seats won such as 365 MPs.
+When creating a chart, most high-level libraries such as Google Charts expect values in domain
+terms, but more flexible libraries like D3 expect the user to first explicitly trnaslate
+such domain values to pixels. In Compost, the user composes primitive graphical elements such
+as filled rectangles, but their position is specified in terms of domain values.
+
+Our design focuses on two-dimensional charts with $x$ and $y$ axes. Values mapped to those axes
+can be either categorical (e.g.~political parties, countries) or continuous
+(e.g.~number of votes, exchange rates). The mapping from categorical and continuous values
+to positions on the chart, as well as the range of values associated with a scale,
+are calculated automatically. Figure~\ref{fig:scales} illustrates the
+two kinds of values. A continuous value, written as $\texttt{cont}~n$ contains any number $n$.
+A categorical value $\texttt{cat}~c, r$ consists of a categorical value $c$ and a number $r$ between
+$0$ and $1$. The second parameter determines an exact position in the range allocated for the
+categorical value such as ``Green''.
+
+\begin{figure}[t]
+  \vspace{-1em}
+  \centering\includegraphics[scale=0.95,trim=0cm 7cm 6cm 0cm,clip]{img/values.pdf}
+  \caption{On a continuous scale (above), a position is determined by a number. On a
+  categorical scale (below), a position is determined by the category and a number
+  between 0 and 1.}
+  \label{fig:scales}
+\end{figure}
+
+Assuming we have a list \texttt{elections} which contains 5-element tuples with the party name,
+colours for 2017 and 2019 and number of MPs for 2017 and 2019, we can construct the chart in
+Figure~\ref{fig:compost} as follow (using F\# or similar language with list comprehensions):
+
+\begin{lstlisting}[language=sharp,mathescape=true]
+axis$_l$ (axis$_b$ (overlay [
+  for party, c17, c19, mp17, mp19 in elections $\rightarrow$
+    padding 0, 10, 0, 10, overlay [
+      fill clr17, [
+        (cat party, 0), (cont 0); (cat party, 0), (cont mp17);
+        (cat party, 0.5), (cont mp17); (cat party, 0.5), (cont 0) ],
+      fill clr19, [
+        (cat party, 0.5), (cont 0); (cat party, 0.5), (cont mp19);
+        (cat party, 1), (cont mp19); (cat party, 1), (cont 0) ]
+    ]
+]))
+\end{lstlisting}
+
+\noindent
+The central part of the code (lines 4-6 and 7-9) constructs two filled rectangles (bars)
+representing number of MPs for 2017 and 2019, respectively. Each rectangle is specified
+by four corners (separated using ``;''). The $y$ axist is continuous and the rectangle occupies
+space from 0 to the specified number. The $x$ axis is categorical. The first bar takes the
+first half of the space available for the party ($0$ to $0.5$) while the second occupies the
+second half ($0.5$ to $1$). We then compose the two rectangles using \texttt{overlay}, which
+ensures they are rendered on a shared scale. The \texttt{padding} primitive adds a space around
+a given shape (specified in pixels). We generate pair of rectangles for each party using a
+list comprehension and then overlay all the rectangles before adding axes on the left and bottom.
+
+In addition to the primitives illustrated by the above example, Compost has a number of
+other basic shapes (lines, text, bubbles). Perhaps more interestingly, there are also a couple of
+combinators that make it possible to combine charts or create charts that share axes.
+The \texttt{nest} combinator, explained in Chapter~\ref{ch:compost}, takes a shape (with its own
+scales) and nests it inside an explicitly specified range. We can, for example, take a space
+defined by a categorical value (from $\texttt{cat}~c, 0$ to $\texttt{cat}~c, 1$) and nest
+another shape, or even a line chart, inside this space. In practice, this is useful for combining
+multiple charts. The combinator can also apply to one axis only, making it possible to create
+two charts that are side-by-side on one axis, but share the other axis.
+
+\subsection{Rendering a Compost chart}
+
+The rendering logic of Compost takes a declarative chart description such as the one generated
+by the simple functional program above and transforms it to an SVG in three steps:
+
+\begin{nitemize}
+\item \emph{Inferring the scales of a shape}. The implementation first recursively walks over
+  the composed shape and infers the ranges of the $x$ and $y$ scales of the shape. For shapes
+  constructed using \texttt{overlay}, this unions the ranges of the scales of the contained
+  shapes. In case of continuous scale, we take the overall minimum and maximum. For categorical
+  scale, the sets of categories obtained for each shape are unioned.
+
+\item \emph{Projecting coordinates}. Once the chart is annotated with the inferred scales, we
+  turn all positions from values defined in domain terms to values specified in pixels. This
+  is done using a projection function that takes a scale, a space it should be mapped onto
+  (in pixels) and a value on the scale. The result are $x$ and $y$ coordinates in pixels.
+
+\item \emph{Rendering chart shapes}. Finally, the recursively defined shape is turned into
+  a flat list of shapes in the SVG format. This involves collecting and concatenating
+  all the primitive shapes, lines and text elements.
+\end{nitemize}
+
+The implementation of the core logic consists of only 800 lines of code. Although the
+process is conceptually simple, there is a number of subtle details. In particular,
+operations that specify some parameters in pixels (such as padding) have to transform the
+projection operation so that the resulting shapes only occupy a space without the specified padding.
+Nesting also requires keeping track of the outer range and the inner scale. It is also worth
+noting that some operations, such as \texttt{axis} that adds an axis with labels, can be eliminated
+at some point in the process. In particular, \texttt{axis} is replaced by overlaid lines and text
+elements in the first step.
+
+\subsection{Functional abstraction and interactivity}
+
+As noted earlier, Compost differs from libraries based on the
+grammar of graphics such as ggplot2 \citep{wickham-2016-ggplot2} that treat a chart as
+as a mapping from data to chart elements and their visual attributes. In Compost,
+a chart is a concrete description of chart elements, generated from data by code
+written in an ordinary programming language. I illustrated this above with the code that
+generated a bar chart using list comprehensions. This means that Compost
+can leverage other capabilities of the host~language~and~its~ecosystem.
+
+First, it is possible to easily introduce new higher-level chart abstractions. For example,
+the chart shown in Figure~\ref{fig:compost} is sometimes referred to as Dual X-axis Bar Chart.
+Some high-level libraries such as Google Charts support this directly. We saw that the
+chart can be constructed using Compost, but in a somewhat tedious way. However, in a host
+language that lets us define new functions like F\#, we can introduce a new abstraction
+for this kind of chart. The following merely extracts the rectangle construction from the
+previous example into a function \texttt{dualXBar}:
+
+\begin{lstlisting}[language=sharp,mathescape=true]
+let dualXBar xcat clr1 clr2 yval1 yval2 = overlay [
+  fill clr1, [ (cat xcat, 0), (cont 0); (cat xcat, 0), (cont yval1);
+    (cat xcat, 0.5), (cont yval1); (cat xcat, 0.5), (cont 0) ],
+  fill clr2, [ (cat xcat, 0.5), (cont 0); (cat xcat, 0.5), (cont yval2);
+    (cat xcat, 1), (cont yval2); (cat xcat, 1), (cont 0) ]
+]
+\end{lstlisting}
+
+\noindent
+We can now use the function inside a list comprehension to construct the original chart
+in just three lines of code:
+
+\begin{lstlisting}[language=sharp,mathescape=true]
+axis$_l$ (axis$_b$ (overlay [
+  for party, c17, c19, mp17, mp19 in elections $\rightarrow$
+    dualXBar party c17 c19 mp17 mp19 ]))
+\end{lstlisting}
+
+\noindent
+One last interesting aspect of the Compost library that is discussed in Chapter~\ref{ch:compost}
+is the support for interactivity. The library can be used in conjunction with the
+Elm (model-view-update) architecture \citep{czaplicki-2016-mvu} where the programmer defines
+the program \emph{state} and \emph{events}. They then provide a function that renders
+a chart based on the current state. They also specify a function that updates the sate when
+an event occurs. For example, in the earlier interactive chart in Figure~\ref{fig:youguess},
+one event is clicking on a bar, which then updates the guessed value. Compost makes programming
+such charts easier by reporting events in terms of domain values (using a backward projection).
+When user clicks on a bar, the event handler receives a pair of values such as
+$\texttt{cat}~\textnormal{``Health''}, 0.3$ and $\texttt{cont}~12.7$. It then updates the
+guessed value for the category Health to the new value 12.7\% GDP.
+
+\section{Linked visualizations via dependency analysis}
 
 \newpage
 
-\section{Fluid}
+xx
 
 \begin{figure}[t]
 \hspace{-3em}\includegraphics[scale=0.7]{img/fluid.png}
@@ -2669,6 +2887,9 @@ who did what
 (especially galois)
 
 \chapter{Conclusion}
+
+
+
 
 if the society is to benefit...
 
