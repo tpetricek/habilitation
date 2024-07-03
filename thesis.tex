@@ -127,7 +127,8 @@ runcolor=Black
   sensitive=true
 }
 \lstdefinelanguage{fluid}{
-  keywords={let},
+  keywords={let,fun},
+  ndkeywords={BarChart,LineChart,LinePlot},
   morestring=[b]",
   sensitive=true
 }
@@ -1746,7 +1747,7 @@ providing rapid feedback to data scientists during data exploration. The other t
 I listed in the opening of this chapter were the need for polyglot tooling support and the need
 to make data analyses more reproducible.
 
-The two challenges are tackled by the open-source Wrattler notebook system presented in full in
+The two challenges are addressed by the open-source Wrattler notebook system presented in full in
 Chapter~\ref{ch:wrattler}. Wrattler is an extension for the industry standard JupyterLab platform.
 As illustrated in Figure~\ref{fig:wrattler}, Wrattler adds a new type of document format that
 allows programmers to mix cells written in multiple different programming languages in a single
@@ -2516,7 +2517,7 @@ often analyse data in order to find interesting insights and share those with th
 A sophisticated and illuminating data visualization can be a powerful tool for such storytelling.
 
 Producing a quick data visualization during data exploration is usually easy. In programmatic
-environments, it is usually a matter of calling a function with a few parameters to specify
+environments, it is typically a matter of calling a function with a few parameters to specify
 the type of chart one wants to see. However, developing a data visualization that helps
 the reader gain insight into a complex problem and critically think about it is typically
 a challenging programming task.
@@ -2807,40 +2808,166 @@ guessed value for the category Health to the new value 12.7\% GDP.
 
 \section{Linked visualizations via dependency analysis}
 
-\newpage
+The Compost library makes it possible to compose an appealing data visualization
+from individual graphical elements. This is necessary if we want to create rich interactive
+charts. But a single chart that offers a single perspective is not enough if we want to
+explain complex data. To support better understanding, \emph{linked visualizations}
+consist of multiple charts that display different aspects of the same data. When the user
+selects an element in one of the charts, the elements that are based on related data as the
+selected one are highlighted in the other charts.
 
-xx
+For example, consider the data visualization in Figure~\ref{fig:fluid} that displays data
+on energy production over time for different countries and different types of energy.
+A single chart with three variables would be difficult to read, so the visualization
+instead filters and aggregates the data in two ways. It shows data per country for the year
+2015 and ratio of energy produced in the USA and China over time for each type of energy.
+The user can select a particular data point (bar on the left, point on the right). If they
+select the bar representing the USA, the system infers which input data contributed to the
+value (data for all types of energy for the USA in 2015) and computes what chart elements depend
+on this data in the second chart (data points for 2015). Selecting Germany
+would not highlight any points as the right chart depends only on data points for
+China and the USA.
 
 \begin{figure}[t]
-\hspace{-3em}\includegraphics[scale=0.7]{img/fluid.png}
-\caption{fluid}
-\label{fig:gap}
+  \hspace{-3em}\includegraphics[scale=0.7]{img/fluid.png}
+  \caption{Linked data visualization of energy production, showing aggregated data per
+  country for 2015 (left) and timeline with the ratio of production
+  in the USA and China per energy type (right).}
+  \label{fig:fluid}
 \end{figure}
 
+Constructing such linked visualization requires
+
+\newcommand*{\evalBwdR}[1]{{\mathrel{\rotatebox[origin=c]{45}{$\Rightarrow$}}}_{#1}}
+\newcommand*{\evalFwdR}[1]{{\mathrel{\rotatebox[origin=c]{-45}{$\Rightarrow$}}}_{\hspace{-0.2em}#1}}
+\newcommand*{\dual}[1]{{#1}^{\circ}}
+
+\subsection{Language-based foundation for explainable charts}
+
+~
+
+~
+
+~
+
+~
+
+
 \begin{lstlisting}[language=fluid,mathescape=true]
-let totalFor c rows =
-   sum [ row.output | row $\leftarrow$ rows, row.country == c ]
-let data2015 = [ row | row $\leftarrow$ data, row.year == 2015 ]
-let countryData = [ { x: c, y: totalFor c data2015 }
-                  | c $\leftarrow$ ["China", "USA", "Germany"] ]
-BarChart { caption: "Total by country", data: countryData }
+let data2015 =
+  [ row | row $\leftarrow$ data, row.year == 2015 ]
+let totalFor c =
+  sum [ row.output | row $\leftarrow$ data2015, row.country == c ]
+let countryData =
+  [ { x: c, y: totalFor c } | c $\leftarrow$ ["China", "USA", "Germany"] ]
+BarChart { data: countryData }
 \end{lstlisting}
 
 \begin{lstlisting}[language=fluid,mathescape=true]
-let series type country = [
-   { x: year, y: row.output }
-   | year $\leftarrow$ [2013..2018], row $\leftarrow$ data,
-     row.year == year, row.energyType == type, row.country == country ]
-LineChart {
-   caption: "Output of USA relative to China",
-   plots: [
-      LinePlot { name: type, data: plot }
-      | type $\leftarrow$ ["Bio", "Hydro", "Solar", "Wind"],
-        let plot = zipWith (fun p1 p2 $\rightarrow$ { x: p1.x, y: p1.y / p2.y })
-                           (series type "USA") (series type "China")
-   ]
-}
+let series type country =
+  [ { x: year, y: row.output } | year $\leftarrow$ [2013..2018], row $\leftarrow$ data,
+    row.year == year, row.energyType == type, row.country == country ]
+let plot type =
+  zipWith (fun p1 p2 $\rightarrow$ { x: p1.x, y: p1.y / p2.y })
+    (series type "USA") (series type "China")
+LineChart { plots: [
+  LinePlot { name: type, data: plot type }
+    | type $\leftarrow$ ["Bio", "Hydro", "Solar", "Wind"] ] }
 \end{lstlisting}
+
+\newpage
+
+\subsection{Language-based foundation for explainable charts}
+
+...
+
+The paper included as Chapter~\ref{ch:galois} defines a range of program analyses that
+can be composed in a number of ways to obtain information necessary for automatically
+generating linked data visualizations. The analyses are more general-purpose and can be
+used in other ways, but I focus on the primary use case. Given the scope of the language
+and the considerable number of analyses, I do not discuss any details in this overview
+and focus merely on sketching the overall structure and the key properties of the analyses.
+
+The analyses are built around the central notion of a program trace $T$. The traces
+are generated during program evaluation and they collect information about how the
+evaluation proceeded. More formally, a trace is a compact representation of the derivation
+trees in the operational semantics. Given a program $e$ and a variable environment $\rho$,
+the following judgement states that the program reduces to a value $v$, producing a trace $T$:
+%
+\begin{equation*}
+T :: \rho, e \Rightarrow v
+\end{equation*}
+%
+The program analyses operate on values where some parts are marked as selected. For example,
+if a program $e$ produces a value $v$ that represents a chart using the primitives of the Compost
+library, we can mark some parts of the resulting chart, for example a bar created using the
+\texttt{fill} primitive.
+
+Formally, we annotate values and terms with selection states $\alpha$ from a bounded
+lattice of selections $\mathcal{A}$. It is possible to annotate primitive values such as
+numbers $n_\alpha$ or empty lists $\textnormal{\texttt{[]}}_\alpha$ but also values that
+contain further values such as a non-empty list (a cons cell) such as
+$v_1\, \textnormal{\textbf{:}}_\alpha\, v_2$. This would indicate that we are interested in
+data that determined that the list will be non-empty (but not the specfic values it contains).
+In practice, the most useful kind of annotation is a two-point lattice (selected, non-selected),
+but the generality allows for other uses, such as a vector of selections (to be computed in one
+step and displayed using different colours).
+
+\subsection{Bidirectional dependency analyses}
+
+The program analyses that are introduced in Chapter~\ref{ch:galois} are defined for a fixed
+computation $T :: \rho, e \Rightarrow v$ where $T$ is the trace. In practice, the system evaluates
+the expression $e$ and uses the resulting trace $T$ repeatedly for different analyses and
+with multiple possible selections. The first two analyses that we define are the backward and
+forward data dependency analyses written as $\evalFwdR{T}$ and $\evalBwdR{T}$, respectively.
+The two analyses are defined over the trace $T$ and take the availability-annotated
+variable context and an expression $\rho, e$ as inputs. They produce an annotated value
+$v$, which is the same as the value computed initially, but with availability annotations.
+Their intuitive meaning is as follows:
+
+\begin{nitemize}
+\item \emph{Forward data dependency} $\rho, e, \alpha\; \evalFwdR{T}\; v$ or \emph{``what only needs me''}.
+  Given a context and expression where annotations indicate what resources (data and parts of
+  the program) are available, the analysis produces a value with annotations indicating what
+  part of the value can be computed using only the available resources.
+\item\emph{Backward data dependency} $\rho, e, \alpha\; \evalBwdR{T}\; v$ or \emph{``what do I need''}.
+  Given an annotated value $v$, the analysis follows the evaluation backwards (using the trace
+  $T$) and annotates resources (data and parts of the program) that have to be available in
+  order to produce the annotated parts of the value $v$.
+\end{nitemize}
+
+The two analyses form a Galois connection, i.e., the two analyses are not exactly inverses,
+because they approximate in some ways, but they are close. For example, if we have a value with
+a selection $v$, ask what is needed for the selection using $\evalBwdR{T}$ and then ask
+what can be computed using the same data using $\evalFwdR{T}$, we may find that other parts of
+the value can also be computed, but the original selection will certainly also be included.
+
+Interestingly, the forward and backward data dependency analyses are not sufficient to
+support linked data visualizations. The backward analysis can correctly determine what parts of
+the input are needed in order to produce the selected output. However, to highlight the related
+elements of the other chart, we do not need to know what the input selection is \emph{sufficient}
+for, but what it is \emph{necessary} for. In other words, we do not need to know what can be
+computed using only the selected parts of the input, but what part of the result will they
+certainly contribute to. This can be formulated as a dual of the original analyses. What would we
+not be able to compute if the selected data were unavailable?
+
+In the paper included as Chapter~\ref{ch:galois}, we define this duality formally and exploit
+it to define De Morgan dual $(\dual{\evalFwdR{T}}, \dual{\evalBwdR{T}})$ of the Galois
+connection $(\evalBwdR{T}, \evalFwdR{T})$, which itself also forms a Galois connection.
+The intuitive meaning of the new analyses is as follows:
+
+\begin{nitemize}
+\item \emph{Dual forward data dependency} $\rho, e, \alpha\; \dual{\evalFwdR{T}}\; v$ or \emph{``what needs me''}.
+  For an annotated context and expression (resources), the analysis highlights what
+  parts of the resulting value depend on the specified resources, i.e., what would we not be
+  able to compute if the selected parts of the value were unavailbale.
+\item \emph{Dual backward data dependency} $\rho, e, \alpha\; \dual{\evalBwdR{T}}\; v$ \emph{``what do only I need''}.
+  Given an annotated value, the analysis highlights parts of the program and data
+  that are only needed for producing the selected output, i.e., resources that
+  would not be needed if the selected part of the output was not needed.
+\end{nitemize}
+
+...
 
 \part{Publications: Type providers}
 \label{part:providers}
