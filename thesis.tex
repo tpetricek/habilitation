@@ -24,6 +24,7 @@
 %\usepackage[scaled]{beramono}
 \usepackage[scaled=0.8]{noto}
 \usepackage[T1]{fontenc}
+\usepackage{bibentry}
 
 % \usepackage{caladea}
 \usepackage[colorlinks]{hyperref} % [hidelinks]
@@ -167,11 +168,68 @@ runcolor=Black
 \label{ch:preface}
 \addcontentsline{toc}{chapter}{\nameref{ch:preface}}
 
-Cambridge, MSR, Kent, ATI
+This thesis presents a selection of my recent research that focuses on making programming
+tools for data exploration simpler. The origins of this research direction can be traced to
+my involvement with the F\# programming language. When Don Syme and the F\# team at Microsoft
+developed the first versions of the F\# type provider mechanism, I started my first experiments
+that eventually led to the type providers for structured data presented as one of the contributions
+in this thesis. However, seeing how easy working with data in a programming language can be
+led me to a further question: Could we make programmatic data exploration easy enough that it
+could be done by non-programmers? The rising popularity of data journalism at the time provided
+a further practical motivation.
 
-DNI
+The work presented in this thesis has been done at a number of institutions, starting towards the
+end of my PhD at University of Cambridge and finishing as I was joining the Department of
+Distributed and Dependable Systems (D3S) at the Faculty of Mathematics and Physics. In between,
+I spent time at Microsoft Research in Cambrige, The Alan Turing Institute in London and the
+University of Kent in Canterbury. I am grateful to all those institutions for enabling me to
+pursue my research vision.
 
-CUNI
+Although I am the first author of most of the work presented in this thesis, none of it would be
+possible without the many collaborators that I was fortunate to meet along the way. Don Syme
+not only provided the initial motivation and collaborated with me on multiple papers, but also
+became my long-term mentor and a friend. The work related to F\# received warm welcome from the
+friendly F\# community and early commercial adopters. Gustavo Guerra deserves a special credit
+for turning F\# Data from a prototype to a well-engineered (and widely adopted) package.
+
+At The Alan Turing Institute, I was fortunate to meet James Geddes who got me involved in the
+AI for Data Analytics (AIDA) project. The bridging of different worlds that James made possible
+resulted in my involvement in research on notebooks and data provenance with Charles Sutton,
+but also work on automating data wrangling with Gerrit van den Burg, Alfredo Nazábal, Taha Ceritli,
+Ernesto Jim\'enez-Ruiz and Chris William. The Alan Turing Institute also provided initial funding
+for our joint work on data visualization tools with Roly Perera.
+
+In addition to direct collaborators, the work presented in this thesis benefited from numerous
+discussions with my other colleagues and friends. This includes Dominic Orchard and Stephen Kell
+first at University of Cambridge and then at University of Kent,
+Kenji Takeda, Jomo Fisher and Keith Battocchi at Microsoft Research
+and May Yong, Nick Barlow, Brooks Paige at The Alan Turing Institute.
+Mathias Brandewinder, Jonathan Edwards, Nour Boulahcen, Luke Church, Clemens Klokmose,
+Mariana Marasoiu and Alan Blackwell also provided ideas, insights, technical contributions
+and valuable feedback on some of the works presented as part of this thesis.
+
+~
+
+The work presented in this thesis also received valuable support from industrial collaborators.
+My research focused on data journalism benefited from discussions with
+Megan Lucero from The Bureau of Investigative Journalism. My work on F\# was supported by
+the wide and enthusiastic F\# community and also by Howard Mansell and BlueMountain Capital.
+I had the pleasure of presenting many of the ideas at a number of industry conferences,
+including NDC in Oslo and London, LambdaDays and DevDay in Krak\'ow, GOTO in Copenhagen and Chicago,
+CogX London and, most recently, the F\# Data Science conference in Berlin. These presentations
+were vital not only for enabling industry adoption of some of the systems presented in this thesis,
+but also provided valuable feedback.
+
+Over time, the work has been financially supported in a number of ways. The Google Digital News
+Initiative provided me with a generous individual grant that allowed me to fully focus on
+programming tools for data journalism for one and half years. Microsoft Research,
+BlueMountain Capital, University of Kent and Charles University paid for some of my time over
+the years. At The Alan Turing Institute, I was supported by The UKRI Strategic Priorities Fund
+under EPSRC Grant EP/T001569/1, particularly the Tools, Practices and Systems theme within that
+grant, through the UK Government's Defence & Security Programme and by The Alan Turing Institute
+under EPSRC grant EP/N510129/1. At Charles University, I was a part of the
+Department of Distributed and Dependable Systems and I was also supported by the PRIMUS
+grant PRIMUS/24/SCI/021.
 
 \addcontentsline{toc}{chapter}{Contents}
 \tableofcontents
@@ -2806,17 +2864,18 @@ When user clicks on a bar, the event handler receives a pair of values such as
 $\texttt{cat}~\textnormal{``Health''}, 0.3$ and $\texttt{cont}~12.7$. It then updates the
 guessed value for the category Health to the new value 12.7\% GDP.
 
-\section{Linked visualizations via dependency analysis}
+\section{Automatic linking for data visualizations}
 
-The Compost library makes it possible to compose an appealing data visualization
-from individual graphical elements. This is necessary if we want to create rich interactive
-charts. But a single chart that offers a single perspective is not enough if we want to
-explain complex data. To support better understanding, \emph{linked visualizations}
+The Compost library makes it possible to compose an appealing data visualization from individual
+graphical elements. This is necessary if we want to create rich interactive charts. But a single
+chart that offers a single perspective is not enough if we want to explain complex data. To
+support better understanding, \emph{linked visualizations} \citep{buja-1991-linking}
 consist of multiple charts that display different aspects of the same data. When the user
 selects an element in one of the charts, the elements that are based on related data as the
-selected one are highlighted in the other charts.
+selected one are highlighted in the other charts. This makes it possible to relate different
+perspectives on the same data.
 
-For example, consider the data visualization in Figure~\ref{fig:fluid} that displays data
+For example, consider the visualization in Figure~\ref{fig:fluid} that displays data
 on energy production over time for different countries and different types of energy.
 A single chart with three variables would be difficult to read, so the visualization
 instead filters and aggregates the data in two ways. It shows data per country for the year
@@ -2829,30 +2888,42 @@ would not highlight any points as the right chart depends only on data points fo
 China and the USA.
 
 \begin{figure}[t]
-  \hspace{-3em}\includegraphics[scale=0.7]{img/fluid.png}
+  \vspace{-1.5em}
+  \hspace{-3.5em}\includegraphics[scale=0.7]{img/fluid.png}
   \caption{Linked data visualization of energy production, showing aggregated data per
   country for 2015 (left) and timeline with the ratio of production
   in the USA and China per energy type (right).}
   \label{fig:fluid}
 \end{figure}
 
-Constructing such linked visualization requires
+Constructing linked visualization like the one in Figure~\ref{fig:fluid} is difficult,
+because the data visualization needs to understand how to map selection between the charts.
+This can be done automatically for simple data transformations in libraries based on the
+grammar of graphics such as Altair~\citep{vanderplas-2018-altair}. In those, simple data
+transformations can be expressed using primitives provided by the library. However, the
+approach does not work if the data transformation is more complex or if the user prefers to
+express it in an ordinary programming language (as ordinary list processing) as opposed to
+using a special-purpose domain specific language (grammar of graphics primitives).
 
-\newcommand*{\evalBwdR}[1]{{\mathrel{\rotatebox[origin=c]{45}{$\Rightarrow$}}}_{#1}}
-\newcommand*{\evalFwdR}[1]{{\mathrel{\rotatebox[origin=c]{-45}{$\Rightarrow$}}}_{\hspace{-0.2em}#1}}
-\newcommand*{\dual}[1]{{#1}^{\circ}}
+In Chapter~\ref{ch:galois}, we use dynamic dependency analysis techniques
+to simplify the creation of linked data visualizations. Those techniques have
+traditionally been used in areas such as information-flow security, optimisation and
+debugging. In our work, we extend the techniques so that they can provide fine-grained
+dependency information for programs constructing structured outputs, such as the data structures
+used to describe charts in the Compost data visualization library. We introduce a simple
+functional programming language Fluid that the users can use to write arbitrary data
+transformations and construct charts. By combining two dynamic dependency analyses, we can
+then automatically infer the relationships between multiple charts constructed from the
+same data.
 
-\subsection{Language-based foundation for explainable charts}
+\subsection{Creating linked visualizations using Fluid}
 
-~
-
-~
-
-~
-
-~
-
-
+Consider again the visualization shown in Figure~\ref{fig:fluid}. The two charts are
+based on the same input data, which is a collection of records storing the country, energy
+type, year and the amount produced. To produce the chart on the left, we filter the data by
+year and then sum the produced energy for each of the countries. In Fluid, this is written as
+a simple functional program using list comprehensions:
+%
 \begin{lstlisting}[language=fluid,mathescape=true]
 let data2015 =
   [ row | row $\leftarrow$ data, row.year == 2015 ]
@@ -2863,6 +2934,25 @@ let countryData =
 BarChart { data: countryData }
 \end{lstlisting}
 
+The code is similar to what one would write in widely-used functional languages such as
+F\# or Haskell. It defines filtered \texttt{data2015}, a helper function \texttt{totalFor}
+and then computes data per country using the helper before constructing the resulting chart.
+The last step uses a built-in \texttt{BarChart} function. As discussed earlier, this could be
+implemented as an abstraction over more basic Compost primitives.
+
+The program analysis automatically infers what values from the source \texttt{data}
+contribute to the resulting \texttt{y} value, computed using the \texttt{totalFor} function.
+The relevant rows are only those for the year 2015 (due to the filtering) and only those for
+the given country (due to the \texttt{totalFor} implementation). It is worth noting that unlike
+approaches based on grammar of graphics, we are not restricted to a set of pre-defined primitives.
+The data transformation can be arbitrary and we can write it using custom functions such as
+\texttt{totalFor}.
+
+The code to construct the second chart is slightly more complicated, because it constructs a
+line chart with multiple lines. It defines \texttt{series} helper to obtain a time series for
+a given country and energy type, \texttt{plot} helper that calculates ratio between the USA and
+China for a given energy type and then composes the chart:
+%
 \begin{lstlisting}[language=fluid,mathescape=true]
 let series type country =
   [ { x: year, y: row.output } | year $\leftarrow$ [2013..2018], row $\leftarrow$ data,
@@ -2874,19 +2964,41 @@ LineChart { plots: [
   LinePlot { name: type, data: plot type }
     | type $\leftarrow$ ["Bio", "Hydro", "Solar", "Wind"] ] }
 \end{lstlisting}
+%
+The example illustrates two requirements that we have for dynamic dependency analyses that
+let us automatically generate linked data visualizations. First, we are not interested in the
+resources (code and data) needed to produce the entire result, but only in resources needed to
+produce a part of the result. Specifically, if the user clicks on a data point of the line chart,
+we want to know what resources contributed to the \texttt{data} field of a specific record in the
+list passed to one particular \texttt{LinePlot}. In the analyses, we address this by introducing
+the concept of a selection for structured values, which lets us mark a particular part of the
+value. (We use this mechanism for analysing charts, but it could equally be used to analyse code
+that produces e.g., representations of documents.)
 
-\newpage
+Second, we need multiple different kinds of dependency analyses to automatically link the charts.
+If the user selects a part of one chart, we need a \emph{backward} analysis to trace it back to
+the original data. This analysis needs to determine parts of the input that were needed for the
+output, even if they were also used elsewhere (an alternative analysis would look for inputs
+needed only for the particular output).
+Then we need a \emph{forward} analysis to determine what outputs it affects in the linked chart.
+This, again, needs to determine parts of the output that needed the specific parts of the input,
+even if they also needed other umarked inputs (an alternative analysis would look for outputs
+that only needed the particular inputs).
+As we will see, this analysis leads to four different program analyses.
+We use two of them to automatically generate linked data visualizations.
+
+\newcommand*{\evalBwdR}[1]{{\mathrel{\rotatebox[origin=c]{45}{$\Rightarrow$}}}_{#1}}
+\newcommand*{\evalFwdR}[1]{{\mathrel{\rotatebox[origin=c]{-45}{$\Rightarrow$}}}_{\hspace{-0.2em}#1}}
+\newcommand*{\dual}[1]{{#1}^{\circ}}
 
 \subsection{Language-based foundation for explainable charts}
 
-...
-
-The paper included as Chapter~\ref{ch:galois} defines a range of program analyses that
-can be composed in a number of ways to obtain information necessary for automatically
-generating linked data visualizations. The analyses are more general-purpose and can be
-used in other ways, but I focus on the primary use case. Given the scope of the language
-and the considerable number of analyses, I do not discuss any details in this overview
-and focus merely on sketching the overall structure and the key properties of the analyses.
+The program analyses introduced in Chapter~\ref{ch:galois} can be, more broadly, seen as
+tools that help us understand how programs work. They could be used to support a range of
+use cases outside of the narrow domain of data visualization. However, to keep the presentation
+simpler, I will focus on this particular use case. Given the scope of the Fluid language
+and the considerable number of analyses, I do not discuss many details in this overview
+and focus on sketching the overall structure of the analyses and their key properties.
 
 The analyses are built around the central notion of a program trace $T$. The traces
 are generated during program evaluation and they collect information about how the
@@ -2967,7 +3079,64 @@ The intuitive meaning of the new analyses is as follows:
   would not be needed if the selected part of the output was not needed.
 \end{nitemize}
 
-...
+In order to construct a linked data visualization, we need to combine two of the data analyses.
+When the user selects a part of one chart, we annotate the relevant part of the structured value
+that represents the chart with a selection $\alpha \in \mathcal{A}$ that marks the part.
+We then use the backward data dependency analysis $\evalBwdR{T}$ to compute what resources are needed
+for producing the output. To mark corresponding parts of another chart, we then use the
+dual forward dependency analysis $\dual{\evalFwdR{T}}$. This marks parts of the other chart
+that depend on the resources needed for the first chart.
+
+\section{Conclusions}
+In this chapter, I provided an overview of the contributions to data visualization included in
+Part~\ref{part:visualization}. The focus of this work has been on simplifying the construction
+of rich interactive charts that assist the viewer gain deeper insight into the presented data.
+While producing simple charts is often easy, building a visualization that combines custom
+visual elements, interactivity and allows linking multiple charts requires advanced programming
+skills. Unlike with the work outlined in Chapter~\ref{ch:iterative}, I do not hope that the work
+presented here will allow non-programmers to create rich interactive data visualizations.
+However, Compost and Fluid show that programming data visualizations that encourage critical
+thinking about data can be significantly easier than using systems that are widely used today.
+
+The two contributions presented in this chapter also serve as a good justification for using
+programming language research methods in the context of tools for data science. In particular,
+the work included as Chapter~\ref{ch:compost} relies on the minimalist design of highly composable
+functional (domain-specific) languages. It presents the Compost charting library, which lets
+programmers compose charts by combining a small number of primitives (such as a filled shape
+or a text) using a small number of combinators (overlaying, nesting of scales). The library is
+simple to use mainly due to the fact that all positions are specified in terms of domain units
+on a continuous numerical scale or a categorical scale (with 0 to 1 range for each category).
+
+The work included as Chapter~\ref{ch:galois} uses dynamic program analysis techniques to
+automatically create linked data visualization where the user can explore relationships between
+data in multiple charts. The system works by analysing the program that is used to construct the
+chart from source data (by filtering and aggregating it in various ways). When the user clicks on
+an element of a chart, the system uses two different dynamic dependency analysis techniques to
+higlight elements of other charts that depend on the same data as the element selected by the user.
+The Chapter~\ref{ch:galois} uses methods of programming language theory to describe the mechanism.
+We formalize the programming language, define two analyses, derive their duals, and describe their
+formal properties.
+
+Although the prototype implementation of the two systems is not currently integrated, the
+two contributions presented in this chapter are closely related. In particular, the program
+analysis techniques developed for Fluid would combine well with a composable data visualization
+library like Compost.
+
+In this chapter, I also completed one loop of the data science lifecycle illustrated in
+Figure~\ref{fig:lifecycle}. The loop started with data acquisition using type providers,
+continued with data cleaning and exploring using novel notebook systems and iterative prompting
+and now concludes with data visualization. This is the last step in an exploratory phase of
+the data science lifecycle where the aim is to understand and explain interesting aspects of data.
+An illuminating data visualization that conveys interesting insights found in data is often
+the end goal of the process. The production phase that aims to turn the result of the data
+analysis into a running component of a larger system is perhaps equally interesting, but
+is out of scope for this thesis.
+
+% ==================================================================================================
+% PART II - V: PAPERS
+% ==================================================================================================
+
+\nobibliography*
 
 \part{Publications: Type providers}
 \label{part:providers}
@@ -2975,8 +3144,12 @@ The intuitive meaning of the new analyses is as follows:
 \chapter{Types from data: Making structured data first-class citizens in F\#}
 \label{ch:fsdata}
 
+\bibentry{petricek-2016-data}
+
 \chapter{Data exploration through dot-driven development}
 \label{ch:dotdriven}
+
+\bibentry{petricek-2017-dot}
 
 \part{Publications: Data infrastructure}
 \label{part:infra}
@@ -2984,8 +3157,17 @@ The intuitive meaning of the new analyses is as follows:
 \chapter{Foundations of a live data exploration environment}
 \label{ch:foundations}
 
+\bibentry{petricek-2020-live}
+
 \chapter{Wrattler: Reproducible, live and polyglot notebooks}
 \label{ch:wrattler}
+
+Tomas Petricek, James Geddes, and Charles Sutton. 2018. Wrattler: Reproducible, live and
+polyglot notebooks. In \emph{10th USENIX Workshop on the Theory and Practice of Provenance,
+TaPP 2018, London, UK, July 11-12}, 2018, Melanie Herschel (Ed.). USENIX Association.
+
+% this does not work, no idea why
+\bibentry{petricek-2018-notebooks}
 
 \part{Publications: Iterative prompting}
 \label{part:iterative}
@@ -2993,8 +3175,12 @@ The intuitive meaning of the new analyses is as follows:
 \chapter{The Gamma: Programmatic data exploration for non-programmers}
 \label{ch:thegamma}
 
+\bibentry{petricek-2022-gamma}
+
 \chapter{AI Assistants: A framework for semi-automated data wrangling}
 \label{ch:aia}
+
+\bibentry{petricek-2023-aia}
 
 \part{Publications: Data visualization}
 \label{part:visualization}
@@ -3002,50 +3188,129 @@ The intuitive meaning of the new analyses is as follows:
 \chapter{Composable data visualizations}
 \label{ch:compost}
 
+\bibentry{petricek-2021-compost}
+
 \chapter{Linked visualisations via Galois dependencies}
 \label{ch:galois}
 
-\part{Conclusion}
+\bibentry{petricek-2022-galois}
 
-\chapter{Contributions}
+% ==================================================================================================
+% PART VI: CONCLUSIONS
+% ==================================================================================================
 
-thanks
-who did what
-(especially galois)
+\part{Conclusions}
 
-\chapter{Conclusion}
+\chapter*{Contributions}
+\label{ch:contribs}
+\addcontentsline{toc}{chapter}{\nameref{ch:contribs}}
+
+The contributions presented in this thesis is the result of my long-term effort to
+rethink data science tooling from the perspective of programming languages research.
+The work has been undertaken at multiple institutions (Microsoft Research, The Alan
+Turning Institute, University of Kent) and involved collaboration with a number of
+co-authors. The following summarizes my contribution. With the exception of
+Chapter~\ref{ch:galois} \citep{petricek-2022-galois},
+I am the first author of the included papers.
+
+\begin{nitemize}
+\item Chapter~\ref{ch:fsdata} \citep{petricek-2016-data} -- I developed the initial version
+  of the library, developed the formal model and wrote most of the paper. Gustavo Guerra significantly
+  improved the initial implementation. Don Syme first developed the CSV type provider, assistend with
+  the formalization and provided the problem framing.
+\item Chapter~\ref{ch:dotdriven} \citep{petricek-2017-dot} -- I am the sole author of the paper,
+  but some aspects of the work have benefited from discussion with Don Syme.
+\item Chapter~\ref{ch:foundations} \citep{petricek-2020-live} -- I am the sole author of the paper,
+  but the work has benefited from discussions with Dominic Orchard, Stephen Kell, Roly Perera and
+  Jonathan Edwards and detailed feedback from Dominic Orchard.
+\item Chapter~\ref{ch:wrattler} \citep{petricek-2018-notebooks} -- I developed the prototype
+  implementation of the presented system and wrote most of the paper. Charles Sutton provided
+  inspiration for work on provenance and James Geddes shaped the system design.
+\item Chapter~\ref{ch:thegamma} \citep{petricek-2022-gamma} -- I am the sole author,
+  but valuable implementation work, adjacent to the paper, has been done by May Yong and Nour Boulahcen.
+\item Chapter~\ref{ch:aia} \citep{petricek-2023-aia} -- The work on individual AI assistants has
+  been done by the first five authors. I proposed the initial formal model and system architecture
+  and led paper writing jointly with Christopher Williams.
+\item Chapter~\ref{ch:compost} \citep{petricek-2021-compost} I am the sole author of the paper,
+  but the earliest form of the idea was born in discussion with Mathias Brandewinder.
+\item Chapter~\ref{ch:galois} \citep{petricek-2022-galois} -- The work was led by Roly Perera,
+  Minh Nguyen contributed to implementation and formalization and Meng Wang to paper writing.
+  I was involved in the original conceptual development with Roly Perera and writing.
+\end{nitemize}
 
 
+\chapter*{Conclusions}
+\label{ch:concls}
+\addcontentsline{toc}{chapter}{\nameref{ch:concls}}
 
+From a narrow technical perspective, the work presented in this thesis may seen as
+an assorted list of contributions to a wide range of research areas including type systems,
+programming languages, provenance tracking, interactive programming environments, data wrangling,
+data visualization and program analysis. But looking at the work from this perspective would be
+missing the forest for the trees. Collecting the individual contributions in
+a single body of work reveals two unifying themes behind the research.
 
-if the society is to benefit...
+The first unifying theme is the broader motivation. If the society is to benefit from the
+increasing availability of open data and data processing capabilities, we must make working
+with data accessible to broader audience. Experts who are not trained as programmers need to
+be able to gain valuable insights from data. They also need to be able to do so in ways that
+support transparency and openness and encourage critical engagement with data.
+Unlike in much programming languages research where the typical user is a professional
+programmer, the typical user for much of the work presented in this thesis has been a data
+journalist, who is exploring an interesting dataset in order to share relevant insights
+with the broader public.
 
-AI and LLMs
+The above motivation justifies a number of technical choices made in the presented work.
+I typically tried to make some kind of programming simpler, reduce the complexity of
+programming or design and develop tools that will assist with the task. The focus made
+it possible to restrict problems in ways that would, in other context, seem too constrained.
+Examples include the data exploration calculus, which does not let users introduce custom
+abstractions and the iterative prompting mechanism, which restricts aggregations in a query
+to a fixed set of pre-defined operations. I believe in the value of restrictions
+like these. A programming language research is as much a designer as a scientist and
+designers ``tend to (\ldots) seek, or impose a `primary generator' (\dots) which both
+defines the limits of the problem and suggests the nature of its possible solution''
+\citep{cross-2007-designerly}. The focus on simple tools for users like data journalists
+has been such `primary generator' for some of the research presented in this work.
 
-in other words, technology has democratized opinions, but can it also democratize facts
+The second unifying theme of this thesis is methodological. The contributions presented here
+generally approach a problem related to working with data through the perspective
+of programming langauges and systems research. I do not claim to be the first or the only one
+to view data science tooling from this perspective, but my work shows that the perspective can
+be fruitful for tackling problems across the entire data science lifecycle. In other words,
+I strongly believe there is a strong mutually beneficial relationship between programming
+languages and systems research and data science tooling. On the one hand, methods from
+programming languages and systems research can be used to build new powerful data science tools.
+On the other hand, data science tools provide interesting challenges and design constraints that
+force us to rethink established assumptions in programming language research and can inspire new
+techniques and approaches.
 
+I also believe there is more to be done in the space explored by this thesis, both in terms
+of building simpler and more open data science tools and in terms of advancing programming
+language and systems research.
 
+Despite the recent developments in large langauge models (LLMs), I believe that the
+direction outlined in this thesis is still the right one. In many of the systems presented
+in this thesis, my aim has been to make the code of a data analysis or data visualization
+as simple as possible, possibly to the point where a non-programmer would be able to read
+and understand it. With the rise of LLMs, the ability to review and understand code is
+becoming even more important. If we are faced with a data processing task and use a 100 line
+script generated by an LLM, it may be difficult to gain confidence in the results. But if
+we use a 10 line script in a langauge like The Gamma that has been generated with the assistance
+of an LLM and whose step-by-step execution we can inspect through live previews, gaining the
+confidence in the results may be much easier.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Data science tools also show that we need to think less about \emph{programming languages}
+and more about interactive and stateful \emph{programming systems} \citep{jakubovic-2023-techdims}.
+When working with data, data scientists often interleave writing of code, running it and
+manual tweaking of data and script parameters. If we look merely at the programming languages
+they use, the work may seem uninteresting. But if we look at the rich interactions between
+current state, scripts that data scientists are tweaking and what they see on the screen,
+we can see that data exploration is a remarkably interesting kind of programming practice.
+One of the lessons from the work presented in this thesis is that we should see programming
+more as an interaction with a stateful and interactive system than as the process of writing
+of textual code. Data science can, again, provide a convenient and familiar testbed for
+exploring this perspective on programming.
 
 
 % Bibliography
