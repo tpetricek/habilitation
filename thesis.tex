@@ -12,6 +12,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{lettrine}
 \usepackage{graphicx}
 \usepackage{endnotes}
 \usepackage{sectsty}
@@ -25,6 +26,8 @@
 \usepackage[scaled=0.8]{noto}
 \usepackage[T1]{fontenc}
 \usepackage{bibentry}
+\usepackage{etoolbox}
+\usepackage{fontawesome}
 
 % \usepackage{caladea}
 \usepackage[colorlinks]{hyperref} % [hidelinks]
@@ -33,6 +36,7 @@
 \usepackage{stmaryrd}
 \usepackage{enumerate}
 \usepackage{pdfpages}
+\usepackage[breakable, theorems, skins]{tcolorbox}
 
 \newcommand{\Din}{X}
 \newcommand{\Dout}{Y}
@@ -95,6 +99,15 @@
 { \end{enumerate}
   \vspace{-0.4em} }
 
+\DeclareRobustCommand{\keyideabox}[3]{\begin{tcolorbox}[breakable,
+  boxsep=10pt,left=0pt,right=0pt,top=0pt,bottom=0pt,width=\dimexpr\textwidth\relax,
+  colback=gray!20,colframe=gray!20,
+  enlarge bottom by=5pt,enlarge top by=5pt,
+  arc=0pt,outer arc=0pt]
+\lettrine[lraise=0.3]{\LARGE #1}{~}
+\textbf{#2.} #3
+\end{tcolorbox}
+}
 
 \hypersetup{
 linkcolor=Black,
@@ -160,12 +173,16 @@ runcolor=Black
 %\setcounter{secnumdepth}{0} % sections are level 1
 
 
+\newtoggle{fulltext}
+%\toggletrue{fulltext}
+\togglefalse{fulltext}
+
 \begin{document}
 \title{\Huge\textbf{Simple programming tools \\for data exploration}}
 \author{Tomas Petricek}
 \maketitle
 
-\chapter*{Preface}
+\chapter*{Acknowledgements}
 \label{ch:preface}
 \addcontentsline{toc}{chapter}{\nameref{ch:preface}}
 
@@ -277,8 +294,8 @@ complexity limiting the number of users. Adapted from \citet{edwards-2015-transc
 The above illustration should not be taken at face value. Although there is no single accepted
 solution, there are multiple projects that exist in the gap between spreadsheets and programming
 tools. However, the gap provides a useful perspective for positioning the contributions presented
-in this thesis. Some of the work develops novel tools that aim to combine the simplicity of
-spreadsheets with the power of programming for the specific domain of data exploration, aiming to
+in this thesis. Some of the work I present develops novel tools that aim to combine the simplicity
+of spreadsheets with the power of programming for the specific domain of data exploration, aiming to
 fill the space in the middle of the gap. Some of the work I present focuses on making regular
 programming with data easier, or making simple programming with data accessible to a greater
 number of users, reducing the size of the gap on the side of programming.
@@ -293,20 +310,20 @@ number of users, reducing the size of the gap on the side of programming.
 \section{How data journalists explore data}
 \label{sec:intro-ddj}
 
-To explain the motivation of this thesis, I use an example data exploration done in the context of
+To explain the motivation behind this thesis, I use an example data exploration done in the context of
 data journalism \citep{bounegru-2021-handbook}. Following the phenomenal success of the swimmer
 Michael Phelps at the 2016 Olympic games, many journalists produced charts such as the one
 in Figure~\ref{fig:phelps}, which puts Phelps on a chart showing countries with similar number
 of medals. Even such simple visualization raises multiple questions. Is the table counting
-Gold medals or all medals? Would it change if we used the other metric? What would it look like
+Gold medals or all medals? How would it change if we used the other metric? What would it look like
 if we added more countries or removed the historical ``Mixed Team''? How many top countries
 were skipped?
 
 This simple example illustrates two challenges that I hinted at earlier. First, producing this
 visualization may not be hard for a programmer, but it involves a number of tricky problems
-for a non-programmer. It has to acquire and and clean the source data, aggregate medals by
-country and produce and join two subsets of the data. Doing so manually in a spreadsheet
-is tedious, error-prone and not reproducible, but using Python or R requires non-trivial programming
+for a non-programmer. The author has to acquire and and clean the source data, aggregate medals by
+country and join two subsets of the data. Doing so manually in a spreadsheet is tedious,
+error-prone and not reproducible, but using Python or R requires non-trivial programming
 skills. Second, the non-technical reader of the newspaper article may want to answer the above
 follow-up questions. Data journalists sometimes offer download of the original dataset, but the
 reader would then have to redo the analysis from scratch. If the data analysis was done in Python
@@ -314,10 +331,10 @@ or R, they could get the source code, but this would likely be too complex to mo
 
 This thesis presents a range of tools that allow non-programmers, such as data journalists, to
 clean and explore data, such as the table of Olympic medals, and produce data analyses that are
-backed by source code in a simple language that can be read and understood without sophisticated
-programming skills. The code can be produced interactively, by repeatedly choosing one from a
-range of options offered by the tool and can then be modified to change parameters of the
-visualization.
+backed by source code in a simple programming language that can be read and understood without
+sophisticated programming skills. In some cases, the code can be produced interactively, by
+repeatedly choosing one from a range of options offered by the tool and can then be modified
+to change parameters of the visualization.
 
 \begin{figure}[t]
 \begin{lstlisting}[language=thegamma]
@@ -340,7 +357,7 @@ Figure~\ref{fig:phelps}. The case study is based on the work presented in Chapte
 
 As an example, the source code of the data analysis used to produce the visualization above is shown
 in Figure~\ref{fig:gamma}. The tools that enable non-programmers to create it will be discussed
-later. The key aspect of the code is that it mostly consists of sequence of human-readable
+later. The key aspect of the code is that it mostly consists of a sequence of human-readable
 commands such as \ident{'filter data'.'Athlete is'.'Michael Phelps'}. Those are iteratively
 selected from options offered by the system and so the author of the data analysis can complete
 most of the analysis without writing code.
@@ -350,8 +367,8 @@ aspects of the logic. The analysis counts the number of gold medals (\ident{'sum
 skips 42 countries before the ones shown in the visualization and does not filter out any
 other data. Finally, the code can be easily executed (in a web browser), allowing the reader
 to easily make small changes, such as pick a different athlete or increase the number of displayed
-countries. Such engagement has the potential to aid their positive perception of open, transparent
-data-driven insights based on facts.
+countries. Such engagement has the potential to aid the reader's positive perception of open,
+transparent data-driven insights based on facts.
 
 \section{Requirements of simple tools for data exploration}
 
@@ -392,9 +409,8 @@ also make simple modifications such as changing analysis or visualization parame
 as is often done in interactive visualisations by journalists \citep{kennedy-2021-engagements}.
 \end{nitemize}
 
-The above criteria point at the gap between spreadsheets and regular programming systems
-illustrated by Figure~\ref{fig:gap} and there are multiple possible solutions and approaches to
-satisfy the above criteria. This thesis explores one particular point in the design space,
+The criteria point at the technology gap illustrated by Figure~\ref{fig:gap} and there are multiple
+possible approaches to satisfy the criteria. This thesis explores one particular point in the design space,
 which is to treat data analysis as a program with an open source code, created in a simple
 programming language with rich tooling.
 
@@ -408,6 +424,7 @@ Finally, meaningful interaction can be offered by suitable graphical tools that 
 of the underlying source code.
 
 \section{Data exploration as a programming problem}
+\label{sec:intro-dataprog}
 
 Data exploration is typically done using a combination of tools including spreadsheets,
 programming tools, online systems and ad-hoc utilities. Spreadsheets like Excel and business
@@ -420,15 +437,20 @@ it possible to interleave documentation, mathematical formulas and code with out
 visualisations. Online data processing environments like Trifacta provide myriads of tools for
 importing and transforming data, which are accessible through different user interfaces or
 programmatic interfaces, but even those have to be complemented with ad-hoc single-purpose tools,
-often invoked through a command line interface.
+often invoked through a command line interface. Finding a unified perspective for thinking about
+such hotchpotch of systems and tools is a challenge.
 
-Finding a unified perspective for thinking about such hotchpotch of systems and tools
-is a challenge. The view taken in this thesis is that, most of the systems and tools can be
-considered as programming systems. This view makes it possible to apply the powerful methodology
-of programming languages research to the problem of data exploration.
-However, the programs that are constructed during data exploration have a number of specific
-characteristics that distinguishes them from programs typically considered in programming
-language research:
+\keyideabox{\faLightbulbO}{Key novel perspective}{In this thesis, I propose to view systems and tools used for
+data exploration as \emph{programming tools}. This view can offer a unified perspective on a
+broad range of systems and tools. It also enables us to apply the powerful
+methodology of programming languages research to the problem of data exploration.}
+
+\noindent
+If we look at data exploration tools from the perspective of programming languages research,
+we can adapt and leverage techniques for ensuring program correctness and compositional design,
+as well as rich interaction principles. However, the programs that are constructed during data
+exploration have a number of specific characteristics that distinguish them from programs typically
+considered in programming language research:
 
 \begin{nitemize}
 \item \emph{Data exists alongside code}. Systems such as spreadsheets often mix
@@ -450,15 +472,15 @@ language research:
   Python often use libraries implemented in C/C++ for performance reasons.
 \end{nitemize}
 
-The above generally hold for simple data explorations that are done by data journalists, public
-servants and analysts that this thesis is primarily concerned with. The characteristics do not
-apply to all programs that work with data, which may include complex reusable and parameterized
-models, general-purpose algorithms and rich data processing pipelines. However, focusing on simple
-data exploration problems for which the above criteria are true allows us to narrow the design
+The above hold for simple data explorations, such as those done by data journalists
+that this thesis is concerned with. The characteristics do not apply to all programs that work with
+data. Reusable and parameterized models, general-purpose algorithms and rich data processing
+pipelines share structure with conventional programs. However, focusing on simple
+data explorations for which the above criteria are true allows us to narrow the design
 space and study a range of interesting problems. The narrow focus also makes us rethink a number of
-accepted assumptions in programming language research, such as what are the key primitives to be
-included in a formal model of a programming language (in Chapter~\ref{ch:foundations}, an
-invocation of an external function becomes more important than lambda abstraction).
+accepted assumptions in programming language research, such as what are the key primitives
+of a programming language (in Chapter~\ref{ch:foundations}, an invocation of an external
+function becomes more important than lambda abstraction).
 
 \section{Utilised research methodologies}
 The research presented in this thesis tackles multiple research questions such as:
@@ -470,6 +492,7 @@ And can non-programmers effectively use such interaction mechanism?
 The diversity of the research questions calls for a corresponding diversity of research
 methodologies.
 
+\vspace{-0.34em}
 \paragraph{Programming language theory.}
 The first methodology used in this thesis is that of theoretical programming language research.
 When using this methodology, a core aspect of a programming language is described using a small,
@@ -487,6 +510,7 @@ visualization language in Chapter~\ref{ch:galois}, to formalise the optimization
 in Chapter~\ref{ch:foundations} and to define the structure of the semi-automatic data wrangling
 tools developed in Chapter~\ref{ch:aia}.
 
+\vspace{-0.34em}
 \paragraph{Programming systems.}
 The theoretical approach is complemented by a range of applied programming systems methods.
 The work using those methodologies often focuses on designing suitable system architecture,
@@ -499,6 +523,7 @@ science. Chapter~\ref{ch:foundations} develops an optimised programming assistan
 evaluates the efficiency empirically. Software systems and libraries presented in this thesis
 are available as open-source and are listed below.
 
+\vspace{-0.34em}
 \paragraph{Human-computer interaction.}
 Finally, answering questions that concern usability requires a human-centric approach offered by
 the human-computer interaction (HCI) research methodology, which is increasingly used to study
@@ -522,8 +547,6 @@ context of this thesis. The notion of simplicity is used as a unifying theme in 
 In the papers presented as part of this thesis, the notion takes one of several more specific and
 rigorously evaluated forms:
 
-~
-
 \begin{nitemize}
 \item In the context of user-centric work, I refer to a system as \emph{simple} if it allows
   non-programmers to complete tasks that are typically limited to programmers. This is the
@@ -546,6 +569,7 @@ rigorously evaluated forms:
   in Chapter~\ref{ch:fsdata} and the language for creating visualisations in Chapter~\ref{ch:galois}.
   Using such high-level abstractions means that programmers have write less code.
 \end{nitemize}
+\vspace{0.5em}
 
 The overarching theme of this thesis is thus the design of programming tools for data exploration
 that are simple in one or more of the meanings of the term indicated above. The focus on simplicity
@@ -554,20 +578,19 @@ make data exploration accessible to a broader range of users.
 
 \section{Structure of the thesis contributions}
 
-The contributions of this thesis cover multiple different kinds of tasks that a data analyst
-faces when they work with data. To position the contributions in the broader context of data
-analytical work, Figure~\ref{fig:lifecycle} shows where they fit in the data science lifecycle
-as defined by IBM (with slight modifications). As the diagram shows, the focus of this thesis is on work done in the
-initial data exploration phase.
+The key novel perspective---to view data exploration tools from the perspective of programming
+language research---can be leveraged for a wide range of different data exploration tools,
+including tools for data acquisition, data cleaning and data visualization. Correspondingly,
+the contributions presented in this thesis cover multiple different kinds of tasks that a data
+analyst faces when they work with data.
 
-\begin{figure}[h]
-  \vspace{1em}
-  \includegraphics[scale=0.2]{img/lifecycle.png}
-  \vspace{-1em}
-  \caption{Illustration showing the data science lifecycle, as understood by \cite{ibm-2020-lifecycle},
-  alongside with the contributions of this thesis to the individual steps of the data exploration phase.}
-  \label{fig:lifecycle}
-\end{figure}
+To position the contributions in the broader context of data analytical work, it is useful to
+see where they fit in a typical data science lifecycle. For this thesis, it is useful to consider
+a variant of the lifecycle that distinguishes beteen the exploration and production phases as done
+by \cite{jain-2022-survey} as well as \cite{ibm-2020-lifecycle}. As shown in
+Figure~\ref{fig:lifecycle}, the contributions of this thesis focus on the work done in the initial
+data exploration phase. Unlike with the later production phase, the programs used in the exploration
+phase typically exhibit the unique characteristics discussed in Section~\ref{sec:intro-dataprog}.
 
 The data science lifecycle starts with data acquisition (1), which involves loading
 data from a range of sources. This is followed by data cleaning (2), where multiple data sources
@@ -577,6 +600,18 @@ interesting patterns and, finally, in data visualization (4) they produce charts
 their insights. In the production phase, the insights are then used to develop a model
 that becomes a part of a production system. The process can be repeated based on the results
 of the model evaluation.
+
+
+\begin{figure}[t]
+  \vspace{1em}
+  \includegraphics[scale=0.2]{img/lifecycle.png}
+  \vspace{-1em}
+  \caption{Illustration showing the data science lifecycle, as understood by ,
+  alongside with the contributions of this thesis to the individual steps of the data exploration phase.}
+  \label{fig:lifecycle}
+\end{figure}
+
+~
 
 The work that constitutes this thesis contributes to each of the four steps of the data
 exploration phase. In Part~\ref{part:providers}, I present two papers on type providers,
@@ -665,45 +700,33 @@ of charts produced from the same input data. The key research contribution is a 
 dynamic dependency program analysis, which is formalised and shown to have a desirable formal
 structure. The technique is used as the basis for a high-level programming language Fluid.
 
-\section{Open-source software contributions}
+\keyideabox{\faRoad}{Key novel perspective}{A close look at how data scientists interact with programming
+tools forces us to rethink how we conceptualize programming. It shows that we need to
+shift our attention from static \emph{programming languages} to rich, stateful and interactive
+\emph{programming systems}. Understanding the theory and practice of those remains an interesting
+open problem.}
 
-The work presented in this thesis is not merely theoretical. An important contribution
-of this thesis is a practical implementation of the presented programming systems, languages
-and libraries. The concepts discussed in the previous section have been implemented in
-several open-source software packages that are available under the permissive Apache 2.0 (F\# Data)
-and MIT (all other projects) licenses.
+\section{Research outlook}
 
-\begin{nitemize}
-  \item \emph{F\# Data} (\url{https://github.com/fsprojects/FSharp.Data}) has became a widely-used
-    F\# library for data access. It implements utilities, parsers and type providers for working
-    with structured data in multiple formats (XML, JSON, HTML and CSV). The initial version based
-    on the work presented in Chapter~\ref{ch:fsdata} has since been extended by multiple
-    contributors from the F\# community.
+Viewing data exploration from the perspective of programming language research is beneficial in
+both directions. Most of this thesis is concerned with the novel data exploration tools and
+systems that become conceivable as a result of this perspective. However, an equally interesting
+question is whether data exploration forces us to think about (conventional) programming differently.
+I believe this is the case.
 
-  \item \emph{The Gamma} (\url{https://github.com/the-gamma}) is a simple data exploration
-    environment for non-programmers such as data journalists. It implements the iterative
-    prompting mechanism for data access (Chapters~\ref{ch:thegamma} and \ref{ch:dotdriven})
-    and live preview mechanism (Chapter~\ref{ch:foundations}). Live demos using the environment
-    in a web browser can  be found at \url{https://thegamma.net} and \url{https://turing.thegamma.net}.
+As noted earlier, data scientists often work with concrete data that exists alongside with code.
+This is an approach that has existed in image-based programming systems since the era of
+Smalltalk. They also often interleave coding with exection, which is how most modern programs
+are constructed. Although many programming environments discard any state of the executing program,
+hot-reloading is increasingly used to make sure programmers do not lose state while editing code.
 
-  \item \emph{Wrattler} (\url{https://github.com/wrattler}) is an experimental notebook system
-    described in Chapter~\ref{ch:wrattler} that tracks dependencies between cells, makes it
-    possible to combine multiple languages in a single notebook and hosts AI assistants for
-    data wrangling described in Chapter~\ref{ch:aia}. More information can be found at
-    \url{http://www.wrattler.org}.
-
-  \item \emph{Compost.js} (\url{https://github.com/compostjs}) is a composable library for creating
-    data visualisations described in Chapter~\ref{ch:compost}. Although the library is implemented
-    in the F\# language, it is compiled to JavaScript and provides a convenient interface for
-    Java\-Script users. A range of demos illustrating the use of the library can be found online at
-    \url{https://compostjs.github.io}.
-
-  \item \emph{Fluid} (\url{https://github.com/explorable-viz/fluid}) is a programming language
-    for building linked data visualisations described in Chapter~\ref{ch:galois}. The project has
-    since been developed into a general-purpose language for transparent, self-explanatory research
-    outputs by the Institute of Computing for Climate Science, University of Cambridge.
-    A live example can be found at \url{https://f.luid.org}.
-\end{nitemize}
+Most contemporary programming language research focuses solely on languages and
+ignore such stateful aspects of programming systems, possibly due to the paradigm shift documented
+by \cite{rpg-2012-revolution}. This ignores important aspect of the reality of modern programming.
+Moreover, the new capabilities presented in this thesis in the context of data science suggest
+that the programming systems perspective has the potential to yield fruitful results about
+programming in a broader sense. This is also an area that I started exploring in recent years
+in joint work with \cite{jakubovic-2023-techdims,edwards-2021-image,edwards-2025-schema}.
 
 % ==================================================================================================
 % CHAPTER 2: TYPE PROVIDERS
@@ -1252,12 +1275,11 @@ of the type provider, but also allows us to prove its safety.
 \subsection{Safety of data acquisition programs}
 
 The pivot type provider guarantees that the data transformations, which can be constructed using
-the types it generates and are expressed using the primitives of the relational algebra, will
-always be correct. They will never result in an undefined runtime behaviour that one may otherwise
-encounter when accidentally accessing a non-existent field. This is important result, because the
-sequence of operations transforms the fields in an interesting way. Operations like \texttt{drop}
-remove fields from the schema, while \texttt{group by} not only changes the set of fields, but also
-their types (e.g., when we count distinct values of a string-typed field $f$ in aggregation,
+the types it generates  will always be correct. They will never result in an undefined runtime
+behaviour that one may otherwise encounter when accidentally accessing a non-existent field. This is
+an important result, because the sequence of operations transforms the fields in interesting ways.
+Operations like \texttt{drop}remove fields from the schema, while \texttt{group by} changes the set
+of fields and their types (e.g., when we count distinct values of a string-typed field $f$ in aggregation,
 the resulting dataset will contain a numerical field $f$).
 
 To capture the property formally, we again state that any program written by the programmer using
@@ -1292,14 +1314,21 @@ correct type. Although the property is not labelled as \emph{relative type safet
 case of the F\# Data type providers, it follows the same spirit. A well-typed program will not
 go wrong, as long as the input has the right structure.
 
-\section{Conclusions}
+\section{Contributions}
 In this chapter, I offered a brief overview of the work on type providers that is included in
-Part~\ref{part:providers} of this thesis. The focus of this part is on simplifying programmatic
+Part~\ref{part:providers}. The focus of this part is on simplifying programmatic
 data acquisition, that is on making it easier and safer to write code that reads data from external
-data sources. It consists of a type provider for accessing semi-structured data in XML, JSON and
-CSV formats (Chapter~\ref{ch:fsdata}) and the pivot type provider that makes it possible to
+data sources. It consists of a type provider for semi-structured data in XML, JSON and
+CSV formats (Chapter~\ref{ch:fsdata}) and a type provider that makes it possible to
 express queries over tabular data (Chapter~\ref{ch:dotdriven}).
 
+\keyideabox{\faPencilSquareO}{Key contributions}{The publications included in Part~\ref{part:providers}
+include three main contributions. They introduce the novel notion of \emph{relative type safety}
+for discussing correctness of programs that rely on external data, they present \emph{type providers
+for structured data formats} and they a type provider for \emph{querying relational databases}
+that guarantees relative type safety of the resulting program.}
+
+\noindent
 Both of the contributions consist of a practical implementation, as a library for the F\# language and
 as a component of the web-based programming environment The Gamma, respectively. They combine this
 with a theoretical analysis using the methodology of theoretical programming language research.
@@ -1940,8 +1969,15 @@ request needs to include only hashes of imported variables as the server can obt
 directly from the data store. For nodes that run on the client-side (JavaScript, The Gamma),
 the evaluation is done directly in the web browser.
 
-\section{Conclusions}
+\section{Contributions}
 
+\keyideabox{\faPencilSquareO}{Key contributions}{The publications included in Part~\ref{part:infra}
+include three main contributions. They capture the essence of data scripting in the form of
+\emph{data exploration calculus}, they present architecture for \emph{polyglot, live and reproducible
+notebook systems} and they describe an efficient algorithm for \emph{live preview recomputation}
+based on the construction of a dependency graph.}
+
+\noindent
 In this chapter, I outlined two contributions to the data analytics infrastructure that
 are included in Part~\ref{part:infra} of this thesis. The two contributions describe systems
 that aim to make data exploration more live and reproducible, while supporting the polyglot
@@ -1968,8 +2004,6 @@ are already familiar with, but use novel tools where appropriate - for example, 
 The Gamma that will let consumers of their notebooks explore aggregate data without advanced
 programming expertise. We will leverage this architecture again in the work on AI assistants
 (Chapter~\ref{ch:aia}), outlined in the next chapter.
-
-~
 
 One interesting point that is revealed by putting the two contributions side-by-side is that they
 both rely on the same implementation technique. They both maintain a dependency graph of
@@ -2516,8 +2550,15 @@ are needed to complete a given data wrangling task for multiple datasets (either
 existing benchmark or synthetically generated). The evaluation shows that 1-2 human interactions
 are usually sufficient to complete the task.
 
-\section{Conclusions}
+\section{Contributions}
 
+\keyideabox{\faPencilSquareO}{Key contributions}{The publications included in Part~\ref{part:iterative}
+include three main contributions. They introduce the novel \emph{iterative prompting} interaction
+principle. They use it as the basis of \emph{AI assistants}, novel semi-automated data wrangling
+tools, as well as multuiple \emph{type providers} for accessing data in graph databases,
+data cubes and relational databases.}
+
+\noindent
 This chapter brings together two contributions that aim to reduce the gab between programming
 and spreadsheets by making two tasks that typically require some kind of programming easier.
 In the first contribution, I focused on data exploration, whereas the second contribution tackles
@@ -2550,6 +2591,8 @@ automatically, the complexity of real-world data sets often means that some huma
 is needed. Iterative prompting provides an easy method through which humans can provide such
 guidance. The chapter introduces a formal model of AI assistants and uses it as the basis for
 the implementation of four practical tools.
+
+~
 
 The contributions presented in this chapter link together many of the themes and contributions
 discussed in earlier chapters. In particular, the notion of type providers was introduced
@@ -3088,7 +3131,14 @@ for producing the output. To mark corresponding parts of another chart, we then 
 dual forward dependency analysis $\dual{\evalFwdR{T}}$. This marks parts of the other chart
 that depend on the resources needed for the first chart.
 
-\section{Conclusions}
+\section{Contributions}
+
+\keyideabox{\faPencilSquareO}{Key contributions}{The publications included in Part~\ref{part:visualization}
+include two main contributions. They introduce a \emph{composable data visualization} library
+based on novel functional design and a dynamic program analysis technique that enables easy
+construction of \emph{linked data visualizations}.}
+
+\noindent
 In this chapter, I provided an overview of the contributions to data visualization included in
 Part~\ref{part:visualization}. The focus of this work has been on simplifying the construction
 of rich interactive charts that assist the viewer gain deeper insight into the presented data.
@@ -3146,13 +3196,13 @@ is out of scope for this thesis.
 \label{ch:fsdata}
 
 \bibentry{petricek-2016-data}
-\includepdf[pages=-]{papers/fsdata.pdf}
+\iftoggle{fulltext}{\includepdf[pages=-]{papers/fsdata.pdf}}
 
 \chapter{Data exploration through dot-driven development}
 \label{ch:dotdriven}
 
 \bibentry{petricek-2017-dot}
-\includepdf[pages=-]{papers/dotdriven.pdf}
+\iftoggle{fulltext}{\includepdf[pages=-]{papers/dotdriven.pdf}}
 
 \part{Publications: Data infrastructure}
 \label{part:infra}
@@ -3161,7 +3211,7 @@ is out of scope for this thesis.
 \label{ch:foundations}
 
 \bibentry{petricek-2020-live}
-\includepdf[pages=1-36]{papers/foundations.pdf}
+\iftoggle{fulltext}{\includepdf[pages=1-36]{papers/foundations.pdf}}
 
 \chapter{Wrattler: Reproducible, live and polyglot notebooks}
 \label{ch:wrattler}
@@ -3172,7 +3222,7 @@ TaPP 2018, London, UK, July 11-12}, 2018, Melanie Herschel (Ed.). USENIX Associa
 
 % this does not work, no idea why
 \bibentry{petricek-2018-notebooks}
-\includepdf[pages=-]{papers/wrattler.pdf}
+\iftoggle{fulltext}{\includepdf[pages=-]{papers/wrattler.pdf}}
 
 \part{Publications: Iterative prompting}
 \label{part:iterative}
@@ -3181,13 +3231,13 @@ TaPP 2018, London, UK, July 11-12}, 2018, Melanie Herschel (Ed.). USENIX Associa
 \label{ch:thegamma}
 
 \bibentry{petricek-2022-gamma}
-\includepdf[pages=-]{papers/thegamma.pdf}
+\iftoggle{fulltext}{\includepdf[pages=-]{papers/thegamma.pdf}}
 
 \chapter{AI Assistants: A framework for semi-automated data wrangling}
 \label{ch:aia}
 
 \bibentry{petricek-2023-aia}
-\includepdf[pages=-]{papers/aia.pdf}
+\iftoggle{fulltext}{\includepdf[pages=-]{papers/aia.pdf}}
 
 \part{Publications: Data visualization}
 \label{part:visualization}
@@ -3196,13 +3246,13 @@ TaPP 2018, London, UK, July 11-12}, 2018, Melanie Herschel (Ed.). USENIX Associa
 \label{ch:compost}
 
 \bibentry{petricek-2021-compost}
-\includepdf[pages=-]{papers/compost.pdf}
+\iftoggle{fulltext}{\includepdf[pages=-]{papers/compost.pdf}}
 
 \chapter{Linked visualisations via Galois dependencies}
 \label{ch:galois}
 
 \bibentry{petricek-2022-galois}
-\includepdf[pages=-]{papers/galois.pdf}
+\iftoggle{fulltext}{\includepdf[pages=-]{papers/galois.pdf}}
 
 % ==================================================================================================
 % PART VI: CONCLUSIONS
@@ -3210,47 +3260,110 @@ TaPP 2018, London, UK, July 11-12}, 2018, Melanie Herschel (Ed.). USENIX Associa
 
 \part{Conclusions}
 
-\chapter*{Contributions}
-\label{ch:contribs}
-\addcontentsline{toc}{chapter}{\nameref{ch:contribs}}
+\chapter{Contributions and outlook}
+%\label{ch:contribs}
+%\addcontentsline{toc}{chapter}{\nameref{ch:contribs}}
 
-The contributions presented in this thesis is the result of my long-term effort to
+The work presented in this thesis is the result of my long-term effort to
 rethink data science tooling from the perspective of programming languages research.
-The work has been undertaken at multiple institutions (Microsoft Research, The Alan
+The research has been undertaken at multiple institutions (Microsoft Research, The Alan
 Turning Institute, University of Kent) and involved collaboration with a number of
-co-authors. The following summarises my contribution. With the exception of
-Chapter~\ref{ch:galois} \citep{petricek-2022-galois},
-I am the first author of the included papers.
+co-authors.
+
+The work presented in this thesis is not merely theoretical. An important contribution
+of this thesis is a practical implementation of the presented programming systems, languages
+and libraries. The resulting software packages have been made available as open-source.
+Some were developed by a larger team of collaborators, while others later received valuable
+contributions from the broader community. In some cases, industry adopters further developed
+the project and became maintainers of the tool.
+
+This chapter briefly reviews my own contributions to the papers included in this thesis,
+as well as my role in the resulting open-source projects. I will then reflect on the new
+perspective on programming and data science tooling that emerges from the work, as well as
+future research directions inspired by the presented work.
+
+\section{Contributions to included publications}
+The publications selected for this thesis focus on an independent research direction that I
+have been pursuing after completing my PhD. I often developed the initial idea or a prototype,
+but many papers were the result of a broader collaboration or an attempt to integrate the idea
+with work of my colleagues and collaborators.
 
 \begin{nitemize}
-\item Chapter~\ref{ch:fsdata} \citep{petricek-2016-data} -- I developed the initial version
+\item \emph{Chapter~\ref{ch:fsdata}} \citep{petricek-2016-data} -- I developed the initial version
   of the library, developed the formal model and wrote most of the paper. Gustavo Guerra significantly
-  improved the initial implementation. Don Syme first developed the CSV type provider, assisted with
-  the formalisation and provided the problem framing.
-\item Chapter~\ref{ch:dotdriven} \citep{petricek-2017-dot} -- I am the sole author of the paper,
+  improved the initial implementation. Don Syme first developed the CSV type provider, assisted
+  with the formalisation and provided the problem framing.
+\item \emph{Chapter~\ref{ch:dotdriven}} \citep{petricek-2017-dot} -- I am the sole author of the paper,
   but some aspects of the work have benefited from discussion with Don Syme.
-\item Chapter~\ref{ch:foundations} \citep{petricek-2020-live} -- I am the sole author of the paper,
+\item \emph{Chapter~\ref{ch:foundations}} \citep{petricek-2020-live} -- I am the sole author of the paper,
   but the work has benefited from discussions with Dominic Orchard, Stephen Kell, Roly Perera and
   Jonathan Edwards and detailed feedback from Dominic Orchard.
-\item Chapter~\ref{ch:wrattler} \citep{petricek-2018-notebooks} -- I developed the prototype
+\item \emph{Chapter~\ref{ch:wrattler}} \citep{petricek-2018-notebooks} -- I developed the prototype
   implementation of the presented system and wrote most of the paper. Charles Sutton provided
   inspiration for work on provenance and James Geddes shaped the system design.
-\item Chapter~\ref{ch:thegamma} \citep{petricek-2022-gamma} -- I am the sole author,
+\item \emph{Chapter~\ref{ch:thegamma}} \citep{petricek-2022-gamma} -- I am the sole author,
   but valuable implementation work, adjacent to the paper, has been done by May Yong and Nour Boulahcen.
-\item Chapter~\ref{ch:aia} \citep{petricek-2023-aia} -- The work on individual AI assistants has
+\item \emph{Chapter~\ref{ch:aia}} \citep{petricek-2023-aia} -- The work on individual AI assistants has
   been done by the first five authors. I proposed the initial formal model and system architecture
   and led paper writing jointly with Christopher Williams.
-\item Chapter~\ref{ch:compost} \citep{petricek-2021-compost} I am the sole author of the paper,
+\item \emph{Chapter~\ref{ch:compost}} \citep{petricek-2021-compost} I am the sole author of the paper,
   but the earliest form of the idea was born in discussion with Mathias Brandewinder.
-\item Chapter~\ref{ch:galois} \citep{petricek-2022-galois} -- The work was led by Roly Perera,
+\item \emph{Chapter~\ref{ch:galois}} \citep{petricek-2022-galois} -- The work was led by Roly Perera,
   Minh Nguyen contributed to implementation and formalisation and Meng Wang to paper writing.
   I was involved in the original conceptual development with Roly Perera and writing.
 \end{nitemize}
 
+\section{Open-source software contributions}
 
-\chapter*{Conclusions}
+The ideas discussed in the earlier parts of the thesis have been implemented in several
+open-source software packages that are available under the permissive Apache 2.0 (F\# Data)
+and MIT (all other projects) licenses.
+
+\begin{nitemize}
+  \item \emph{F\# Data} (\url{https://github.com/fsprojects/FSharp.Data}) has became a widely-used
+    F\# library for data access. It implements utilities, parsers and type providers for working
+    with structured data in multiple formats (XML, JSON, HTML and CSV). I developed the initial
+    version of the library and later described it in the paper included as Chapter~\ref{ch:fsdata}.
+    The library has since attracted over 100 industry contributors and further development has been
+    led by industry maintainers including Gustavo Guerra, Colin Bull, Chet Husk, Taylor Wood,
+    Steffen Forkmann, Don Syme and others.
+
+  \item \emph{The Gamma} (\url{https://github.com/the-gamma}) is a simple data exploration
+    environment for non-programmers such as data journalists. It implements the iterative
+    prompting mechanism for data access (Chapters~\ref{ch:thegamma} and \ref{ch:dotdriven})
+    and live preview mechanism (Chapter~\ref{ch:foundations}). I created most of the implementation.
+    May Yong, Nour Boulahcen and Tom Knowles implemented support for further data sources and
+    worked on case studies using the system. Live demos using the environment
+    in a web browser can  be found at \url{https://thegamma.net} and \url{https://turing.thegamma.net}.
+
+  \item \emph{Wrattler} (\url{https://github.com/wrattler}) is an experimental notebook system
+    described in Chapter~\ref{ch:wrattler} that tracks dependencies between cells, makes it
+    possible to combine multiple languages in a single notebook and hosts AI assistants for
+    data wrangling described in Chapter~\ref{ch:aia}. I created the initial prototype and oversaw
+    later development done mainly by May Yong and Nick Barlow with contributions from
+    Roly Perera, Camila Rangel Smith, Gertjan van den Burg and others. More information can be
+    found at \url{http://www.wrattler.org}.
+
+  \item \emph{Compost.js} (\url{https://github.com/compostjs}) is a composable library for creating
+    data visualisations described in Chapter~\ref{ch:compost}. Although the library is implemented
+    in the F\# language, it is compiled to JavaScript and provides a convenient interface for
+    Java\-Script users. I am currently the sole developer of the library, although it also served
+    as a design inspiration for some aspects of Fluid (below). A range of demos illustrating the
+    use of the library can be found online at
+    \url{https://compostjs.github.io}.
+
+  \item \emph{Fluid} (\url{https://github.com/explorable-viz/fluid}) is a programming language
+    for building linked data visualisations described in Chapter~\ref{ch:galois}. The project has
+    since been developed into a general-purpose language for transparent, self-explanatory research
+    outputs by the Institute of Computing for Climate Science, University of Cambridge. The
+    development has been led by Roly Perera with recent contributions from Joseph Bond and
+    Achintya Rao. I participated in the project in advisory role and collaborated on some of the
+    research behind the implementation. A live example can be found at \url{https://f.luid.org}.
+\end{nitemize}
+
+\section{New look at data exploration}
 \label{ch:concls}
-\addcontentsline{toc}{chapter}{\nameref{ch:concls}}
+%\addcontentsline{toc}{chapter}{\nameref{ch:concls}}
 
 From a narrow technical perspective, the work presented in this thesis may seen as
 an assorted list of contributions to a wide range of research areas including type systems,
@@ -3270,7 +3383,7 @@ journalist, who is exploring an interesting dataset in order to share relevant i
 with the broader public.
 
 The above motivation justifies a number of technical choices made in the presented work.
-I typically tried to make some kind of programming simpler, reduce the complexity of
+I typically tried to make some aspect of programming simpler, reduce the complexity of
 programming or design and develop tools that will assist with the task. The focus made
 it possible to restrict problems in ways that would, in other context, seem too constrained.
 Examples include the data exploration calculus, which does not let users introduce custom
@@ -3293,7 +3406,7 @@ programming languages and systems research can be used to build new powerful dat
 On the other hand, data science tools provide interesting challenges and design constraints that
 force us to rethink established assumptions in programming language research and can inspire new
 techniques and approaches.
-
+%
 I also believe there is more to be done in the space explored by this thesis, both in terms
 of building simpler and more open data science tools and in terms of advancing programming
 language and systems research.
@@ -3306,21 +3419,32 @@ and understand it. With the rise of LLMs, the ability to review and understand c
 becoming even more important. If we are faced with a data processing task and use a 100 line
 script generated by an LLM, it may be difficult to gain confidence in the results. But if
 we use a 10 line script in a language like The Gamma that has been generated with the assistance
-of an LLM and whose step-by-step execution we can inspect through live previews, gaining the
-confidence in the results may be much easier.
+of an LLM, as recently explored by \cite{fromm-2024-llm}, and if the step-by-step execution
+of the program can be inspected through live previews, gaining the confidence in the results may be much easier.
 
-Data science tools also show that we need to think less about \emph{programming languages}
-and more about interactive and stateful \emph{programming systems} \citep{jakubovic-2023-techdims}.
+\section{Towards programming systems research}
+
+Looking at the problem of data exploration from the perspective of programming languages
+is beneficial in both directions. On the one hand, the programming languages perspective
+lets us see the problem in new ways and develop new, simple, practical and more principled
+tools for data exploration. This has been the subject of the present thesis. On the other hand,
+a close look at how data scientists interact with programming tools also forces us to rethink
+how we conceptualise programming languages. We need to think less about \emph{programming languages}
+and more about interactive and stateful \emph{programming systems}. I started exploring this
+perspective in recent joint work with \cite{jakubovic-2023-techdims}.
+
 When working with data, data scientists often interleave writing of code, running it and
 manual tweaking of data and script parameters. If we look merely at the programming languages
 they use, the work may seem uninteresting. But if we look at the rich interactions between
 current state, scripts that data scientists are tweaking and what they see on the screen,
 we can see that data exploration is a remarkably interesting kind of programming practice.
-One of the lessons from the work presented in this thesis is that we should see programming
-more as an interaction with a stateful and interactive system than as the process of writing
-of textual code. Data science can, again, provide a convenient and familiar testbed for
-exploring this perspective on programming.
-
+We should thus see programming more as an interaction with a stateful and interactive system
+than as the process of writing of textual code. To study programming from this perspective,
+we will need new formal models, that can account for the interactivity lacking from
+conventional programming language theories, as well as new research methodologies, which
+make it possible to contrast and evaluate different kind of interactions with the programming
+system. Data science can provide a convenient and familiar testbed for exploring this new
+perspective on programming.
 
 % Bibliography
 \bibliographystyle{ACM-Reference-Format}
