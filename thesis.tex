@@ -176,8 +176,8 @@ runcolor=Black
 \newtoggle{printpage}
 \newtoggle{fulltext}
 %\toggletrue{fulltext}
-\togglefalse{fulltext}
 %\toggletrue{printpage}
+\togglefalse{fulltext}
 \togglefalse{printpage}
 
 \begin{document}
@@ -245,7 +245,7 @@ could be done by non-programmers? The rising popularity of data journalism at th
 a further practical motivation.
 
 The work presented in this thesis has been done at a number of institutions, starting towards the
-end of my PhD at University of Cambridge and finishing as I was joining the Department of
+end of my PhD at the University of Cambridge and finishing as I was joining the Department of
 Distributed and Dependable Systems (D3S) at the Faculty of Mathematics and Physics. In between,
 I spent time at Microsoft Research in Cambridge, The Alan Turing Institute in London and the
 University of Kent in Canterbury. I am grateful to all those institutions for enabling me to
@@ -253,9 +253,9 @@ pursue my research vision.
 
 Although I am the first author of most of the work presented in this thesis, none of it would be
 possible without the many collaborators that I was fortunate to meet along the way. Don Syme
-not only provided the initial motivation and collaborated with me on multiple papers, but also
-became my long-term mentor and a friend. The work related to F\# received warm welcome from the
-friendly F\# community and early commercial adopters. Gustavo Guerra deserves a special credit
+not only provided the initial motivation and collaborated with me on multiple papers but also
+became my long-term mentor and friend. The work related to F\# received a warm welcome from the
+friendly F\# community and early commercial adopters. Gustavo Guerra deserves special credit
 for turning F\# Data from a prototype to a well-engineered (and widely adopted) package.
 
 At The Alan Turing Institute, I was fortunate to meet James Geddes who got me involved in the
@@ -267,8 +267,8 @@ for our joint work on data visualization tools with Roly Perera.
 
 In addition to direct collaborators, the work presented in this thesis benefited from numerous
 discussions with my other colleagues and friends. This includes Dominic Orchard and Stephen Kell
-first at University of Cambridge and then at University of Kent,
-Kenji Takeda, Jomo Fisher and Keith Battocchi at Microsoft Research
+first at the University of Cambridge and then at the University of Kent,
+Kenji Takeda, Jomo Fisher, and Keith Battocchi at Microsoft Research
 and May Yong, Nick Barlow, Brooks Paige at The Alan Turing Institute.
 Mathias Brandewinder, Jonathan Edwards, Nour Boulahcen, Luke Church, Clemens Klokmose,
 Mariana Marasoiu and Alan Blackwell also provided ideas, insights, technical contributions
@@ -280,16 +280,16 @@ The work presented in this thesis also received valuable support from industrial
 My research focused on data journalism benefited from discussions with
 Megan Lucero from The Bureau of Investigative Journalism. My work on F\# was supported by
 the wide and enthusiastic F\# community and also by Howard Mansell and BlueMountain Capital.
-I had the pleasure of presenting many of the ideas at a number of industry conferences,
+I had the pleasure of presenting many of the ideas at multiple industry conferences,
 including NDC in Oslo and London, LambdaDays and DevDay in Krak\'ow, GOTO in Copenhagen and Chicago,
 CogX London and, most recently, the F\# Data Science conference in Berlin. These presentations
-were vital not only for enabling industry adoption of some of the systems presented in this thesis,
+were vital not only for enabling industry adoption of some of the systems presented in this thesis
 but also provided valuable feedback.
 
 Over time, the work has been financially supported in a number of ways. The Google Digital News
 Initiative provided me with a generous individual grant that allowed me to fully focus on
-programming tools for data journalism for one and half years. Microsoft Research,
-BlueMountain Capital, University of Kent and Charles University paid for some of my time over
+programming tools for data journalism for one and a half years. Microsoft Research,
+BlueMountain Capital, the University of Kent, and Charles University paid for some of my time over
 the years. At The Alan Turing Institute, I was supported by The UKRI Strategic Priorities Fund
 under EPSRC Grant EP/T001569/1, particularly the Tools, Practices and Systems theme within that
 grant, through the UK Government's Defence \& Security Programme and by The Alan Turing Institute
@@ -319,14 +319,14 @@ live in a post-truth era has become widely accepted over the last decade.
 While there are complex socio-political reasons for this paradox, from a merely technical
 perspective, the limited engagement with data-driven insights should perhaps
 not be a surprise. We lack accessible data exploration technologies that would allow
-non-programmers such as data journalists, public servants and analysts to produce transparent data
-analyses that can be understood, explored and adapted by a broad range of end-users including
-educators, the public and the members of the civic society.
+non-programmers such as data journalists, public servants, and analysts to produce transparent data
+analyses that can be understood, explored, and adapted by a broad range of end-users including
+educators, the public, and the members of the civic society.
 
 The technology gap is illustrated in Figure~\ref{fig:gap}. On the one hand, graphical tools such as
 spreadsheets are easy to use, but they are limited to small tabular data sets, they are error-prone
 \citep{panko-2015-errors} and they do not aid transparency. On the other hand, programmatic tools for
-data exploration such as Python and R can tackle complex problems, but require expert programming
+data exploration such as Python and R can tackle complex problems but require expert programming
 skills for completing even the simplest tasks.
 
 \begin{figure}[h!]
@@ -361,19 +361,19 @@ number of users, reducing the size of the gap on the side of programming.
 To explain the motivation behind this thesis, I use an example data exploration done in the context of
 data journalism \citep{bounegru-2021-handbook}. Following the phenomenal success of the swimmer
 Michael Phelps at the 2016 Olympic games, many journalists produced charts such as the one
-in Figure~\ref{fig:phelps}, which puts Phelps on a chart showing countries with similar number
-of medals. Even such simple visualization raises multiple questions. Is the table counting
+in Figure~\ref{fig:phelps}, which puts Phelps on a chart showing countries with similar numbers
+of medals. Even such a simple visualization raises multiple questions. Is the table counting
 Gold medals or all medals? How would it change if we used the other metric? What would it look like
 if we added more countries or removed the historical ``Mixed Team''? How many top countries
 were skipped?
 
 This simple example illustrates two challenges that I hinted at earlier. First, producing this
 visualization may not be hard for a programmer, but it involves a number of tricky problems
-for a non-programmer. The author has to acquire and and clean the source data, aggregate medals by
+for a non-programmer. The author has to acquire and clean the source data, aggregate medals by
 country and join two subsets of the data. Doing so manually in a spreadsheet is tedious,
 error-prone and not reproducible, but using Python or R requires non-trivial programming
 skills. Second, the non-technical reader of the newspaper article may want to answer the above
-follow-up questions. Data journalists sometimes offer download of the original dataset, but the
+follow-up questions. Data journalists sometimes offer a download of the original dataset, but the
 reader would then have to redo the analysis from scratch. If the data analysis was done in Python
 or R, they could get the source code, but this would likely be too complex to modify.
 
@@ -382,7 +382,7 @@ clean and explore data, such as the table of Olympic medals, and produce data an
 backed by source code in a simple programming language that can be read and understood without
 sophisticated programming skills. In some cases, the code can be produced interactively, by
 repeatedly choosing one from a range of options offered by the tool and can then be modified
-to change parameters of the visualization.
+to change the parameters of the visualization.
 
 \begin{figure}[t]
 \begin{lstlisting}[language=thegamma]
@@ -412,9 +412,9 @@ most of the analysis without writing code.
 
 The use of a simple programming language also makes it possible to understand the key
 aspects of the logic. The analysis counts the number of gold medals (\ident{'sum Gold'}),
-skips 42 countries before the ones shown in the visualization and does not filter out any
+skips 42 countries before the ones shown in the visualization, and does not filter out any
 other data. Finally, the code can be easily executed (in a web browser), allowing the reader
-to easily make small changes, such as pick a different athlete or increase the number of displayed
+to easily make small changes, such as picking a different athlete or increasing the number of displayed
 countries. Such engagement has the potential to aid the reader's positive perception of open,
 transparent data-driven insights based on facts.
 
@@ -428,7 +428,7 @@ them to critically engage with the data.
 
 In the subsequent discussion, I thus distinguish between \emph{data analysts} who produce the
 analyses and \emph{readers} who consume and engage with the results. The former are
-technically-skilled and data-literate, but may not have programming skills. The latter are
+technically skilled and data-literate, but may not have programming skills. The latter are
 non-technical domain experts who may nevertheless be interested
 in understanding and checking the analysis or modifying some of its attributes.
 This context leads to a number of requirements for the envisioned data exploration tools:
@@ -454,10 +454,10 @@ many users learn the spreadsheet formula language.
 \item \emph{Encourage meaningful reader interaction}. The reader should not be just a passive
 consumer of the data analyses. They should be able to study the analysis, but
 also make simple modifications such as changing analysis or visualization parameters,
-as is often done in interactive visualisations by journalists \citep{kennedy-2021-engagements}.
+as is often done in interactive visualizations by journalists \citep{kennedy-2021-engagements}.
 \end{nitemize}
 
-The criteria point at the technology gap illustrated by Figure~\ref{fig:gap} and there are multiple
+The criteria point to the technology gap illustrated by Figure~\ref{fig:gap} and there are multiple
 possible approaches to satisfy the criteria. This thesis explores one particular point in the design space,
 which is to treat data analysis as a program with an open source code, created in a simple
 programming language with rich tooling.
@@ -465,8 +465,8 @@ programming language with rich tooling.
 As I will show, treating data exploration as a programming problem makes it possible to satisfy
 the above criteria. Gradual progression from simple to complex can be supported by a language
 that provides very high-level abstractions (or domain-specific languages) for solving simple
-problems. Transparency, openness and reproducibility are enabled by the fact that the source code
-is always available and can be immediately executed, while learning
+problems. Transparency, openness, and reproducibility are enabled by the fact that the source code
+is always available and can be immediately executed while learning
 by percolation can be supported by structuring the program as a sequence of transformations.
 Finally, meaningful interaction can be offered by suitable graphical tools that simplify editing
 of the underlying source code.
@@ -475,18 +475,18 @@ of the underlying source code.
 \label{sec:intro-dataprog}
 
 Data exploration is typically done using a combination of tools including spreadsheets,
-programming tools, online systems and ad-hoc utilities. Spreadsheets like Excel and business
+programming tools, online systems, and ad-hoc utilities. Spreadsheets like Excel and business
 intelligence tools like Tableau \citep{wesley-2011-tableau} are often used for manual data
-editing, reshaping and visualization. More complex and automated data analyses are done in
+editing, reshaping, and visualization. More complex and automated data analyses are done in
 programming languages like R and Python using a range of data processing libraries such as pandas
 and Tidyverse \citep{wickham-2019-tidyverse}. Such analyses are frequently done in a computational
-notebook environments such as RStudio or Jupyter \citep{kluyver-2016-jupyter}, which make
+notebook environment such as RStudio or Jupyter \citep{kluyver-2016-jupyter}, which make
 it possible to interleave documentation, mathematical formulas and code with outputs such as
-visualisations. Online data processing environments like Trifacta provide myriads of tools for
+visualizations. Online data processing environments like Trifacta provide myriads of tools for
 importing and transforming data, which are accessible through different user interfaces or
-programmatic interfaces, but even those have to be complemented with ad-hoc single-purpose tools,
+programmatically, but even those have to be complemented with ad-hoc single-purpose tools,
 often invoked through a command line interface. Finding a unified perspective for thinking about
-such hotchpotch of systems and tools is a challenge.
+such a hotchpotch of systems and tools is a challenge.
 
 \keyideabox{\faLightbulbO}{Key novel perspective}{In this thesis, I propose to view systems and tools used for
 data exploration as \emph{programming tools}. This view can offer a unified perspective on a
@@ -520,7 +520,7 @@ considered in programming language research:
   Python often use libraries implemented in C/C++ for performance reasons.
 \end{nitemize}
 
-The above hold for simple data explorations, such as those done by data journalists
+The above holds for simple data explorations, such as those done by data journalists
 that this thesis is concerned with. The characteristics do not apply to all programs that work with
 data. Reusable and parameterized models, general-purpose algorithms and rich data processing
 pipelines share structure with conventional programs. However, focusing on simple
@@ -546,15 +546,15 @@ The first methodology used in this thesis is that of theoretical programming lan
 When using this methodology, a core aspect of a programming language is described using a small,
 formally tractable mathematical model that captures the essential properties of the aspect.
 The model is then used to formally study properties of the given aspect, such as whether a
-programming language that implements it can be used to write programs that exhibit certain kind
-of incorrect behaviour.
+programming language that implements it can be used to write programs that exhibit a certain kind
+of incorrect behavior.
 
 In this thesis, Part~\ref{part:providers} presents two instances of a programming language
 extension mechanism called type providers. To show that code written using type providers will
 never result in a particular error condition, I develop a formal model of type providers and prove
 a correctness property using the model. The actual system implementation then closely follows the
 formal model. Theoretical programming language research methods are also used to develop a data
-visualization language in Chapter~\ref{ch:galois}, to formalise the optimization technique introduced
+visualization language in Chapter~\ref{ch:galois}, to formalize the optimization technique introduced
 in Chapter~\ref{ch:foundations} and to define the structure of the semi-automatic data wrangling
 tools developed in Chapter~\ref{ch:aia}.
 
@@ -566,8 +566,8 @@ empirical evaluation of measurable characteristics of the system such as efficie
 also be complemented with an open-source implementation and/or a reproducible software artifact.
 
 I use the programming systems research methodology primarily in Chapter~\ref{ch:wrattler}, which
-presents the architecture and an implementation of a novel computational notebook system for data
-science. Chapter~\ref{ch:foundations} develops an optimised programming assistance tool and
+presents the architecture and implementation of a novel computational notebook system for data
+science. Chapter~\ref{ch:foundations} develops an optimized programming assistance tool and
 evaluates the efficiency empirically. Software systems and libraries presented in this thesis
 are available as open-source and are listed below.
 
@@ -614,8 +614,8 @@ rigorously evaluated forms:
 \item Finally, I also use the term simple when talking about programming systems and libraries
   that provide a high-level interface designed specifically for a particular task. This is the
   case for the notebook system presented in Chapter~\ref{ch:wrattler}, data access library
-  in Chapter~\ref{ch:fsdata} and the language for creating visualisations in Chapter~\ref{ch:galois}.
-  Using such high-level abstractions means that programmers have write less code.
+  in Chapter~\ref{ch:fsdata}, and the language for creating visualizations in Chapter~\ref{ch:galois}.
+  Using such high-level abstractions means that programmers have to write less code.
 \end{nitemize}
 \vspace{0.5em}
 
@@ -634,7 +634,7 @@ analyst faces when they work with data.
 
 To position the contributions in the broader context of data analytical work, it is useful to
 see where they fit in a typical data science lifecycle. For this thesis, it is useful to consider
-a variant of the lifecycle that distinguishes beteen the exploration and production phases as done
+a variant of the lifecycle that distinguishes between the exploration and production phases as done
 by \cite{jain-2022-survey} as well as \cite{ibm-2020-lifecycle}. As shown in
 Figure~\ref{fig:lifecycle}, the contributions of this thesis focus on the work done in the initial
 data exploration phase. Unlike with the later production phase, the programs used in the exploration
@@ -666,7 +666,7 @@ exploration phase. In Part~\ref{part:providers}, I present two papers on type pr
 which simplify data acquisition, while Part~\ref{part:visualization} consists of two
 novel data visualization systems. The four publications presented in Part~\ref{part:infra}
 and Part~\ref{part:iterative} all focus on working with data, including data cleaning and
-exploration. They are not grouped in parts based on the lifecycle step, but based on their research
+exploration. They are not grouped in parts based on the lifecycle step but based on their research
 methodology. The publications in Part~\ref{part:infra} use programming systems methods to
 design new infrastructure, while Part~\ref{part:iterative} introduces a novel interaction
 principle and applies it to two problems, one from the domain of data exploration and one from the
@@ -679,33 +679,33 @@ to integrate external data into a statically-typed programming language. The wor
 Part~\ref{part:providers} presents two new type providers.
 
 Chapter~\ref{ch:fsdata} presents a library of type providers that makes it possible to safely access
-structured data in formats such as CSV, XML and JSON in the F\# programming language. The two key
+structured data in formats such as CSV, XML, and JSON in the F\# programming language. The two key
 research contributions of the work are, first, a novel inference mechanism that infers a type based
 on a collection of sample data and, second, a formulation of a \emph{relative safety property} that
 formally captures the safety guarantees offered by the system.
 
 Chapter~\ref{ch:dotdriven} takes the idea of type providers further. It uses the mechanism not just
-for data access, but for construction of SQL-like queries over tabular data. The research
+for data access, but for the construction of SQL-like queries over tabular data. The research
 contribution is a novel type provider, implemented in The Gamma system, which generates a type that
-can be used to group, filter and sort tabular data. Using a novel formal model, the presented paper
+can be used to group, filter, and sort tabular data. Using a novel formal model, the presented paper
 shows that all queries constructed using the type provider are valid.
 
 \paragraph{Data infrastructure.}
 Programmatic data exploration is typically done in notebook systems such as Jupyter
-\citep{kluyver-2016-jupyter} that make it possible to combine documentation, formulas, code and
-output such as visualisations. Notebook systems are a convenient tool, but they suffer from
+\citep{kluyver-2016-jupyter} that make it possible to combine documentation, formulas, code, and
+output such as visualizations. Notebook systems are a convenient tool, but they suffer from
 a number of limitations and issues. The two novel systems presented in Part~\ref{part:infra} address
 several of those.
 
 Chapter~\ref{ch:foundations} presents a programming environment for The Gamma that makes data
 exploration easier by providing instant feedback. The research contributions of the work are
-twofold. First, builds a practical efficient algorithm for displaying live previews. Second, it
+twofold. First, it builds a practical efficient algorithm for displaying live previews. Second, it
 develops a formal model of code written to explore data called \emph{data exploration calculus}
 and uses it to show the correctness of the live preview algorithm.
 
 Chapter~\ref{ch:wrattler} tackles more directly the problems of notebook systems. It presents
 Wrattler, which is a novel notebook system that makes it possible to combine multiple
-programming languages and tools in a single notebook, resolves the reproducibility issues of
+programming languages and tools in a single notebook resolves the reproducibility issues of
 standard systems and stores computation state in a transparent way, allowing for precise
 data provenance tracking.
 
@@ -725,32 +725,32 @@ complete a range of data exploration tasks.
 Chapter~\ref{ch:aia} uses the iterative prompting mechanism as the basis of a range of
 semi-automatic data cleaning tools. It augments existing AI tools for parsing data, merging data,
 inferring data types and semantic information with a mechanism that lets the user guide the AI
-tool. Using iterative prompting, the user can correct mistakes and configure parameters of the tool.
+tool. Using iterative prompting, the user can correct mistakes and configure the parameters of the tool.
 The augmented tools are evaluated empirically, showing that the correct result can typically be
 obtained with 1 or 2 manual interventions.
 
 \paragraph{Data visualization.}
 Data visualization is the last step in the exploratory phase of the data science lifecycle
 discussed above. Although standard charts are typically easy to build, creating richer
-interactive visualisations is a challenging programming task. Part~\ref{part:visualization}
-presents two systems that make it easier to build interactive data visualisations that encourage
+interactive visualizations is a challenging programming task. Part~\ref{part:visualization}
+presents two systems that make it easier to build interactive data visualizations that encourage
 critical thinking about data.
 
 Chapter~\ref{ch:compost} presents a functional domain-specific language for creating charts that
 makes it possible to compose rich interactive charts from basic building blocks (such as lines
-and shapes) using small number of combinators (such overlaying and nesting of scales).
+and shapes) using a small number of combinators (such as overlaying and nesting of scales).
 The simplicity of the approach is illustrated through a range of examples and confirmed by the
 publication of the work as a so-called functional pearl \citep{gibbons-2010-pearl}.
 
 Chapter~\ref{ch:galois} introduces a language-based program analysis technique that makes it
-possible to automatically build linked data visualisations that show the relationships between parts
+possible to automatically build linked data visualizations that show the relationships between parts
 of charts produced from the same input data. The key research contribution is a novel bidirectional
-dynamic dependency program analysis, which is formalised and shown to have a desirable formal
+dynamic dependency program analysis, which is formalized and shown to have a desirable formal
 structure. The technique is used as the basis for a high-level programming language Fluid.
 
 \keyideabox{\faRoad}{Key novel perspective}{A close look at how data scientists interact with programming
 tools forces us to rethink how we conceptualize programming. It shows that we need to
-shift our attention from static \emph{programming languages} to rich, stateful and interactive
+shift our attention from static \emph{programming languages} to rich, stateful, and interactive
 \emph{programming systems}. Understanding the theory and practice of those remains an interesting
 open problem.}
 
@@ -764,13 +764,13 @@ I believe this is the case.
 
 As noted earlier, data scientists often work with concrete data that exists alongside with code.
 This is an approach that has existed in image-based programming systems since the era of
-Smalltalk. They also often interleave coding with exection, which is how most modern programs
+Smalltalk. They also often interleave coding with execution, which is how most modern programs
 are constructed. Although many programming environments discard any state of the executing program,
 hot-reloading is increasingly used to make sure programmers do not lose state while editing code.
 
 Most contemporary programming language research focuses solely on languages and
-ignore such stateful aspects of programming systems, possibly due to the paradigm shift documented
-by \cite{rpg-2012-revolution}. This ignores important aspect of the reality of modern programming.
+ignores such stateful aspects of programming systems, possibly due to the paradigm shift documented
+by \cite{rpg-2012-revolution}. This ignores an important aspect of the reality of modern programming.
 Moreover, the new capabilities presented in this thesis in the context of data science suggest
 that the programming systems perspective has the potential to yield fruitful results about
 programming in a broader sense. This is also an area that I started exploring in recent years
@@ -784,8 +784,8 @@ in joint work with \cite{jakubovic-2023-techdims,edwards-2021-image,edwards-2025
 \label{ch:tp}
 
 The first step of the data science lifecycle outlined in the previous chapter was data acquisition.
-This typically involves reading data in semi-structured formats such as CSV, XML and JSON or
-retrieving data from a a database. The aim of the work on type providers, outlined in this chapter,
+This typically involves reading data in semi-structured formats such as CSV, XML, and JSON or
+retrieving data from a database. The aim of the work on type providers, outlined in this chapter,
 is to make programmatic data acquisition reliable and simpler.
 
 The lack of reliability arises primarily from the fact that most data access code is written in
@@ -795,14 +795,14 @@ check that the program accesses it correctly. If we retrieve a JSON object that 
 with fields \texttt{title} and \texttt{link} and parse it into an object \texttt{item} in
 JavaScript, we can then access the fields using just \texttt{item.title} and \texttt{item.link}.
 The fields will exist at runtime, but the language does not need to know at compile-time whether
-they will be  available, because member access is not statically checked.
+they will be available, because member access is not statically checked.
 
 In statically-typed programming languages, the situation is no better. The typical approach, illustrated
 in Figure~\ref{fig:rss}, is equally dynamic, but more verbose. Object fields are accessed using
 a string-based lookup, which can easily contain fields that do not exist at runtime (indeed, there
 is an uncaught typo on line 6!) and, moreover, the lookup has to be done using an additional method
 invocation and may require tedious type conversions. The first challenge we face is how to
-make accessing data in semi-structured formats, such as JSON, XML and CSV, as simple as in
+make accessing data in semi-structured formats, such as JSON, XML, and CSV, as simple as in
 dynamically-typed languages (a matter of just using a dot), but support checking that will
 statically guarantee that the accessed fields will be present at runtime.
 
@@ -837,7 +837,7 @@ olympics[olympics["Games"] == "Rio (2016)"]
   .head(8)
 \end{lstlisting}
 \caption{Data transformation written using pandas in Python. The code loads a CSV file with
-Olympic medal history, gets data for Rio 2016 games, groups the data by athlete and sums their
+Olympic medal history, gets data for Rio 2016 games, groups the data by the athlete, and sums their
 number of gold medals and, finally, takes the top 8 athletes.}
 \label{fig:pandas}
 \end{figure}
@@ -860,22 +860,22 @@ of concepts and syntactic elements that the user needs to master:
 To make data acquisition simpler, the user should not need this many concepts and they should not
 need to remember the names of operations or the names of columns in their data source.
 Moreover, their code should be checked to ensure that it accesses the correct supported
-operations and applies them on compatible data that exist in the data source. As I will show later,
+operations and applies them to compatible data that exist in the data source. As I will show later,
 this can be achieved using type providers, a concept that originated in the F\# programming language
 in the early 2010s.
 
 \section{Information-rich programming}
 In the 2010s, applications increasingly relied on external data sources and APIs for their
 function. The typical solution for accessing such data was either to use a scripting language,
-a dynamic access library (both illustrated above) or a code-generation tool that would generate
+a dynamic access library (both illustrated above), or a code-generation tool that would generate
 code for accessing the data source or an API (although only for data sources with small enough
 schema). This provided the motivation for the type provider mechanism in F\#
 \citep{syme-2012-providers,syme-2013-inforich}, which made it possible to make the type checker
 in a statically-typed programming language aware of the structure of external data sources.
 
 Technically, a type provider in F\# is an extension that is executed by the compiler at
-compile-time. A type provider can run arbitrary code, such as access read a database schema or
-access another external data source. It then generates a representation of a type that is
+compile-time. A type provider can run arbitrary code, such as accessing a database schema or
+another external data source. It then generates a representation of a type that is
 passed to the compiler and used to check the user program. For example, the World Bank
 type provider (Figure~\ref{fig:wb}) retrieves the list of known countries and indicators from
 the World Bank database (by querying the REST API provided by the World Bank) and generates
@@ -920,7 +920,7 @@ to type providers presented in Part~\ref{part:providers} make data acquisition r
 and simpler.
 %
 The work on type providers included in this thesis develops two kinds of type providers.
-The type providers for CSV, JSON and XML packaged in the F\# Data library make it possible
+The type providers for CSV, JSON, and XML packaged in the F\# Data library make it possible
 to access data in a statically-checked way using ordinary member access. The work also makes
 two theoretical contributions, an algorithm for schema inference from sample data and a
 programming language theory of type providers.
@@ -935,7 +935,7 @@ Chapter~\ref{ch:dotdriven}, respectively. The following provides an accessible h
 of the contributions.
 
 \section{Type providers for semi-structured data}
-The F\# Data library implements type providers for accessing data in XML, JSON and CSV formats.
+The F\# Data library implements type providers for accessing data in XML, JSON, and CSV formats.
 It is based on the premise that most real-world data sources using those formats do not have an
 explicit schema. The type providers thus infer the schema from a sample (or a collection of
 samples). The inferred schema is then mapped to F\# types through which the user of the type
@@ -979,27 +979,27 @@ and print the total number of items (line 5) as well as each year for which ther
 \begin{nitemize}
 \item \emph{Real-world schema inference is hard.} Here, the response is an array always containing
   two items, a record with meta-data and an array with individual data points. The data records
-  have consistent structure, although some values may be \kvd{null}.
+  have a consistent structure, although some values may be \kvd{null}.
 \item \emph{Inference needs to be stable.} The type providers allow adding further samples. If the
   user adds further examples, the structure of the provided types should change in a predictable
   (and limited) way so that the user code can be easily updated.
 \item \emph{Safety guaranteed by static checks is relative.} Static type checking guarantees that
   only data available in the sample input can be accessed in user code, but if the data loaded at
-  runtime have different structure, this will not prevent errors. We thus need to specify what
+  runtime has a different structure, this will not prevent errors. We thus need to specify what
   exactly can the system guarantee about programs.
 \end{nitemize}
 
 The F\# Data type providers, presented in full in Chapter~\ref{ch:fsdata} offer an answer to
-all of these three challenges. They can infer shape of real-world data, infer types with a stable
-structure and capture the runtime guarantees formally through the relative safety property. The
+all of these three challenges. They can infer the shape of real-world data, infer types with a stable
+structure, and capture the runtime guarantees formally through the relative safety property. The
 publication also presented novel programming language theory that made it possible to analyze type
 providers formally, which I briefly review in the next three sections.
 
 \subsection{Shape inference and provider structure}
 When the type provider for semi-structured data is used, it is given a sample of data that
-can be analysed at compile time (such as the \texttt{"worldbank.json"} file name above). It
+can be analyzed at compile time (such as the \texttt{"worldbank.json"} file name above). It
 uses this to infer the shape of the data. A shape is a structure similar to a type and is
-composed from primitive shapes, record shapes, collections and a few other special shapes:
+composed from primitive shapes, record shapes, collections, and a few other special shapes:
 %
 \begin{equation*}
 \begin{array}{rcl}
@@ -1011,19 +1011,19 @@ composed from primitive shapes, record shapes, collections and a few other speci
 %
 The inference distinguishes between non-nullable shapes ($\hat{\sigma}$) and nullable shapes
 ($\sigma$), which can be inferred even when the collection of inputs contains the \kvd{null}
-value. The former consist of primitive shapes (inferred from a corresponding value) and
-a record shape. The record shape has an (optional) name $\nu$ and consists of a multiple fields
+value. The former consists of primitive shapes (inferred from a corresponding value) and
+a record shape. The record shape has an (optional) name $\nu$ and consists of multiple fields
 that have their own respective shapes. A record is the shape inferred for JSON objects, but also
 XML elements containing attributes and child elements. A non-nullable shape can be made nullable
 by explicitly wrapping it as $\kvd{nullable}\langl \hat{\sigma} \rangl$. Other nullable shapes
 include collections (a \kvd{null} value is treated as an empty collection) and shapes that represent
-any data, only null values and the bottom shape $\bot$, representing no information about the shape.
-The above definition does not include handling of choice shapes (corresponding to sum types), which
+any data, only null values, and the bottom shape $\bot$, representing no information about the shape.
+The above definition does not include the handling of choice shapes (corresponding to sum types), which
 is introduced later.
 
 A key technical operation of the shape inference is expressed using the \emph{common preferred shape}
 function written as $\sigma_1 \triangledown \sigma_2 = \sigma$. Given two shapes, the function
-returns a shape the most specific shape that can be used to represent values of both of the two
+returns a shape the most specific shape that can be used to represent the values of both of the two
 given shapes. The details are discussed later, but it is worth illustrating how the function works
 using two examples.
 
@@ -1031,7 +1031,7 @@ using two examples.
 \item $\ident{int} \,\triangledown\, \ident{float} = \ident{float}\quad$ In this case, the common
   preferred shape is \ident{float}. This may lead to a loss of precision, but it makes accessing
   the data easier than if we inferred a shape representing a choice shape. This is one example
-  where the system favours practical usability over formal correctness.
+  where the system favors practical usability over formal correctness.
 \item $\{ \textit{x} \!:\! \ident{int} \} \,\triangledown\,
   \{ \textit{x} \!:\! \ident{int}, \textit{y} \!:\! \ident{int} \} =
   \{ \textit{x} \!:\! \ident{int}, \textit{y} \!:\! \kvd{nullable}\langl\ident{int}\rangl \}\quad$
@@ -1041,7 +1041,7 @@ using two examples.
 \end{nitemize}
 
 When the type provider is used, it receives a sample data value and uses it to infer the expected
-shape of data. A data value is modelled formally as a value that can be either a primitive value
+shape of data. A data value is modeled formally as a value that can be either a primitive value
 (integer $i$, floating-point value $f$, string $s$, a Boolean or \kvd{null}), a collection of values
 or a record with fields that have other values:
 %
@@ -1055,7 +1055,7 @@ or a record with fields that have other values:
 %
 The shape inference is then defined as a function $\semalt(d_1, \ldots, d_n)=\sigma$ that takes a
 collection of data values and infers a single shape $\sigma$ that represents the shape of all the
-specified values. (Note that this can always be defined. In case where values are of incompatible
+specified values. (Note that this can always be defined. In cases where values are of incompatible
 shape, the system infers the shape $\kvd{any}$.)
 
 \begin{equation*}
@@ -1081,7 +1081,7 @@ shapes and combining them using the  $\triangledown$ function.
 
 The last aspect of the formal programming language model of type providers is the logic that,
 given an inferred shape, produces the corresponding F\# type. To explain the important
-properties of type providers, we do not need to elaborate what an F\# type is here, but the most
+properties of type providers, we do not need to elaborate on what an F\# type is here, but the most
 important case is a class with members (properties or methods). A type provider takes the inferred
 shape and produces an F\# type $\tau$ for the shape, a collection of classes $L$ that may appear
 in $\tau$ (typically as types of members in case $\tau$ is a class). The type provider also needs
@@ -1100,7 +1100,7 @@ This brief overview of the formal model of type providers for semi-structured da
 to formulate the two key results about the F\# Data type providers. The first describes the relative
 type safety of programs written using a type provider and is a novel variation on the classic
 type safety property of programming language research. The second describes the
-stability of provided types and concerns usability of the system.
+stability of provided types and concerns the usability of the system.
 
 \subsection{Relative safety of checked programs}
 
@@ -1111,7 +1111,7 @@ entity in Milner's system). A code written using a type provider can go wrong if
 input obtained at runtime is of a structure that does not match the structure of the input used
 as a sample for shape inference at compile time.
 
-However, thanks to the formal model defined above, the property can be specified precisely and,
+However, thanks to the formal model defined above, the property can be specified precisely, and
 most importantly, we can specify for which inputs the programs written using a type provider will
 never fail because of invalid data access. The definition relies on a preferred shape relation
 $\sqsubseteq$, which captures the fact that one shape is more specific than another (if
@@ -1125,7 +1125,7 @@ transitive closure of $\reduce$).
 \begin{theorem}[Relative safety]
 \label{thm:safety}
 Assume $d_1, \ldots, d_n$ are samples, $\sigma=\semalt{d_1, \ldots, d_n}$ is an inferred
-shape and $\tau,e,L = \sem{\sigma}$ are a type, expression and class definitions generated by a
+shape and $\tau,e,L = \sem{\sigma}$ are a type, expression, and class definitions generated by a
 type provider.
 
 For all inputs $d'$ such that $\semalt{d'} \sqsubseteq \sigma$ and all expressions $e'$
@@ -1137,7 +1137,7 @@ also $\emptyset; \vdash v : \tau'$.
 \vspace{-0.2em}
 
 In other words, the relative safety property specifies that, for any program that the user may
-write using a type provider (without using low-level functions that are only usable accessible
+write using a type provider (without using low-level functions that are only accessible
 inside a type provider), if the program is executed with any input whose shape is more specific
 than the shape inferred from statically known samples, the program will not encounter a data-related
 runtime error. It is, of course, still possible for runtime errors to happen, but not with a
@@ -1148,7 +1148,7 @@ over 100 contributors.} this is often a sufficient guarantee in practice.
 
 \subsection{Stability of provided types}
 When the user of an F\# Data type provider gets a runtime error, this is because the
-data source they use produced an input of a structure not encountered before. A typical example
+data source they use produces an input of a structure not encountered before. A typical example
 is an input that includes \kvd{null} in a field that previously always had a value.
 Such errors are inevitable (without an explicit schema). The programmer can handle this by
 adding the new input as a new sample to the collection of samples used for the shape inference.
@@ -1159,7 +1159,7 @@ the type provided before. This means that the data processing code, written usin
 type, will be easy to adapt. The programmer will need to add handling of a missing value, but
 they will not have to restructure their code. (A system based on statistical analysis of similarity
 would not have this property as a small change in the input may affect a decision whether two
-shape are sufficiently similar to be unified into a single type.) Using the formal model, we
+shapes are sufficiently similar to be unified into a single type.) Using the formal model, we
 can capture this property (and later prove that it holds for the F\# Data type providers).
 
 \begin{theorem}[Stability of inference]
@@ -1198,9 +1198,9 @@ and (iii) adding a conversion of a primitive value.
 The type providers presented in the previous section are designed to allow easy programmatic
 access to data in semi-structured formats. The focus is on providing typed direct access to the
 data. The pivot type provider, presented in Chapter~\ref{ch:dotdriven}, builds on the same
-concepts, but focuses on letting users construct queries over tabular data. The user should not
+concepts but focuses on letting users construct queries over tabular data. The user should not
 just be able to fetch the data in a typed form, but also use the provided types to filter,
-aggregate and reshape the data.
+aggregate, and reshape the data.
 
 \begin{figure}[t]
 \vspace{-0.5em}
@@ -1235,25 +1235,25 @@ a space). The system has a number of properties:
 \item \emph{Discoverability of members.} All querying logic is expressed through member accesses.
   The members are statically known (generated by a type provider). When using the type provider in
   an editor, the user gets a choice of available members (auto-completion) when they type ``.''
-  and they can thus construct query simply by repeatedly choosing one of the offered members.
+  and they can thus construct a query simply by repeatedly choosing one of the offered members.
 
 \item \emph{Lazy class generation.} The classes used in the code are generated lazily. This is
-  necessary, because each operation transforms the set of available fields based on which the
+  necessary because each operation transforms the set of available fields based on which the
   subsequent types are generated. For example, calling \texttt{'drop Games'} would remove the field
   \texttt{Games} from the schema.
 
 \item \emph{Safety of generated types.} Any query constructed using the type provider is correct meaning that it
   will not attempt to access a field that does not exist in the data. This is a variant of the
-  usual type safety property that is formalised below.
+  usual type safety property that is formalized below.
 \end{nitemize}
 
-The formalisation of the type provider follows the same style as that for F\# Data, but it explicitly
+The formalization of the type provider follows the same style as that for F\# Data, but it explicitly
 encodes the laziness of the type provider as illustrated in the next section.
 
 \subsection{Formalising lazy type provider for data querying}
 The pivot type provider works on tabular data. In order to generate a type, it needs to have the
 schema of the input table (names of fields and their types). In the above example, the type
-provider is imported through a configuration rather than code and \texttt{olympics} refers to a
+provider is imported through a configuration rather than code, and \texttt{olympics} refers to a
 value of the provided type, but the type is generated using a known schema of the input data.
 In the formal model, the schema is written as (with $f$ ranging over the field names and
 $\tau$ ranging over a small set of primitive types):
@@ -1263,9 +1263,9 @@ F=\{ f_1 \mapsto \tau_1, \ldots, f_n \mapsto \tau_n \}
 \end{equation*}
 %
 When the type provider is invoked, it takes the schema and generates a class for querying data
-of the given schema. The types of the members of the class are further classes that allow further
+of the given schema. The types of members of the class are further classes that allow further
 querying. As the provided class structure is potentially infinite, it needs to be generated
-lazily. The structure of provided class definition, written as $L$ is thus a function mapping
+lazily. The structure of the provided class definition, written as $L$ is thus a function mapping
 a class name $C$ to a pair consisting of the class definition and a function that provides
 definitions of delayed classes (types used by the members of the class $C$):
 %
@@ -1276,12 +1276,12 @@ L(C) = \kvd{type}~C(x:\tau) = \overline{m}, L'
 Here, $\kvd{type}~C(x:\tau) = \overline{m}$ is a definition of a class $C$ that consists of a
 sequence of members $\overline{m}$ and has a constructor taking a variable $x$ of type $\tau$ as
 an argument. The structure and evaluation of the resulting object calculus is discussed
-in Chapter~\ref{ch:dotdriven} and is loosely modelled after standard object calculi
+in Chapter~\ref{ch:dotdriven} and is loosely modeled after standard object calculi
 \citep{igarashi-2001-fj,abadi-2012-objects}, with the exception that it includes
 operations for transforming data as primitives.
 
 The classes provided by the pivot type provider can be used to construct a query, which is a
-value of type \ident{Query}. Expressions of this type are those of the relational algebra
+value of type \ident{Query}. Expressions of this type are those of relational algebra
 (projection, sorting, selection, as well as additional grouping). The type provider constructs
 classes that take the query constructed so far as the constructor argument. The provided members
 further refine and build the query. A type provider is formally defined as a function
@@ -1314,18 +1314,18 @@ l = \kvd{type}~C(x:\ident{Query}) = &\hspace{-1em}\forall f \in \ident{dom}(F)~\
 \end{array}
 \end{equation*}
 
-The formalisation of the pivot type provider follows a similar style as that of the F\# Data,
+The formalization of the pivot type provider follows a similar style as that of the F\# Data,
 although it differs in that it explicitly represents the laziness of the type generation and
 also in that the provided types construct more complex code, expressed using a a variant of
-relational algebra, that is executed at runtime. The formalisation serves to explain the functioning
+relational algebra, that is executed at runtime. The formalization serves to explain the functioning
 of the type provider, but also allows us to prove its safety.
 
 \subsection{Safety of data acquisition programs}
 
 The pivot type provider guarantees that the data transformations, which can be constructed using
-the types it generates  will always be correct. They will never result in an undefined runtime
-behaviour that one may otherwise encounter when accidentally accessing a non-existent field. This is
-an important result, because the sequence of operations transforms the fields in interesting ways.
+the types it generates will always be correct. They will never result in an undefined runtime
+behavior that one may otherwise encounter when accidentally accessing a non-existent field. This is
+an important result because the sequence of operations transforms the fields in interesting ways.
 Operations like \texttt{drop}remove fields from the schema, while \texttt{group by} changes the set
 of fields and their types (e.g., when we count distinct values of a string-typed field $f$ in aggregation,
 the resulting dataset will contain a numerical field $f$).
@@ -1338,7 +1338,7 @@ map fields to vectors of values, written as $D =
 A specific kind of data value is a data series $\ident{series}\langl\tau_k,\tau_v\rangl(D)$ that
 contains a vector of keys $k$ and a vector of values $v$. The evaluation is defined as a reduction
 operation $e \leadsto_{L}^{*} e'$ which also has access to class definitions $L$.
-Similarly, the typing judgement $L_1;\Gamma \vdash e : \tau; L_2$ includes additional handling of
+Similarly, the typing judgment $L_1;\Gamma \vdash e : \tau; L_2$ includes additional handling of
 lazily generated classes. It states that the expression $e$ has a type $\tau$ in a variable context
 $\Gamma$. The typing is provided with (potentially unevaluated) class definitions $L_1$. It
 accesses (and evaluates) some of those definitions and those that are used throughout the typing
@@ -1358,7 +1358,7 @@ such that $\vdash v_{i, j} : \tau_i$ it holds that $e[x\leftarrow C(D)]\leadsto_
 In other words, if a programmer uses the provided types to write a program $e$ that evaluates to
 a data series and we provide the program with input data $D$ that matches the schema used to invoke
 the type provider, the program will always evaluate to a data series containing values of the
-correct type. Although the property is not labelled as \emph{relative type safety} as in the
+correct type. Although the property is not labeled as \emph{relative type safety} as in the
 case of the F\# Data type providers, it follows the same spirit. A well-typed program will not
 go wrong, as long as the input has the right structure.
 
@@ -1381,11 +1381,11 @@ Both of the contributions consist of a practical implementation, as a library fo
 as a component of the web-based programming environment The Gamma, respectively. They combine this
 with a theoretical analysis using the methodology of theoretical programming language research.
 This makes it possible to precisely capture subtle aspects of how the type providers work
-(including shape inference, laziness and generation of types for query construction), but also
+(including shape inference, laziness, and generation of types for query construction), but also
 to capture safety guarantees of the generated types. Given that type providers always access
 external data, the guarantees are not absolute as in conventional programming language theory.
 For this reason, my work introduced a novel notion of \emph{relative type safety}, stating that
-programs will ``not go wrong'' as long as the input has correct structure (in a precisely defined
+programs will ``not go wrong'' as long as the input has the correct structure (in a precisely defined
 sense).
 
 From a broader perspective, the two type providers can be seen as filling a glaring gap in the
@@ -1397,7 +1397,7 @@ this is typically done in an unchecked way. Monads and effect systems \citep{luc
 can be used to track that some external access is made, but they do not help the static type
 system understand the structure of the outside data.
 %
-With a slight notational creativity, we can say that the static type checking of a program that
+With slight notational creativity, we can say that the static type checking of a program that
 uses type providers starts with a rule $\pi(\oplus) \vdash e\!:\!\tau$ where $\oplus$ (used as the
 astronomical symbol for the Earth) refers to the entire outside world and $\pi$ refers
 to some projection from all the things that exist in the outside world to program variables
@@ -1408,7 +1408,7 @@ technology gap suggested in Figure~\ref{fig:gap}. The F\# Data type providers ai
 programming with external data in a statically typed programming language a bit easier.
 In other words, they extend the area that can be covered by conventional programming,
 including more users and reducing the complexity. The pivot type provider and The Gamma
-programming environment tries to fill a particular space within the gap. It lets relatively
+programming environment tries to fill a particular space within the gap. It lets a relatively
 large number of users (who are not professional programmers) solve problems that are more complex
 than simple data wrangling in a spreadsheet system, but much less complex than using a conventional
 programming tool such as Python and pandas. Its usability is a topic I will revisit in
@@ -1425,21 +1425,21 @@ Data scientists use a wide range of tools when working with data. A large part o
 data cleaning and data exploration challenging is that data scientists often need to switch
 from one tool to another \citep{rattenbury-2017-wrangling}. They may use an interactive online
 tool like Trifacta to do data cleanup, run an ad-hoc command-line tool to
-transform it and then import it into a Jupyter notebook to create a visualization. Moreover,
+transform it, and then import it into a Jupyter notebook to create a visualization. Moreover,
 data science is an interactive and iterative process. Data scientist need to be able to quickly
 review the results of the operation they performed in order to see whether the results match
 their expectations and to detect unexpected problems. The interactivity brings a further challenge,
 which is the reproducibility of results. If the data scientist quickly tries multiple different
-approaches, reverts some of their earlier experiments, they should always be able to know what
+approaches, and reverts some of their earlier experiments, they should always be able to know what
 exact steps led to the final result they see on their screen.
 
-In this chapter, I provide overview of two contributions to the infrastructure for doing data
+In this chapter, I provide an overview of two contributions to the infrastructure for doing data
 exploration. The work addresses the three requirements that arise from the typical way data
 exploration is done as outlined above:
 
 \begin{nitemize}
 \item \emph{Polyglot tooling support.} Data scientist need an easy way of integrating multiple
-  different tools. For example, they should be able to use a simple data acquisition tools,
+  different tools. For example, they should be able to use simple data acquisition tools,
   such as the pivot type provider implemented in The Gamma, but then pass the data to Python
   for further processing or to a visual interactive tool.
 
@@ -1454,7 +1454,7 @@ exploration is done as outlined above:
 \end{nitemize}
 
 Although each of those challenges has a range of solutions, there are not many systems that
-address all of them. This chapter provides an overview of work leading towards such system.
+address all of them. This chapter provides an overview of work leading towards such a system.
 It consists of two parts. The first is a data exploration environment for The Gamma that introduces
 an efficient way of evaluating live previews (presented in full in Chapter~\ref{ch:foundations})
 using a method based on maintaining a dependency graph. The second part is a notebook system for
@@ -1465,7 +1465,7 @@ uses the dependency graph to ensure reproducibility of the data explorations.
 Methodologically, the work outlined in this chapter combines the programming systems research
 methods with programming language theory. Both of the systems are available as open-source
 projects and they have been evaluated through a range of realistic case studies. The publication
-on live previews for data exploration environment presents a formal model to explain how
+on live previews for data exploration environments presents a formal model to explain how
 live previews are computed using a dependency graph and to show the correctness of this approach,
 but it also includes a performance evaluation. The main contribution of the work on Wrattler
 is the novel architecture of the system.
@@ -1527,13 +1527,13 @@ is a challenge \citep{mcdirmid-2007-live}. There are two difficulties:
 
 \begin{nitemize}
 \item \emph{Live previews and abstractions.} It is difficult to provide live previews for code
-  inside functions or classes, because variables in such context cannot be easily linked to
+  inside functions or classes because variables in such context cannot be easily linked to
   concrete values. Even if such abstractions are not used as frequently in data exploration code,
   abstractions are often the key concern in conventional theoretical thinking about programming
   language design.
 
 \item \emph{Responding to code changes.} Code in a text editor can change in arbitrary ways and
-  so it is unclear how to update existing live preview when an edit is made. This is easier in
+  so it is unclear how to update the existing live preview when an edit is made. This is easier in
   structure editors where edits are limited and understood by the system, but live previews for
   a text-based system need to accommodate large and potentially breaking changes in code.
 \end{nitemize}
@@ -1550,8 +1550,8 @@ problems in programmatic data exploration tools.
 
 The problem of responding to code changes is tackled by constructing a dependency graph and
 caching its nodes. When the code is edited, the new version is parsed, resulting in a new
-abstract syntax tree. The nodes of the tree are then analysed and linked to nodes in a
-dependency graph. When the node of the tree corresponds to dependency graph node that has been
+abstract syntax tree. The nodes of the tree are then analyzed and linked to nodes in a
+dependency graph. When the node of the tree corresponds to a dependency graph node that has been
 created previously (with the same dependencies), the graph node is reused. Live previews are
 then computed (and associated with) dependency graph nodes. As a result, when dependencies of
 a particular expression do not change, it is linked to the same graph node as before and the
@@ -1559,14 +1559,14 @@ associated live preview is reused.
 
 In the following two sections, I provide a brief review of the data exploration calculus and of
 the dependency graph construction mechanism. In Chapter~\ref{ch:foundations}, the data exploration
-calculus is then used to formalise the graph construction and show that live previews computed
+calculus is then used to formalize the graph construction and show that live previews computed
 based on the graph are the same as previews that would be computed by directly evaluating the
 data exploration calculus expression. The publication also evaluates the efficiency using live
 previews, quantifying the reduction in overhead in contrast to two other evaluation strategies.
 
 \begin{figure}
 \raggedright
-\hspace{0.5em}{\sffamily Programs, commands, terms, expressions and values}
+\hspace{0.5em}{\sffamily Programs, commands, terms, expressions, and values}
 %
 \begin{equation*}
 \begin{array}{lcl}
@@ -1632,8 +1632,8 @@ A program $p$ consists of a sequence of commands $c$.
 A command can be either a let binding or a term. Let bindings define variables $x$
 that can be used in subsequent commands. As noted earlier, lambda functions can only appear as
 arguments in method calls. To model this, the calculus distinguishes between terms that can appear
-at the top-level and expressions that can appear as argument in an invocation.
-A term $t$ can be a value, variable or a member access, while an expression $e$
+at the top-level and expressions that can appear as arguments in an invocation.
+A term $t$ can be a value, variable, or a member access, while an expression $e$
 can be a lambda function or a term. Values defined by external libraries are written
 as $o$.
 
@@ -1662,8 +1662,8 @@ l.\ident{map}(\lambda x \rightarrow \ident{math}.\ident{mul}(x, \Num{10}))
 \end{equation*}
 %
 An external library provides the \ident{list} and \ident{math} objects, as well as
-numbers $n$, lists of objects $[o_1, \ldots, o_k]$ and failed computations $\bot$.
-Next, the external library needs to define the semantics of the \ident{range}, \ident{mul} and
+numbers $n$, lists of objects $[o_1, \ldots, o_k]$, and failed computations $\bot$.
+Next, the external library needs to define the semantics of the \ident{range}, \ident{mul}, and
 \ident{map} members through the $\rightsquigarrow_\epsilon$ relation. The following shows
 the rules for the \ident{map} operation on lists:
 %
@@ -1692,7 +1692,7 @@ observationally equivalent values as arguments, it should return the same value 
 Second, the evaluation of $o.m(v_1,\ldots,v_n)$ should be defined for all $o, n$ and $v_i$ (totality).
 The above definition satisfies those requirements by using the standard $\beta$-reduction
 for reducing lambda functions and by reducing all invalid calls to the $\bot$ object.
-Compositionality implies deterministic behaviour of external libraries and is essential for
+Compositionality implies the deterministic behavior of external libraries and is essential for
 implementing an efficient live preview mechanism. The totality of the definition, in turn,
 makes it possible to prove the following \emph{normalization} property:
 %
@@ -1704,7 +1704,7 @@ where $\rightsquigarrow^{*}$ is the reflexive, transitive closure of $\rightsqui
 %
 The value of the data exploration calculus is that it can be used to model the functionality
 of different tools that support data exploration. The work outlined here (and presented in
-full in Chapter~\ref{ch:foundations}) uses the calculus to formalise an efficient mechanism
+full in Chapter~\ref{ch:foundations}) uses the calculus to formalize an efficient mechanism
 for showing live previews during the editing of data exploration script. As mentioned earlier,
 the mechanism works by constructing a dependency graph, binding expressions to the graph and
 associating live previews with the (cached) nodes of the graph. The formal properties of the data
@@ -1772,7 +1772,7 @@ This makes it possible to define computation not just over expressions of the da
 calculus, but also over the dependency graph. In order to cache computed previews with the node
 as the key, some of the nodes need to be annotated with a unique symbol. That way, we can
 create two unique nodes representing, for example, access to a member named \ident{take} which
-differ in their dependencies. The graph edges are labelled with labels indicating the kind of
+differ in their dependencies. The graph edges are labeled with labels indicating the kind of
 dependency. For a method call, the labels are ``first argument'', ``second argument'' and so on.
 Writing $s$ for symbols and $i$ for integers, nodes (vertices) $\bndclr{v}$ and edge labels
 $\blblclr{l}$ are defined as:
@@ -1787,7 +1787,7 @@ $\blblclr{l}$ are defined as:
 The \bnd{val} node represents a primitive value and contains the object itself. Multiple occurrences
 of the same value, such as $\Num{10}$, will be represented by the same node. Member access \bnd{mem}
 contains the member name, together with a unique symbol $s$ -- two member access nodes with
-different dependencies will contain a different symbol. Dependencies of a member access are labelled
+different dependencies will contain a different symbol. Dependencies of a member access are labeled
 with \blbl{arg} indicating the index of the argument ($0$~for the instance and $1,2,3,\ldots$ for the
 arguments). Finally, nodes \bnd{fun} and \bnd{var} represent function values and variables
 bound by $\lambda$ abstraction.
@@ -1804,7 +1804,7 @@ $\bnd{mem}(\ident{skip}, s_0)$ are unchanged. The symbol $s_0$ attached to the n
 the same and so the previously computed previews can be reused. This part of the program is not recomputed.
 The $\blbl{arg}(1)$ dependency of the \ident{take} call
 changed and so we create a new node $\bnd{mem}(\ident{skip}, s_2)$ with a fresh symbol $s_2$.
-The preview for this node is then computed as needed using the already known values of its
+The preview for this node is then computed as needed using the already-known values of its
 dependencies.
 
 The full description of how the dependency graph is constructed can be found in
@@ -1814,7 +1814,7 @@ obtains graph nodes representing its sub-expressions. It then checks the cache t
 representing the current expression with the same dependencies exists already. If so, the node is
 reused. If no, a new node (possibly with a new symbol) is created.
 
-The construction of the graph makes it possible to compute preview over the nodes of the
+The construction of the graph makes it possible to compute previews over the nodes of the
 dependency graph and cache the previously computed previews by using the graph node as the cache
 key. I illustrate how the evaluation works using two of the reduction rules. For simplicity,
 I do not discuss the caching here. I will also write $p$ for evaluated previews which can be either
@@ -1840,27 +1840,27 @@ illustrate evaluation for primitive values and for member access:
 The (val) rule is simple. If a graph node represents a primitive value, it directly reduces to
 the value. The (mem-val) rule illustrates a more interesting case. To evaluate a member access,
 we need to find the graph nodes that represent its arguments (by looking for links with an
-appropriate label), reduce those recursively and then use the external library reduction
+appropriate label), reduce those recursively, and then use the external library reduction
 $\rightsquigarrow_\epsilon$ to reduce the member access.
 
 The sketch presented here omits one interesting aspect of the mechanism. In general, previews
 can be provided for all sub-expressions that include variables defined by an earlier let binding.
 However, if a sub-expression contains a variable bound by a lambda expression, we have no
-way of obtaining suitable value for the variable. In this case, our mechanism evaluates
+way of obtaining a suitable value for the variable. In this case, our mechanism evaluates
 a delayed preview $\llbracket e \rrbracket_\Gamma$, which represents a partially-evaluated
 expression that depends on variables specified by $\Gamma$. Delayed previews could still be
 useful if the user interface allowed the user to specify sample value for the free variables
-and they also have interesting theoretical connection to work on Contextual Modal Type Theory
+and they also have an interesting theoretical connection to work on Contextual Modal Type Theory
 \citep{nanevski-2008-cmtt} and comonads~\citep{gabbay-2013-cmtt}.
 
 The full paper, included as Chapter~\ref{ch:foundations}, uses two research methodologies
-to evaluate the work. First, it formalises how the live preview mechanism works using the
-model based on the data exploration calculus as sketched above. The formalisation is
+to evaluate the work. First, it formalizes how the live preview mechanism works using the
+model based on the data exploration calculus as sketched above. The formalization is
 used to show that the previews computed over the dependency graph are \emph{correct}. That is,
 they are the same as the values we would obtain by evaluating the data exploration calculus
-expressions directly. The formalisation is also used to list a number of common edits to
+expressions directly. The formalization is also used to list a number of common edits to
 a program that do not invalidate previously computed live previews. Examples of such edits
-include extracting sub-expression into a let-bound variable, deleting or adding unused code
+include extracting sub-expression into a let-bound variable, deleting or adding unused code,
 or changing unrelated parts of the program. The evaluation also employs programming systems
 research methods to empirically evaluate the efficiency of the live preview evaluation method.
 The paper contrasts the method with standard call-by-value and lazy evaluation strategies
@@ -1884,23 +1884,23 @@ I listed in the opening of this chapter were the need for polyglot tooling suppo
 to make data analyses more reproducible.
 
 The two challenges are addressed by the open-source Wrattler notebook system presented in full in
-Chapter~\ref{ch:wrattler}. Wrattler is an extension for the industry standard JupyterLab platform.
+Chapter~\ref{ch:wrattler}. Wrattler is an extension of the industry standard JupyterLab platform.
 As illustrated in Figure~\ref{fig:wrattler}, Wrattler adds a new type of document format that
 allows programmers to mix cells written in multiple different programming languages in a single
 notebook. The extensibility model of Wrattler makes it possible to support not only new programming
-languages, but also interactive tools that run directly in the notebook (hosted in a web browser).
-As a result, it is possible to integrate tools that provide live preview mechanism such as
+languages but also interactive tools that run directly in the notebook (hosted in a web browser).
+As a result, it is possible to integrate tools that provide a live preview mechanism such as
 The Gamma and also interactive AI assistants that I discuss in Part~\ref{part:iterative}.
 The architecture of the Wrattler system is based on two key principles:
 
 \begin{nitemize}
-\item \emph{Polyglot architecture.} The system is designed to allow integration of components in
+\item \emph{Polyglot architecture.} The system is designed to allow the integration of components in
   different programming languages. This is done by splitting the monolithic architecture of
   Jupyter into individual components including the central data store and multiple language runtimes.
 
 \item \emph{Design for reproducibility.} To guarantee reproducibility and track data provenance,
   the system represents computation as a dependency graph. The graph is similar to the one discussed
-  in the previous section, but uses a coarser granularity with one node for each notebook cell.
+  in the previous section but uses a coarser granularity with one node for each notebook cell.
 \end{nitemize}
 
 The Wrattler system is presented in detail in Chapter~\ref{ch:wrattler}. The paper follows the
@@ -1915,7 +1915,7 @@ capabilities that are enabled by the architecture.
 \vspace{2em}\includegraphics[scale=0.6,trim=1.5cm 6cm 1cm 0.4cm,clip]{img/arch.pdf} &
 \vspace{0em}\includegraphics[scale=0.6,trim=1cm 0.5cm 1cm 4cm,clip]{img/arch.pdf}
 \end{tabular}
-\caption{In notebook systems such as Jupyter, state and execution is managed by a kernel. In
+\caption{In notebook systems such as Jupyter, state and execution are managed by a kernel. In
   Wrattler, those functions are split between data store and language runtimes. Language runtimes
   can run on the server-side (e.g.~Python) or client-side (e.g.~The Gamma).}
 \label{fig:arch}
@@ -1923,29 +1923,29 @@ capabilities that are enabled by the architecture.
 \end{figure}
 
 Standard notebook architecture consists of a \emph{notebook} and a \emph{kernel}. The kernel
-runs on a server, evaluates code snippets and maintains the state they use.
-Notebook runs in a browser and sends commands to the kernel in order to evaluate
+runs on a server, evaluates code snippets, and maintains the state they use.
+The notebook runs in a browser and sends commands to the kernel in order to evaluate
 cells selected by the user. As illustrated in Figure~\ref{fig:arch}, Wrattler splits the
 server functionality into two components:
 
 \begin{nitemize}
 \item \emph{Data store.} Imported external data and results of running scripts
 are stored in the data store. The data store keeps version history and annotates data with
-metadata such as types, inferred semantics and provenance information.
+metadata such as types, inferred semantics, and provenance information.
 
 \item \emph{Language runtimes.} Code in notebook cells is evaluated by language runtimes.
 The runtimes read input data from and write results back to the data store. Wrattler supports
-language runtimes that run code on the server (similar to Jupyter), but also browser-based
+language runtimes that run code on the server (similar to Jupyter) but also browser-based
 language runtimes.
 
 \item \emph{Notebook.} The notebook is displayed in a web browser and orchestrates
 all other components. The browser builds a dependency graph between cells or individual
-calls. It invokes language runtimes to evaluate code that has changed,
+calls. It invokes language runtimes to evaluate code that has changed
 and reads data from the data store to display results.
 \end{nitemize}
 
 The central component of the system is the data store, which enables communication between
-individual Wrattler components and provides a persistent data storage.
+individual Wrattler components and provides persistent data storage.
 Data frames stored in the data store are associated with a hash of a node in a dependency
 graph constructed from the code in the notebook (using a mechanism discussed below)
 and are immutable. When the notebook changes, new nodes with new hashes are created and
@@ -1957,7 +1957,7 @@ binary blobs. Data frames are stored in either JSON or binary format.
 The data store also supports a mechanism for annotating data frames with
 semantic information. Columns can be annotated with primitive data types (date, floating-point
 number) and semantic annotation indicating their meaning (address or longitude and latitude).
-Columns, rows and individual cells of the data frame can also be annotated with custom metadata
+Columns, rows, and individual cells of the data frame can also be annotated with custom metadata
 such as their data source or accuracy.
 
 \begin{figure}[t]
@@ -1968,7 +1968,7 @@ such as their data source or accuracy.
 \begin{minipage}{0.5\textwidth}
 \caption{Dependency graph of a notebook from Figure~\ref{fig:wrattler}. For each cell,
 the graph contains a code node and one (or possibly more) export nodes that represent exported
-data frames. The R and Python cells are independent and map to independent graph node. The node
+data frames. The R and Python cells are independent and map to independent graph nodes. The node
 corresponding to the final JavaScript cell depends on nodes representing the two variables used
 in the code.}
 \label{fig:deps}
@@ -1979,16 +1979,16 @@ in the code.}
 
 At runtime, Wrattler maintains a dependency graph that is remarkably similar to the one
 used in the live data exploration environment for The Gamma discussed in
-Section~\ref{sec:infra-livedata}. As before, the dependency graph is used to cache results
+Section~\ref{sec:infra-livedata}. As before, the dependency graph is used to cache the results
 of previous computations. The nodes in the graph have a unique identifier (hash) that is used
 as the key for caching data in the data store. When code in the notebook is modified, the
 graph is re-created, reusing previously created nodes where possible.
 
 An example of a dependency graph is shown in Figure~\ref{fig:deps}. For every type of
 cell, Wrattler needs to be able to identify the names of imported and exported variables.
-In case of Python, R and JavaScript, this is done using a lightweight code analysis.
-In case of The Gamma, which can also be used in Wrattler, the full
-parse tree and its associated dependency graph is available. A prototype extension of Wrattler
+In the case of Python, R, and JavaScript, this is done using a lightweight code analysis.
+In the case of The Gamma, which can also be used in Wrattler, the full
+parse tree and its associated dependency graph are available. A prototype extension of Wrattler
 embeds The Gamma graph as a sub-graph of the dependency graph maintained by Wrattler.
 
 An important design choice in the Wrattler design is that cells can only share data in the form
@@ -2003,7 +2003,7 @@ mechanism as in the live data exploration environment discussed in Section~\ref{
 Wrattler invokes individual language runtimes to parse each cell. It then walks over the
 resulting structure and constructs nodes for each cell or exported variable with edges
 indicating dependencies. The hash for each node is computed from the data in the node (typically
-source code or variable name) and hashes of nodes it depends on. An important property of this
+source code or variable name) and the hashes of nodes it depends on. An important property of this
 process is that, if there is no change in dependencies of a node, the hash of the node
 will be the same as before. As a result, previously evaluated values attached to nodes
 in the graph are reused.
@@ -2021,14 +2021,14 @@ the evaluation is done directly in the web browser.
 
 \keyideabox{\faPencilSquareO}{Key contributions}{The publications included in Part~\ref{part:infra}
 include three main contributions. They capture the essence of data scripting in the form of
-\emph{data exploration calculus}, they present architecture for \emph{polyglot, live and reproducible
+\emph{data exploration calculus}, they present the architecture for \emph{polyglot, live and reproducible
 notebook systems} and they describe an efficient algorithm for \emph{live preview recomputation}
 based on the construction of a dependency graph.}
 
 \noindent
 In this chapter, I outlined two contributions to the data analytics infrastructure that
 are included in Part~\ref{part:infra} of this thesis. The two contributions describe systems
-that aim to make data exploration more live and reproducible, while supporting the polyglot
+that aim to make data exploration more live and reproducible while supporting the polyglot
 reality of data processing tools used today.
 
 The work included in Chapter~\ref{ch:foundations} focuses on providing live previews during
@@ -2070,18 +2070,18 @@ as in systems based on Read-Eval-Print Loop (REPLs).
 \label{ch:iterative}
 
 Data wrangling is the tedious process of getting data into the right format for data exploration.
-It involves parsing data, joining multiple datasets, correcting errors and recovering semantic
+It involves parsing data, joining multiple datasets, correcting errors, and recovering semantic
 information. According to domain experts \citep{rattenbury-2017-wrangling}, data wrangling
 takes up to 50-80\% of data scientist's time. Unfortunately, there is no easy cure to the problem
 of data wrangling. The reason for the difficulty is what \cite{gerrit-2019-csv} refer to
 as the \emph{double Anna Karenina principle}: ``every messy dataset is messy in its own way, and
 every clean dataset is also clean in its own way.'' In other words, there is no single
-characterisation of a clean dataset that tools could optimise for. Human insight into the data
+characterization of a clean dataset that tools could optimize for. Human insight into the data
 is always needed.
 
 Different research directions approached the problem of data wrangling from different perspectives.
 Graphical end-user programming tools typically make it easy to complete the
-most common tasks for the most common kinds of datasets, but are incapable of covering the
+most common tasks for the most common kinds of datasets but are incapable of covering the
 inevitable special cases that are present due to the double Anna Karenina principle.
 Automatic AI-based tools for data wrangling suffer from the same issue. They work well in a
 large number of cases, but they can easily confuse interesting outliers for uninteresting
@@ -2091,9 +2091,9 @@ tools. We can make those tools easier to integrate and make tweaking of paramete
 live previews (as discussed in the previous chapter), but what if we could offer a different way
 of working with them?
 
-The contributions outlined in this chapter are centred around the question of how to
+The contributions outlined in this chapter are centered around the question of how to
 easily enable human data analysts, even if they are not expert programmers, to supply the
-necessary human insight to programmatic tools when cleaning and analysing data.
+necessary human insight to programmatic tools when cleaning and analyzing data.
 The answer presented in the first contribution (Chapter~\ref{ch:thegamma}) is
 an interaction principle that I refer to as \emph{iterative prompting}. In a tool that
 follows the principle, the user is repeatedly asked to choose from a list of offered options.
@@ -2117,24 +2117,24 @@ use iterative prompting in two ways:
   which the analyst can supply human insights to the AI tool.
 \end{nitemize}
 
-The primary contributions of the work presented in this chapter is that it develops and validates
+The primary contribution of the work presented in this chapter is that it develops and validates
 novel approaches to the problem of data wrangling. To do this, it uses two primary research
 methods. The work introducing iterative prompting (Chapter~\ref{ch:thegamma}) is rooted in
 human-computer interaction research. It motivates the interaction principle, describes a prototype
-implementation and shows its effectiveness through a qualitative case study and an empirical user
+implementation, and shows its effectiveness through a qualitative case study and an empirical user
 study. The work on AI assistants (Chapter~\ref{ch:aia}) combines programming language theory and
 programming systems research methods. It describes the architecture of the system using a formal
 model and validates it by making four existing automatic
 AI tools interactive and semi-automatic. The novel tools are evaluated empirically. In cases where
 the fully automatic tool fails, our semi-automatic tool allows the user to correct the solution
-with a small number (typically 1-2) simple interactions.
+with a small number (typically 1-2) of simple interactions.
 
 The work in this chapter is best seen as design space exploration.
 I believe that programming languages and systems provide the right starting point for tackling the
-problem of data wrangling and data exploration. But in order to fulfil this role, they need to
+problem of data wrangling and data exploration. But in order to fulfill this role, they need to
 be significantly easier to use. Non-programmers need to be able to create simple data exploration
-scripts and data analysts need an easy to use interface for solving typical problems.
-Iterative prompting takes the basic auto completion mechanism leveraged by type providers
+scripts and data analysts need an easy-to-use interface for solving typical problems.
+Iterative prompting takes the basic auto-completion mechanism leveraged by type providers
 to a new level, turning it into a simple but powerful unifying interaction principle.
 
 \section{Data wrangling and data analytics}
@@ -2167,7 +2167,7 @@ the current state of the analysis and make changes to it. The interaction
 between a human and a computer in such data wrangling systems follows a number of common patterns:
 
 \begin{nitemize}
-\item \emph{Onetime interaction.} A tool makes a best guess, but allows the analyst to manually edit
+\item \emph{Onetime interaction.} A tool makes a best guess but allows the analyst to manually edit
 the proposed data transformation. Examples include dataset merging
 in Trifacta and datadiff \citep{sutton-2018-datadiff}.
 
@@ -2190,8 +2190,8 @@ limited forms of human input. The \emph{onetime interaction} pattern is the most
 and only a few systems follow the more flexible \emph{iterative} pattern. The iterative
 prompting principle that I introduce in this chapter implements the \emph{iterative} pattern
 in a uniform way that is inspired by work on information-rich programming programming
-\citep{syme-2013-inforich} and type providers (Chapter~\ref{ch:tp}). It is centred around
-code, but reduces the conceptual complexity of coding to a single basic kind of interaction.
+\citep{syme-2013-inforich} and type providers (Chapter~\ref{ch:tp}). It is centered around
+code but reduces the conceptual complexity of coding to a single basic kind of interaction.
 
 \section{Iterative prompting}
 Technically speaking, I have already discussed all the components that together make up
@@ -2214,7 +2214,7 @@ The example shows three steps of the process:
 \begin{nenumerate}
 \item The user starts by selecting an input data source (not using iterative prompting)
   and types `.' (dot) to see available querying operations. The system offers a list of
-  (all available) operations including filtering, grouping and sorting.
+  (all available) operations including filtering, grouping, and sorting.
 
 \item The user chooses \texttt{filter data}. They are then offered a list of conditions
   based on the columns in the dataset. The user selects \texttt{County is} and is then
@@ -2306,7 +2306,7 @@ drwho.Character.Doctor.'ENEMY OF'.'[any]'
 \end{lstlisting}
 
 \noindent
-The query is illustrated in in Figure~\ref{fig:graphtp}. We start from the \texttt{Doctor} node
+The query is illustrated in Figure~\ref{fig:graphtp}. We start from the \texttt{Doctor} node
 and then follow two relationships. We use \texttt{\textquotesingle ENEMY
 OF\textquotesingle.\textquotesingle [any]\textquotesingle}
 to follow links to all enemies of the Doctor and then specify
@@ -2315,11 +2315,11 @@ to select only enemies that appear in a specific episode. The members are genera
 \texttt{\textquotesingle ENEMY OF\textquotesingle} and \texttt{\textquotesingle APPEARED IN\textquotesingle} are labels
 of relations and \texttt{Doctor} and \texttt{\textquotesingle Day of the Moon\textquotesingle} are labels of nodes. The
 \texttt{[any]} member defines a placeholder that can be filled with any node with the specified
-relationships. The results returned by the provider is a table of properties of all nodes
-along the specified path, which can be further queried and visualised.
+relationships. The result returned by the provider is a table of properties of all nodes
+along the specified path, which can be further queried and visualized.
 
 Unlike the graph and data cube providers, the type provider for tabular data does not just
-allow selecting a subset of the data, but it can be used to construct SQL-like query.
+allow selecting a subset of the data, but it can be used to construct SQL-like queries.
 For example, the code constructed in Figure~\ref{fig:iterative} filters and sorts the data.
 
 When using the provider, the user specifies a sequence of operations. Members such as
@@ -2356,7 +2356,7 @@ us in the demo to the new dataset.'' Once users understood iterative prompting, 
 able to learn from just code samples and do not need to see a live demo of using the tool.
 One participant noted that ``a video would just be this [i.e.~a code sample] anyway.''
 
-\item \emph{How users understand complex query languages?}
+\item \emph{How do users understand complex query languages?}
 The tabular type provider uses a member \texttt{then} to complete the specification of a
 current operation, for example when specifying a list of aggregation operations. Two participants
 initially thought that \texttt{then} is used to split a command over multiple lines,
@@ -2366,7 +2366,7 @@ allows users to start exploring new data sources, the structures exposed by more
 sources have their own further design principles that the users need to understand.
 
 \item \emph{What would make The Gamma easier to use?}
-Three participants struggled to complete a task using the tabular data source,
+Three participants struggled to complete a task using the tabular data source
 because they attempted to use an operation that takes a numerical parameter and thus
 violates the iterative prompting principle. Most participants had no difficulty navigating
 around in text editor and some participants used the text editor effectively, e.g.~leveraging
@@ -2396,7 +2396,7 @@ repeatedly use iterative prompting to further constrain the solution.
 
 As illustrated in Figure~\ref{fig:ddiff}, AI assistants are available in the
 Wrattler notebook system discussed in Chapter~\ref{ch:infra}. In addition to code cells that
-obtain, process and visualise data, users can create AI assistant cells that invoke a semi-automatic
+obtain, process, and visualize data, users can create AI assistant cells that invoke a semi-automatic
 data cleaning tool on some of the available datasets. After invoking the assistant, users are
 shown a preview of the generated clean dataset. If they see an error in the automatically inferred
 solution, they can choose one from the offered options to guide the AI tool and correct the error.
@@ -2449,10 +2449,10 @@ tools can follow in order to use iterative prompting as a mechanism for incorpor
 insights into the data wrangling process.
 
 The formal model defines AI assistants as a mathematical entity that consists of several
-operations, modelled as mathematical functions between different sets.
+operations, modeled as mathematical functions between different sets.
 Every AI assistant is defined by three operations that work with expressions~$e$, past human
 interactions $H$, input data $\Din$, and output data $\Dout$. Expressions $e$ can also be
-thought of as data cleaning scripts. Input and output data are typically one or more data
+thought of as data-cleaning scripts. Input and output data are typically one or more data
 tables, often annotated with meta-data such as column types.
 While AI assistants share a common structure, the language of expressions $e$ that an assistant
 produces, the notion of human interactions $H$, and the notion of $\Din$ and $\Dout$ can differ
@@ -2517,7 +2517,7 @@ Steps drawn as rounded rectangles correspond to user interactions with the syste
 \subsection{Practical AI assistants}
 To show that AI assistants provide a common structure for a wide range of semi-automatic
 data wrangling tools, the work included as Chapter~\ref{ch:aia} takes four existing
-AI-based data wrangling tools that follow the \emph{onetime interaction} pattern and turns them
+AI-based data wrangling tools that follow the \emph{onetime interaction} pattern and turn them
 into interactive tools that follow the \emph{iterative} pattern. The original tools
 cover the entire spectrum of data wrangling ranging from parsing of CSV files~\citep{gerrit-2019-csv}
 and merging data files~\citep{sutton-2018-datadiff} to type and semantic information inference
@@ -2570,10 +2570,10 @@ The four practical AI assistants presented in Chapter~\ref{ch:aia} work as follo
   assistant allows the user to specify that certain patches (e.g., matching two particular columns)
   should or should not be included in the resulting set.
 
-\item The \emph{CleverCSV AI assistant} infers formatting parameters of a CSV file to optimise a
+\item The \emph{CleverCSV AI assistant} infers formatting parameters of a CSV file to optimize a
   metric based on how regular the resulting parsed result is. The semi-interactive AI assistant
   allows the user to specify that a given character should be or should not be used as a delimiter,
-  a quote or an escape character.
+  a quote, or an escape character.
 
 \item The \emph{ptype AI assistant} infers types of columns in a dataset, detecting outliers and
   values representing missing data. The optimization function looks for a type with maximal
@@ -2603,11 +2603,11 @@ are usually sufficient to complete the task.
 \keyideabox{\faPencilSquareO}{Key contributions}{The publications included in Part~\ref{part:iterative}
 include three main contributions. They introduce the novel \emph{iterative prompting} interaction
 principle. They use it as the basis of \emph{AI assistants}, novel semi-automated data wrangling
-tools, as well as multuiple \emph{type providers} for accessing data in graph databases,
-data cubes and relational databases.}
+tools, as well as multiple \emph{type providers} for accessing data in graph databases,
+data cubes, and relational databases.}
 
 \noindent
-This chapter brings together two contributions that aim to reduce the gab between programming
+This chapter brings together two contributions that aim to reduce the gap between programming
 and spreadsheets by making two tasks that typically require some kind of programming easier.
 In the first contribution, I focused on data exploration, whereas the second contribution tackles
 the task of data wrangling. My work shows that, in both cases, it is possible to solve
@@ -2615,7 +2615,7 @@ a large class of problems using the \emph{iterative prompting} interaction princ
 user repeatedly chooses one from the offered options. The interaction principle is simple in
 that it reduces the cognitive load by using the \emph{recognition over recall} design heuristic.
 When using iterative prompting, the users do not need to recall the kind of operation they
-could use to solve the problem. Instead they can review the list of offered options and recognise
+could use to solve the problem. Instead, they can review the list of offered options and recognize
 the most suitable one.
 
 The work included in Chapter~\ref{ch:thegamma} introduces the \emph{iterative prompting}
@@ -2623,7 +2623,7 @@ interaction principle and uses it to view the type provider for data querying ou
 Chapter~\ref{ch:tp} from a novel perspective using the human-computer interaction research
 methodology. Rather than treating auto-completion as a programmer assistance tool, it is
 now used as a mechanism that allows non-programmers to construct entire programs. The key
-characteristics of the type provider that make this possible is that it is complete and correct,
+characteristics of the type provider that make this possible are that it is complete and correct,
 i.e.~ it makes it possible to construct all programs and any program constructed by
 repeatedly choosing one of the offered options is correct (even though some may result in
 empty data). The user study that I briefly discussed in this chapter shows that iterative
@@ -2660,10 +2660,10 @@ used Python and R languages.
 \chapter{Data visualization}
 
 Data visualization plays a dual role in the data science lifecycle. Quick data
-visualisations are needed during data exploration to help data analysts make sense of
-data, find errors and understand how their processing scripts work. However, data visualisations
+visualizations are needed during data exploration to help data analysts make sense of
+data, find errors, and understand how their processing scripts work. However, data visualizations
 can also be one of the outcomes of data science projects. In particular, data journalists
-often analyse data in order to find interesting insights and share those with their readers.
+often analyze data in order to find interesting insights and share those with their readers.
 A sophisticated and illuminating data visualization can be a powerful tool for such storytelling.
 
 Producing a quick data visualization during data exploration is usually easy. In programmatic
@@ -2707,16 +2707,16 @@ the composable Compost data visualization library.}
 \end{figure}
 
 The chart is based on a standard bar chart, but there are multiple additional aspects that
-make creating such chart a challenging programming problem:
+make creating such a chart a challenging programming problem:
 
 \begin{nitemize}
-\item The chart combines multiple different visual elements. In additional to the bars themselves,
+\item The chart combines multiple different visual elements. In addition to the bars themselves,
   it also needs to include the markers (dashed lines) that show the guess.
-\item The chart uses a custom color scheme, background to indicate possible area of the bar and it
+\item The chart uses a custom color scheme, and background to indicate possible areas of the bar and it
   greys out the bars for which the user has not yet made a guess.
 \item The chart is interactive, allowing the user to drag the end of the bar to any location in
   the specified range (until the button is clicked).
-\item Once the button is clicked, a brief animation runs and the bars move from the guessed
+\item Once the button is clicked, a brief animation runs, and the bars move from the guessed
   value to the actual value (the marker stays at the original position).
 \end{nitemize}
 
@@ -2724,45 +2724,45 @@ Although numerous charting libraries support some of the above features, creatin
 data visualization such as the above typically requires using a low-level visualization library
 such as D3 \citep{bostock-2011-d3}, which requires advanced programming skills.
 
-More advanced programming skills are needed if one wants to implement data visualisations
+More advanced programming skills are needed if one wants to implement data visualizations
 that support features such as brushing and linking \citep{buja-1991-linking}. The former allows
 the user to focus on a particular region of the chart, while the latter connects two charts and
 adapts the visualization in the second chart based on the data selection in the first chart.
-Implementing linking is particularly challenging, because it requires understanding what
+Implementing linking is particularly challenging because it requires understanding what
 inputs contributed to the selected data points and then recomputing the data displayed in the
 other visualization.
 
 In the following two sections, I provide an overview of two systems that are presented in
 Part~\ref{part:visualization}. The systems make it easier to create rich interactive
-visualisations. First, the paper included as Chapter~\ref{ch:compost} presents Compost, a novel
+visualizations. First, the paper included as Chapter~\ref{ch:compost} presents Compost, a novel
 functional data visualization library that makes it possible to compose rich charts
 from a small number of primitive building blocks and combinators.
 Second, the paper included as Chapter~\ref{ch:galois}
 presents a program analysis technique that can be used to automatically create linked data
-visualisations based on the code of scripts that construct charts from shared data.
+visualizations based on the code of scripts that construct charts from shared data.
 The two systems are aimed at programmers, but they are simple in that they make it possible
-to create sophisticated interactive visualisations using small amount of straightforward code.
+to create sophisticated interactive visualizations using a small amount of straightforward code.
 
 Both of the papers introduced in this chapter use programming language research methods.
 Chapter~\ref{ch:galois} presents the analysis technique formally, using a small model
-programming language and discusses its properties. Chapter~\ref{ch:compost} gradually introduces
+programming language, and discusses its properties. Chapter~\ref{ch:compost} gradually introduces
 the concepts of the Compost library in the form of a tutorial. Published as a
 functional pearl \citep{gibbons-2010-pearl}, it relies on the tacit assessment of the functional
 programming community.
 
 \section{Visualisations to encourage critical thinking}
 
-Data visualisations that aim to present data-driven insights to a broader audience often
+Data visualizations that aim to present data-driven insights to a broader audience often
 require significant programming effort. The ``You draw it'' series by New York Times
 \citep{aisch-2015-youdraw} lets the user draw on the chart, while the award-winning visualization
 of population density in Asian cities by \cite{bremer-2015-asia} tells a story through multiple
-animated and interlinked charts. Visualisations like these are often built using D3
+animated and interlinked charts. Visualizations like these are often built using D3
 \citep{bostock-2011-d3}, by constructing the chart piece by piece. D3~is easier than drawing
 pixels or primitive shapes, but it still requires tediously transforming values to coordinates,
-specifying positions in pixels and modifying shape properties in response to events.
+specifying positions in pixels, and modifying shape properties in response to events.
 
-Higher-level compositional approaches to chart construction are typically based on grammar of
-graphics \citep{wilkinson-1999-grammar}. In grammar of graphics, a chart is a mapping from
+Higher-level compositional approaches to chart construction are typically based on the grammar of
+graphics \citep{wilkinson-1999-grammar}. In the grammar of graphics, a chart is a mapping from
 data to chart elements and their visual attributes. Libraries based on this idea include
 ggplot2 \citep{satyanaran-2016-vega,wickham-2016-ggplot2} and Vega \citep{wickham-2010-layered}.
 The mapping is limited to a number of built-in operations, which works well for common types of
@@ -2796,11 +2796,11 @@ languages, finding the right primitives is more of an art than science. The Comp
 is designed in a way that gives it a number of desirable properties:
 
 \begin{nitemize}
-\item Concepts such as bar charts, line charts or charts with aligned
+\item Concepts such as bar charts, line charts, or charts with aligned
   axes are all expressed in terms of more primitive building blocks using a small number of combinators.
 \item The primitives are specified in domain terms. When drawing a line, the value of an $y$ coordinate
   is an exchange rate of 1.36 USD/GBP, not 67 pixels from the bottom.
-\item Common chart types such as bar charts or line charts can be easily captured as high level
+\item Common chart types such as bar charts or line charts can be easily captured as high-level
   abstractions, but many interesting custom charts can be created as well.
 \item The approach can easily be integrated with the Elm architecture \citep{czaplicki-2016-mvu}
 	to create web-based charts that involve animations or interaction with the user.
@@ -2809,7 +2809,7 @@ is designed in a way that gives it a number of desirable properties:
 \subsection{Declarative chart descriptions}
 
 To illustrate the first two points, consider the chart in Figure~\ref{fig:compost}, which
-compares UK election results for years 2017 and 2019. In the chart, the $x$ axis shows categorical
+compares UK election results for the years 2017 and 2019. In the chart, the $x$ axis shows categorical
 values representing the political parties such as ``Conservative'' or ``Labour''. The
 $y$ axis shows numerical values representing the number of seats won such as 365 MPs.
 When creating a chart, most high-level libraries such as Google Charts expect values in domain
@@ -2837,7 +2837,7 @@ categorical value such as ``Green''.
 \end{figure}
 
 Assuming we have a list \texttt{elections} which contains 5-element tuples with the party name,
-colours for 2017 and 2019 and number of MPs for 2017 and 2019, we can construct the chart in
+colours for 2017 and 2019 and the number of MPs for 2017 and 2019, we can construct the chart in
 Figure~\ref{fig:compost} as follow (using F\# or similar language with list comprehensions):
 
 \begin{lstlisting}[language=sharp,mathescape=true]
@@ -2856,13 +2856,13 @@ axis$_l$ (axis$_b$ (overlay [
 
 \noindent
 The central part of the code (lines 4-6 and 7-9) constructs two filled rectangles (bars)
-representing number of MPs for 2017 and 2019, respectively. Each rectangle is specified
+representing the number of MPs for 2017 and 2019, respectively. Each rectangle is specified
 by four corners (separated using ``;''). The $y$ axis is continuous and the rectangle occupies
 space from 0 to the specified number. The $x$ axis is categorical. The first bar takes the
 first half of the space available for the party ($0$ to $0.5$) while the second occupies the
 second half ($0.5$ to $1$). We then compose the two rectangles using \texttt{overlay}, which
 ensures they are rendered on a shared scale. The \texttt{padding} primitive adds a space around
-a given shape (specified in pixels). We generate pair of rectangles for each party using a
+a given shape (specified in pixels). We generate a pair of rectangles for each party using a
 list comprehension and then overlay all the rectangles before adding axes on the left and bottom.
 
 In addition to the primitives illustrated by the above example, Compost has a number of
@@ -2873,7 +2873,7 @@ scales) and nests it inside an explicitly specified range. We can, for example, 
 defined by a categorical value (from $\texttt{cat}~c, 0$ to $\texttt{cat}~c, 1$) and nest
 another shape, or even a line chart, inside this space. In practice, this is useful for combining
 multiple charts. The combinator can also apply to one axis only, making it possible to create
-two charts that are side-by-side on one axis, but share the other axis.
+two charts that are side-by-side on one axis but share the other axis.
 
 \subsection{Rendering a Compost chart}
 
@@ -2884,25 +2884,25 @@ by the simple functional program above and transforms it to an SVG in three step
 \item \emph{Inferring the scales of a shape}. The implementation first recursively walks over
   the composed shape and infers the ranges of the $x$ and $y$ scales of the shape. For shapes
   constructed using \texttt{overlay}, this unions the ranges of the scales of the contained
-  shapes. In case of continuous scale, we take the overall minimum and maximum. For categorical
+  shapes. In the case of continuous scale, we take the overall minimum and maximum. For a categorical
   scale, the sets of categories obtained for each shape are unioned.
 
 \item \emph{Projecting coordinates}. Once the chart is annotated with the inferred scales, we
   turn all positions from values defined in domain terms to values specified in pixels. This
   is done using a projection function that takes a scale, a space it should be mapped onto
-  (in pixels) and a value on the scale. The result are $x$ and $y$ coordinates in pixels.
+  (in pixels) and a value on the scale. The results are $x$ and $y$ coordinates in pixels.
 
 \item \emph{Rendering chart shapes}. Finally, the recursively defined shape is turned into
   a flat list of shapes in the SVG format. This involves collecting and concatenating
-  all the primitive shapes, lines and text elements.
+  all the primitive shapes, lines, and text elements.
 \end{nitemize}
 
 The implementation of the core logic consists of only 800 lines of code. Although the
-process is conceptually simple, there is a number of subtle details. In particular,
+process is conceptually simple, there are a number of subtle details. In particular,
 operations that specify some parameters in pixels (such as padding) have to transform the
 projection operation so that the resulting shapes only occupy a space without the specified padding.
 Nesting also requires keeping track of the outer range and the inner scale. It is also worth
-noting that some operations, such as \texttt{axis} that adds an axis with labels, can be eliminated
+noting that some operations, such as \texttt{axis} that add an axis with labels, can be eliminated
 at some point in the process. In particular, \texttt{axis} is replaced by overlaid lines and text
 elements in the first step.
 
@@ -2948,18 +2948,18 @@ One last interesting aspect of the Compost library that is discussed in Chapter~
 is the support for interactivity. The library can be used in conjunction with the
 Elm (model-view-update) architecture \citep{czaplicki-2016-mvu} where the programmer defines
 the program \emph{state} and \emph{events}. They then provide a function that renders
-a chart based on the current state. They also specify a function that updates the sate when
+a chart based on the current state. They also specify a function that updates the state when
 an event occurs. For example, in the earlier interactive chart in Figure~\ref{fig:youguess},
 one event is clicking on a bar, which then updates the guessed value. Compost makes programming
 such charts easier by reporting events in terms of domain values (using a backward projection).
-When user clicks on a bar, the event handler receives a pair of values such as
+When the user clicks on a bar, the event handler receives a pair of values such as
 $\texttt{cat}~\textnormal{``Health''}, 0.3$ and $\texttt{cont}~12.7$. It then updates the
 guessed value for the category Health to the new value 12.7\% GDP.
 
-\section{Automatic linking for data visualisations}
+\section{Automatic linking for data visualizations}
 
 The Compost library makes it possible to compose an appealing data visualization from individual
-graphical elements. This is necessary if we want to create rich interactive charts. But a single
+graphical elements. This is necessary if we want to create rich interactive charts. However a single
 chart that offers a single perspective is not enough if we want to explain complex data. To
 support better understanding, \emph{linked visualisations} \citep{buja-1991-linking}
 consist of multiple charts that display different aspects of the same data. When the user
@@ -2971,7 +2971,7 @@ For example, consider the visualization in Figure~\ref{fig:fluid} that displays 
 on energy production over time for different countries and different types of energy.
 A single chart with three variables would be difficult to read, so the visualization
 instead filters and aggregates the data in two ways. It shows data per country for the year
-2015 and ratio of energy produced in the USA and China over time for each type of energy.
+2015 and the ratio of energy produced in the USA and China over time for each type of energy.
 The user can select a particular data point (bar on the left, point on the right). If they
 select the bar representing the USA, the system infers which input data contributed to the
 value (data for all types of energy for the USA in 2015) and computes what chart elements depend
@@ -2988,18 +2988,18 @@ China and the USA.
   \label{fig:fluid}
 \end{figure}
 
-Constructing linked visualization like the one in Figure~\ref{fig:fluid} is difficult,
+Constructing linked visualization like the one in Figure~\ref{fig:fluid} is difficult
 because the data visualization needs to understand how to map selection between the charts.
 This can be done automatically for simple data transformations in libraries based on the
 grammar of graphics such as Altair~\citep{vanderplas-2018-altair}. In those, simple data
 transformations can be expressed using primitives provided by the library. However, the
 approach does not work if the data transformation is more complex or if the user prefers to
 express it in an ordinary programming language (as ordinary list processing) as opposed to
-using a special-purpose domain specific language (grammar of graphics primitives).
+using a special-purpose domain-specific language (grammar of graphics primitives).
 
 In Chapter~\ref{ch:galois}, we use dynamic dependency analysis techniques
-to simplify the creation of linked data visualisations. Those techniques have
-traditionally been used in areas such as information-flow security, optimisation and
+to simplify the creation of linked data visualizations. Those techniques have
+traditionally been used in areas such as information-flow security, optimization, and
 debugging. In our work, we extend the techniques so that they can provide fine-grained
 dependency information for programs constructing structured outputs, such as the data structures
 used to describe charts in the Compost data visualization library. We introduce a simple
@@ -3008,11 +3008,11 @@ transformations and construct charts. By combining two dynamic dependency analys
 then automatically infer the relationships between multiple charts constructed from the
 same data.
 
-\subsection{Creating linked visualisations using Fluid}
+\subsection{Creating linked visualizations using Fluid}
 
 Consider again the visualization shown in Figure~\ref{fig:fluid}. The two charts are
 based on the same input data, which is a collection of records storing the country, energy
-type, year and the amount produced. To produce the chart on the left, we filter the data by
+type, year, and the amount produced. To produce the chart on the left, we filter the data by
 year and then sum the produced energy for each of the countries. In Fluid, this is written as
 a simple functional program using list comprehensions:
 %
@@ -3036,13 +3036,13 @@ The program analysis automatically infers what values from the source \texttt{da
 contribute to the resulting \texttt{y} value, computed using the \texttt{totalFor} function.
 The relevant rows are only those for the year 2015 (due to the filtering) and only those for
 the given country (due to the \texttt{totalFor} implementation). It is worth noting that unlike
-approaches based on grammar of graphics, we are not restricted to a set of pre-defined primitives.
+approaches based on the grammar of graphics, we are not restricted to a set of pre-defined primitives.
 The data transformation can be arbitrary and we can write it using custom functions such as
 \texttt{totalFor}.
 
-The code to construct the second chart is slightly more complicated, because it constructs a
+The code to construct the second chart is slightly more complicated because it constructs a
 line chart with multiple lines. It defines \texttt{series} helper to obtain a time series for
-a given country and energy type, \texttt{plot} helper that calculates ratio between the USA and
+a given country and energy type, \texttt{plot} helper that calculates the ratio between the USA and
 China for a given energy type and then composes the chart:
 %
 \begin{lstlisting}[language=fluid,mathescape=true]
@@ -3058,13 +3058,13 @@ LineChart { plots: [
 \end{lstlisting}
 %
 The example illustrates two requirements that we have for dynamic dependency analyses that
-let us automatically generate linked data visualisations. First, we are not interested in the
-resources (code and data) needed to produce the entire result, but only in resources needed to
+let us automatically generate linked data visualizations. First, we are not interested in the
+resources (code and data) needed to produce the entire result, but only in the resources needed to
 produce a part of the result. Specifically, if the user clicks on a data point of the line chart,
 we want to know what resources contributed to the \texttt{data} field of a specific record in the
 list passed to one particular \texttt{LinePlot}. In the analyses, we address this by introducing
 the concept of a selection for structured values, which lets us mark a particular part of the
-value. (We use this mechanism for analysing charts, but it could equally be used to analyse code
+value. (We use this mechanism for analyzing charts, but it could equally be used to analyze code
 that produces e.g., representations of documents.)
 
 Second, we need multiple different kinds of dependency analyses to automatically link the charts.
@@ -3077,7 +3077,7 @@ This, again, needs to determine parts of the output that needed the specific par
 even if they also needed other unmarked inputs (an alternative analysis would look for outputs
 that only needed the particular inputs).
 As we will see, this analysis leads to four different program analyses.
-We use two of them to automatically generate linked data visualisations.
+We use two of them to automatically generate linked data visualizations.
 
 \newcommand*{\evalBwdR}[1]{{\mathrel{\rotatebox[origin=c]{45}{$\Rightarrow$}}}_{#1}}
 \newcommand*{\evalFwdR}[1]{{\mathrel{\rotatebox[origin=c]{-45}{$\Rightarrow$}}}_{\hspace{-0.2em}#1}}
@@ -3096,7 +3096,7 @@ The analyses are built around the central notion of a program trace $T$. The tra
 are generated during program evaluation and they collect information about how the
 evaluation proceeded. More formally, a trace is a compact representation of the derivation
 trees in the operational semantics. Given a program $e$ and a variable environment $\rho$,
-the following judgement states that the program reduces to a value $v$, producing a trace $T$:
+the following judgment states that the program reduces to a value $v$, producing a trace $T$:
 %
 \begin{equation*}
 T :: \rho, e \Rightarrow v
@@ -3104,7 +3104,7 @@ T :: \rho, e \Rightarrow v
 %
 The program analyses operate on values where some parts are marked as selected. For example,
 if a program $e$ produces a value $v$ that represents a chart using the primitives of the Compost
-library, we can mark some parts of the resulting chart, for example a bar created using the
+library, we can mark some parts of the resulting chart, for example, a bar created using the
 \texttt{fill} primitive.
 
 Formally, we annotate values and terms with selection states $\alpha$ from a bounded
@@ -3115,7 +3115,7 @@ $v_1\, \textnormal{\textbf{:}}_\alpha\, v_2$. This would indicate that we are in
 data that determined that the list will be non-empty (but not the specific values it contains).
 In practice, the most useful kind of annotation is a two-point lattice (selected, non-selected),
 but the generality allows for other uses, such as a vector of selections (to be computed in one
-step and displayed using different colours).
+step and displayed using different colors).
 
 \subsection{Bidirectional dependency analyses}
 
@@ -3147,7 +3147,7 @@ what can be computed using the same data using $\evalFwdR{T}$, we may find that 
 the value can also be computed, but the original selection will certainly also be included.
 
 Interestingly, the forward and backward data dependency analyses are not sufficient to
-support linked data visualisations. The backward analysis can correctly determine what parts of
+support linked data visualizations. The backward analysis can correctly determine what parts of
 the input are needed in order to produce the selected output. However, to highlight the related
 elements of the other chart, we do not need to know what the input selection is \emph{sufficient}
 for, but what it is \emph{necessary} for. In other words, we do not need to know what can be
@@ -3193,7 +3193,7 @@ of rich interactive charts that assist the viewer gain deeper insight into the p
 While producing simple charts is often easy, building a visualization that combines custom
 visual elements, interactivity and allows linking multiple charts requires advanced programming
 skills. Unlike with the work outlined in Chapter~\ref{ch:iterative}, I do not hope that the work
-presented here will allow non-programmers to create rich interactive data visualisations.
+presented here will allow non-programmers to create rich interactive data visualizations.
 However, Compost and Fluid show that programming data visualisations that encourage critical
 thinking about data can be significantly easier than using systems that are widely used today.
 
@@ -3208,12 +3208,12 @@ on a continuous numerical scale or a categorical scale (with 0 to 1 range for ea
 
 The work included as Chapter~\ref{ch:galois} uses dynamic program analysis techniques to
 automatically create linked data visualization where the user can explore relationships between
-data in multiple charts. The system works by analysing the program that is used to construct the
+data in multiple charts. The system works by analyzing the program that is used to construct the
 chart from source data (by filtering and aggregating it in various ways). When the user clicks on
 an element of a chart, the system uses two different dynamic dependency analysis techniques to
 highlight elements of other charts that depend on the same data as the element selected by the user.
 The Chapter~\ref{ch:galois} uses methods of programming language theory to describe the mechanism.
-We formalise the programming language, define two analyses, derive their duals, and describe their
+We formalize the programming language, define two analyses, derive their duals, and describe their
 formal properties.
 
 Although the prototype implementation of the two systems is not currently integrated, the
@@ -3228,7 +3228,7 @@ and now concludes with data visualization. This is the last step in an explorato
 the data science lifecycle where the aim is to understand and explain interesting aspects of data.
 An illuminating data visualization that conveys interesting insights found in data is often
 the end goal of the process. The production phase that aims to turn the result of the data
-analysis into a running component of a larger system is perhaps equally interesting, but
+analysis into a running component of a larger system is perhaps equally interesting but
 is out of scope for this thesis.
 
 % ==================================================================================================
@@ -3296,7 +3296,7 @@ TaPP 2018, London, UK, July 11-12}, 2018, Melanie Herschel (Ed.). USENIX Associa
 \bibentry{petricek-2021-compost}
 \iftoggle{fulltext}{\includepdf[pages=-]{papers/compost.pdf}}
 
-\chapter{Linked visualisations via Galois dependencies}
+\chapter{Linked visualizations via Galois dependencies}
 \label{ch:galois}
 
 \bibentry{petricek-2022-galois}
@@ -3334,13 +3334,13 @@ future research directions inspired by the presented work.
 The publications selected for this thesis focus on an independent research direction that I
 have been pursuing after completing my PhD. I often developed the initial idea or a prototype,
 but many papers were the result of a broader collaboration or an attempt to integrate the idea
-with work of my colleagues and collaborators.
+with the work of my colleagues and collaborators.
 
 \begin{nitemize}
 \item \emph{Chapter~\ref{ch:fsdata}} \citep{petricek-2016-data} -- I developed the initial version
-  of the library, developed the formal model and wrote most of the paper. Gustavo Guerra significantly
+  of the library, developed the formal model, and wrote most of the paper. Gustavo Guerra significantly
   improved the initial implementation. Don Syme first developed the CSV type provider, assisted
-  with the formalisation and provided the problem framing.
+  with the formalization, and provided the problem framing.
 \item \emph{Chapter~\ref{ch:dotdriven}} \citep{petricek-2017-dot} -- I am the sole author of the paper,
   but some aspects of the work have benefited from discussion with Don Syme.
 \item \emph{Chapter~\ref{ch:foundations}} \citep{petricek-2020-live} -- I am the sole author of the paper,
@@ -3357,7 +3357,7 @@ with work of my colleagues and collaborators.
 \item \emph{Chapter~\ref{ch:compost}} \citep{petricek-2021-compost} I am the sole author of the paper,
   but the earliest form of the idea was born in discussion with Mathias Brandewinder.
 \item \emph{Chapter~\ref{ch:galois}} \citep{petricek-2022-galois} -- The work was led by Roly Perera,
-  Minh Nguyen contributed to implementation and formalisation and Meng Wang to paper writing.
+  Minh Nguyen contributed to implementation and formalization and Meng Wang to paper writing.
   I was involved in the original conceptual development with Roly Perera and writing.
 \end{nitemize}
 
@@ -3369,8 +3369,8 @@ and MIT (all other projects) licenses.
 
 \begin{nitemize}
   \item \emph{F\# Data} (\url{https://github.com/fsprojects/FSharp.Data}) has became a widely-used
-    F\# library for data access. It implements utilities, parsers and type providers for working
-    with structured data in multiple formats (XML, JSON, HTML and CSV). I developed the initial
+    F\# library for data access. It implements utilities, parsers, and type providers for working
+    with structured data in multiple formats (XML, JSON, HTML, and CSV). I developed the initial
     version of the library and later described it in the paper included as Chapter~\ref{ch:fsdata}.
     The library has since attracted over 100 industry contributors and further development has been
     led by industry maintainers including Gustavo Guerra, Colin Bull, Chet Husk, Taylor Wood,
@@ -3380,20 +3380,20 @@ and MIT (all other projects) licenses.
     environment for non-programmers such as data journalists. It implements the iterative
     prompting mechanism for data access (Chapters~\ref{ch:thegamma} and \ref{ch:dotdriven})
     and live preview mechanism (Chapter~\ref{ch:foundations}). I created most of the implementation.
-    May Yong, Nour Boulahcen and Tom Knowles implemented support for further data sources and
+    May Yong, Nour Boulahcen, and Tom Knowles implemented support for further data sources and
     worked on case studies using the system. Live demos using the environment
-    in a web browser can  be found at \url{https://thegamma.net} and \url{https://turing.thegamma.net}.
+    in a web browser can be found at \url{https://thegamma.net} and \url{https://turing.thegamma.net}.
 
   \item \emph{Wrattler} (\url{https://github.com/wrattler}) is an experimental notebook system
     described in Chapter~\ref{ch:wrattler} that tracks dependencies between cells, makes it
     possible to combine multiple languages in a single notebook and hosts AI assistants for
     data wrangling described in Chapter~\ref{ch:aia}. I created the initial prototype and oversaw
     later development done mainly by May Yong and Nick Barlow with contributions from
-    Roly Perera, Camila Rangel Smith, Gertjan van den Burg and others. More information can be
+    Roly Perera, Camila Rangel Smith, Gertjan van den Burg, and others. More information can be
     found at \url{http://www.wrattler.org}.
 
   \item \emph{Compost.js} (\url{https://github.com/compostjs}) is a composable library for creating
-    data visualisations described in Chapter~\ref{ch:compost}. Although the library is implemented
+    data visualizations described in Chapter~\ref{ch:compost}. Although the library is implemented
     in the F\# language, it is compiled to JavaScript and provides a convenient interface for
     Java\-Script users. I am currently the sole developer of the library, although it also served
     as a design inspiration for some aspects of Fluid (below). A range of demos illustrating the
@@ -3401,11 +3401,11 @@ and MIT (all other projects) licenses.
     \url{https://compostjs.github.io}.
 
   \item \emph{Fluid} (\url{https://github.com/explorable-viz/fluid}) is a programming language
-    for building linked data visualisations described in Chapter~\ref{ch:galois}. The project has
+    for building linked data visualizations described in Chapter~\ref{ch:galois}. The project has
     since been developed into a general-purpose language for transparent, self-explanatory research
     outputs by the Institute of Computing for Climate Science, University of Cambridge. The
     development has been led by Roly Perera with recent contributions from Joseph Bond and
-    Achintya Rao. I participated in the project in advisory role and collaborated on some of the
+    Achintya Rao. I participated in the project in an advisory role and collaborated on some of the
     research behind the implementation. A live example can be found at \url{https://f.luid.org}.
 \end{nitemize}
 
@@ -3416,13 +3416,13 @@ and MIT (all other projects) licenses.
 From a narrow technical perspective, the work presented in this thesis may seen as
 an assorted list of contributions to a wide range of research areas including type systems,
 programming languages, provenance tracking, interactive programming environments, data wrangling,
-data visualization and program analysis. But looking at the work from this perspective would be
+data visualization, and program analysis. But looking at the work from this perspective would be
 missing the forest for the trees. Collecting the individual contributions in
 a single body of work reveals two unifying themes behind the research.
 
-The first unifying theme is the broader motivation. If the society is to benefit from the
+The first unifying theme is the broader motivation. If society is to benefit from the
 increasing availability of open data and data processing capabilities, we must make working
-with data accessible to broader audience. Experts who are not trained as programmers need to
+with data accessible to a broader audience. Experts who are not trained as programmers need to
 be able to gain valuable insights from data. They also need to be able to do so in ways that
 support transparency and openness and encourage critical engagement with data.
 Unlike in much programming languages research where the typical user is a professional
@@ -3432,10 +3432,10 @@ with the broader public.
 
 The above motivation justifies a number of technical choices made in the presented work.
 I typically tried to make some aspect of programming simpler, reduce the complexity of
-programming or design and develop tools that will assist with the task. The focus made
-it possible to restrict problems in ways that would, in other context, seem too constrained.
+programming or design, and develop tools that will assist with the task. The focus made
+it possible to restrict problems in ways that would, in other contexts, seem too constrained.
 Examples include the data exploration calculus, which does not let users introduce custom
-abstractions and the iterative prompting mechanism, which restricts aggregations in a query
+abstractions, and the iterative prompting mechanism, which restricts aggregations in a query
 to a fixed set of pre-defined operations. I believe in the value of restrictions
 like these. A programming language research is as much a designer as a scientist and
 designers ``tend to (\ldots) seek, or impose a `primary generator' (\dots) which both
@@ -3464,9 +3464,9 @@ direction outlined in this thesis is still the right one. In many of the systems
 in this thesis, my aim has been to make the code of a data analysis or data visualization
 as simple as possible, possibly to the point where a non-programmer would be able to read
 and understand it. With the rise of LLMs, the ability to review and understand code is
-becoming even more important. If we are faced with a data processing task and use a 100 line
+becoming even more important. If we are faced with a data processing task and use a 100-line
 script generated by an LLM, it may be difficult to gain confidence in the results. But if
-we use a 10 line script in a language like The Gamma that has been generated with the assistance
+we use a 10-line script in a language like The Gamma that has been generated with the assistance
 of an LLM, as recently explored by \cite{fromm-2024-llm}, and if the step-by-step execution
 of the program can be inspected through live previews, gaining the confidence in the results may be much easier.
 
@@ -3474,17 +3474,17 @@ of the program can be inspected through live previews, gaining the confidence in
 
 Looking at the problem of data exploration from the perspective of programming languages
 is beneficial in both directions. On the one hand, the programming languages perspective
-lets us see the problem in new ways and develop new, simple, practical and more principled
+lets us see the problem in new ways and develop new, simple, practical, and more principled
 tools for data exploration. This has been the subject of the present thesis. On the other hand,
 a close look at how data scientists interact with programming tools also forces us to rethink
-how we conceptualise programming languages. We need to think less about \emph{programming languages}
+how we conceptualize programming languages. We need to think less about \emph{programming languages}
 and more about interactive and stateful \emph{programming systems}. I started exploring this
 perspective in recent joint work with \cite{jakubovic-2023-techdims}.
 
-When working with data, data scientists often interleave writing of code, running it and
+When working with data, data scientists often interleave writing of code, running it, and
 manual tweaking of data and script parameters. If we look merely at the programming languages
 they use, the work may seem uninteresting. But if we look at the rich interactions between
-current state, scripts that data scientists are tweaking and what they see on the screen,
+the current state, scripts that data scientists are tweaking and what they see on the screen,
 we can see that data exploration is a remarkably interesting kind of programming practice.
 We should thus see programming more as an interaction with a stateful and interactive system
 than as the process of writing of textual code. To study programming from this perspective,
