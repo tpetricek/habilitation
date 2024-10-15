@@ -173,14 +173,62 @@ runcolor=Black
 %\setcounter{secnumdepth}{0} % sections are level 1
 
 
+\newtoggle{printpage}
 \newtoggle{fulltext}
 %\toggletrue{fulltext}
 \togglefalse{fulltext}
+%\toggletrue{printpage}
+\togglefalse{printpage}
 
 \begin{document}
-\title{\Huge\textbf{Simple programming tools \\for data exploration}}
-\author{Tomas Petricek}
-\maketitle
+\iftoggle{printpage}{
+\pagestyle{empty}
+\begin{center}
+
+{\huge Charles University\\[0.2em]
+Faculty of Mathematics and Physics}
+
+\vfill
+
+{\fontsize{30}{30}\selectfont Habilitation Thesis}
+
+\vfill
+
+{\huge 2024\hfill Tomas Petricek}
+
+\end{center}
+
+\newpage
+}
+
+\pagestyle{empty}
+\begin{center}
+
+\noindent\includegraphics[width=40em]{img/mff.png}}}
+
+\vspace{8em}
+
+{\fontsize{30}{30}\selectfont Simple programming tools \\[0.2em] for data exploration}
+
+\vspace{2em}
+
+{\huge Tomas Petricek}
+
+\vspace{15em}
+
+{\Large\scshape Habilitation Thesis}
+
+\vspace{1em}
+
+{\Large Computer Science, Software Systems}
+
+\vfill
+
+{\Large Prague \hfill 2024}
+
+\end{center}
+
+\newpage
 
 \chapter*{Acknowledgements}
 \label{ch:preface}
